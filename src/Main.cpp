@@ -1,74 +1,20 @@
-#include <windows.h>
+#include "Renderer.h"
 
-// This brings in all the openGL functions we might need so 
-// we can talk to OpenGL
-#include <gl/GL.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-#define REF(v) (void)v;
+#if 0
+struct Image {
+	int w;
+	int h;
+	const char* pixel_data;
+};
 
-// TODO: Handle input in a more efficient way (unordered map)
+Image load_image(const char* file_path) {
 
-void init_open_gl(HWND window) {
-	HDC window_dc = GetDC(window);
-
-	// IMPORTANT: There is a lot of randomness to this. Don't be discouraged if 
-	// you don't remember it all.
-
-	// PIXEL FORMAT DESCRIPTOR: The Pixel Format Descriptor (PFD) is a structure 
-	// used in Windows-based OpenGL applications to define the properties and 
-	// Windows content will be drawn. This structure provides essential information 
-	// about how pixels are handled in the rendering context, including color depth, 
-	// buffer types, transparency, and other graphical features like depth and stencil 
-	// buffers.
-	
-	// NOTE: The pixel format descriptor is a negotiation we don't 
-	// actually fill out a format descriptor, we find one
-	PIXELFORMATDESCRIPTOR desired_pixel_format = {};
-	desired_pixel_format.nSize = sizeof(desired_pixel_format);
-	desired_pixel_format.nVersion = 1;
-	desired_pixel_format.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER;
-	desired_pixel_format.cColorBits = 32;
-	desired_pixel_format.cAlphaBits = 8;
-	desired_pixel_format.iLayerType = PFD_MAIN_PLANE;
-
-	// NOTE: We ask for the pixel format the the one above matches the closes
-	int suggested_pixel_format_index = ChoosePixelFormat(window_dc, &desired_pixel_format);
-	PIXELFORMATDESCRIPTOR suggested_pixel_format;
-	// NOTE: Sets the members of the PIXELFORMATDESCRIPTOR structure pointed to by ppfd 
-	// with that pixel format data.
-	DescribePixelFormat(
-		window_dc,
-		suggested_pixel_format_index,
-		sizeof(suggested_pixel_format),
-		&suggested_pixel_format
-	);
-	SetPixelFormat(window_dc, suggested_pixel_format_index, &suggested_pixel_format);
-
-	HGLRC open_gl_rc = wglCreateContext(window_dc);
-	if (wglMakeCurrent(window_dc, open_gl_rc)) {
-		// Success
-	} else {
-		// failure
-	}
-	ReleaseDC(window, window_dc);
+	// stbi_load();
 }
-
-void* GetAnyGLFuncAddress(const char *name) {
-  void *p = (void *)wglGetProcAddress(name);
-  if(p == 0 ||
-    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
-    (p == (void*)-1) )
-  {
-    HMODULE module = LoadLibraryA("opengl32.dll");
-    p = (void *)GetProcAddress(module, name);
-  }
-
-  return p;
-}
-
-void load_open_gl_functions() {
-
-}
+#endif 
 
 LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
 	// Returning 0 means we processed the message
@@ -136,6 +82,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	}
 
 	init_open_gl(window_handle);
+
+	create_renderer();
+
+	draw_triangle();
 
 	bool running = true;
 	while (running) {
