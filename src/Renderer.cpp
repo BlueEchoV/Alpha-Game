@@ -1,6 +1,9 @@
 #include "Renderer.h" 
 #include "GL_Functions.h"
 
+#define GL_REPEAT                         0x2901
+#define GL_MIRRORED_REPEAT                0x8370
+
 void get_window_size(HWND window, int& w, int& h) {
 	RECT rect = {};
 	if (GetClientRect(window, &rect) != 0) {
@@ -13,7 +16,143 @@ void get_window_size(HWND window, int& w, int& h) {
 	}
 }
 
-void init_open_gl(HWND window) {
+enum SHADER_PROGRAM {
+	SP_2D_BASIC
+};
+
+GLuint create_shader(const char* file_path, GLenum gl_shader_type) {
+	FILE* file = fopen(file_path, "rb");
+	if (file == NULL) {
+		log("Error: Failed to open shader file");
+		return 0;
+	}
+	
+	fseek(file, 0, SEEK_END);
+	UINT32 length = ftell(file);
+	rewind(file);
+
+	// NOTE: Allocate a empty buffer
+	std::string shader_source_buffer(length, ' ');
+
+	// NOTE: Buffer to the pointer to the first character
+	fread(&shader_source_buffer[0], 1, length, file);
+
+	fclose(file);
+
+	GLuint shader;
+	shader = glCreateShader(gl_shader_type);
+
+	const char* shader_source_c_str = shader_source_buffer.c_str();
+	glShaderSource(shader, 1, &shader_source_c_str, NULL);
+	glCompileShader(shader);
+
+	int success;
+	char info_log[512];
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(shader, 512, NULL, info_log);
+		log(info_log);
+		return 0;
+	}
+
+	return shader;
+}
+
+GLuint create_shader_program(const char* vs_file_path, const char* fs_file_path) {
+	GLuint vs = create_shader(vs_file_path, GL_VERTEX_SHADER);
+	GLuint fs = create_shader(fs_file_path, GL_FRAGMENT_SHADER);
+
+	GLuint shader_program;
+	shader_program = glCreateProgram();
+
+	glAttachShader(shader_program, vs);
+	glAttachShader(shader_program, fs);
+	glLinkProgram(shader_program);
+
+	int success;
+	char info_log[512];
+	glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
+	if(!success) {
+		glGetProgramInfoLog(shader_program, 512, NULL, info_log);
+		log(info_log);
+		return 0;
+	}
+
+	// NOTE: The program stores and uses its own copy of the compiled shader code 
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	return shader_program;
+}
+
+std::unordered_map<SHADER_PROGRAM, GLuint> shader_programs;
+void load_shaders() {
+	GLuint sp_2d_basic = create_shader_program("shaders\\vs_2d_basic.txt", "shaders\\fs_2d_basic.txt");
+	shader_programs[SP_2D_BASIC] = sp_2d_basic;
+}
+
+LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
+	// Returning 0 means we processed the message
+	LRESULT result = 0;
+
+	switch(message) {
+	case WM_SIZE: {
+		OutputDebugStringA("WM_SIZE\n");
+		break;
+	}
+	case WM_ACTIVATEAPP: {
+		OutputDebugStringA("WM_ACTIVATEAPP\n");
+		break;
+	} 	
+	case WM_CLOSE: {
+		log("Destroying window");
+		DestroyWindow(window);
+		break; 
+	} 
+	case WM_DESTROY: {
+		PostQuitMessage(0);
+		OutputDebugStringA("WM_DESTROY\n");
+		break;
+	}
+	default: {
+		result = DefWindowProc(window, message, wparam, lparam);
+		break;
+	}
+	}
+
+	return result;
+}
+
+HWND init_windows(HINSTANCE hInstance) {
+	WNDCLASSA wnd_class = {};
+
+	wnd_class.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	wnd_class.lpfnWndProc = wind_proc;
+	wnd_class.hInstance = hInstance;
+	wnd_class.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wnd_class.lpszClassName = "Alpha Game";
+
+	HWND window_handle = {};
+	if(RegisterClassA(&wnd_class)) {
+		window_handle = CreateWindowExA(
+			0,
+			wnd_class.lpszClassName,	
+			"Alpha Game",
+			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			0,
+			0,
+			hInstance,
+			0);
+	}
+
+	return window_handle;
+}
+
+HDC init_open_gl(HWND window) {
 	HDC window_dc = GetDC(window);
 
 	// IMPORTANT: There is a lot of randomness to this. Don't be discouraged if 
@@ -49,12 +188,25 @@ void init_open_gl(HWND window) {
 	);
 	SetPixelFormat(window_dc, suggested_pixel_format_index, &suggested_pixel_format);
 
-	HGLRC open_gl_rc = wglCreateContext(window_dc);
-	if (wglMakeCurrent(window_dc, open_gl_rc)) {
-		// Success
-	} else {
-		// failure
-	}
+	HGLRC temp_context = wglCreateContext(window_dc);
+	wglMakeCurrent(window_dc, temp_context);
+	load_open_gl_functions();
+
+	int attrib_list[] = {
+		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+#if _DEBUG
+		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB, //WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+#endif
+		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+		0, 0
+	};
+
+	HGLRC gl_renderering_context = wglCreateContextAttribsARB(window_dc, 0, attrib_list);
+	// Make the new context current
+	wglMakeCurrent(window_dc, gl_renderering_context);
+	// Delete the garbage context
+	wglDeleteContext(temp_context);
 
 	int width = 0;
 	int height = 0;
@@ -63,83 +215,120 @@ void init_open_gl(HWND window) {
 	// NOTE: Sets the area of the window where the scene will be drawn. In this case, it 
 	//		 starts at the bottom-left corner (0, 0) and stretches to the specified width and height.
 	glViewport(0, 0, width, height);
+
+	return window_dc;
+}
+
+Renderer* create_renderer(HINSTANCE hInstance) {
+	Renderer* renderer = new Renderer();
+
+	HWND window_handle = init_windows(hInstance);
+	renderer->window_dc = init_open_gl(window_handle);
+
+	load_shaders();
+
+	return renderer;
+}
+
+void render_clear() {
 	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 	// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
 	//		 preparing it for new drawing.
 	glClear(GL_COLOR_BUFFER_BIT);
 	// NOTE: Swaps the front and back buffers, showing the newly drawn frame on the screen 
 	//		 (double buffering). window_dc is the window's device context.
-	SwapBuffers(window_dc);
-
-	ReleaseDC(window, window_dc);
 }
 
-void create_renderer() {
-	load_open_gl_functions();
+void render_copy() {
+
 }
 
-float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+void render_present(Renderer* renderer) {
+	SwapBuffers(renderer->window_dc);
+}
+
+GLuint create_gl_texture(const char* file_path) {
+	GLuint texture;
+	glGenTextures(1, &texture);  
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// Set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	// NOTE: A common mistake is to set one of the mipmap filtering options as the magnification 
+	// filter. This doesn't have any effect since mipmaps are primarily used for when textures
+	// get downscaled: texture magnification doesn't use mipmaps and giving it a mipmap filtering
+	// option will generate an OpenGL GL_INVALID_ENUM error code.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Load and generate the texture
+	int width, height, n_channels;
+	unsigned char* data = stbi_load(file_path, &width, &height, &n_channels, 4);
+	DEFER{
+		stbi_image_free(data);
+	};
+	assert(n_channels == 4);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	} else {
+		log("Error: Failed to stbi_load texture");
+		return 0;
+	}
+
+	return texture;
+}
+
+// Square
+Vertex_2D vertices[] = {
+	//     Position			      Color          Texture Coor
+	{-0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 0.0f}, // Bottom left
+	{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, {1.0f, 0.0f}, // Bottom Right
+	{ 0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, {1.0f, 1.0f}, // Top Right
+	{-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f}, // Top Left
 };  
+unsigned int indices[] = {
+	// The indices order in which we draw the two triangles
+	0, 1, 2, 2, 3, 0 
+};
 
 GLuint vbo;
-void draw_triangle() {
+GLuint vao;
+GLuint ebo;
+void init_texture() {
+	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &ebo);
+
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	const char* vertexShaderSource = 
-		"#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	GLuint vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		log("Error: Vertex shader compilation failed");
-	}
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_2D), (void*)offsetof(Vertex_2D, pos));
+	glEnableVertexAttribArray(0);  
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_2D), (void*)offsetof(Vertex_2D, color));
+	glEnableVertexAttribArray(1);  
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_2D), (void*)offsetof(Vertex_2D, texture_coor));
+	glEnableVertexAttribArray(2);  
 
-	const char* fragmentShaderSource = 
-		"#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n;"
-		"{\n"
-		"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n";
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		log("Error: Fragment shader compilation failed");
-	}
+	glUseProgram(shader_programs[SP_2D_BASIC]);
+}
 
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
+void draw_texture(GLuint texture) {
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindVertexArray(vao);
 
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if(!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		log("Error: Shader program linking failed");
-	}
-
-	glUseProgram(shaderProgram);
-
-	// NOTE: Delete the shaders once they are linked to the program
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);  
+	// ***Why choose glDrawElements***
+	// As you can see, there is some overlap on the vertices specified. 
+	// We specify bottom right and top left twice! This is an overhead 
+	// of 50% since the same rectangle could also be specified with only 
+	// 4 vertices, instead of 6. This will only get worse as soon as we 
+	// have more complex models that have over 1000s of triangles where 
+	// there will be large chunks that overlap
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

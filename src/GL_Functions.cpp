@@ -30,6 +30,7 @@ wglCreateContextAttribsARBFunc wglCreateContextAttribsARB = nullptr;
 glActiveTextureFunc glActiveTexture = nullptr;
 glUniform1iFunc glUniform1i = nullptr;
 glBufferSubDataFunc glBufferSubData = nullptr;
+glGenerateMipmapFunc glGenerateMipmap = nullptr;
 
 void load_open_gl_functions() {
 	glCreateShader = (glCreateShaderFunc)wglGetProcAddress("glCreateShader");
@@ -64,5 +65,9 @@ void load_open_gl_functions() {
 	glUniform1f = (glUniform1fFunc)wglGetProcAddress("glUniform1f");
 	glUniform1i = (glUniform1iFunc)wglGetProcAddress("glUniform1i");
 	glUniformMatrix4fv = (glUniformMatrix4fvFunc)wglGetProcAddress("glUniformMatrix4fv");
+	
+	wglCreateContextAttribsARB = (wglCreateContextAttribsARBFunc)wglGetProcAddress("wglCreateContextAttribsARB");
+
+	glGenerateMipmap = (glGenerateMipmapFunc)wglGetProcAddress("glGenerateMipmap");
 }
 
