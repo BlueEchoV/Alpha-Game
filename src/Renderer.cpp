@@ -219,8 +219,8 @@ HDC init_open_gl(HWND window) {
 	return window_dc;
 }
 
-Renderer* create_renderer(HINSTANCE hInstance) {
-	Renderer* renderer = new Renderer();
+MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
+	MP_Renderer* renderer = new MP_Renderer();
 
 	HWND window_handle = init_windows(hInstance);
 	renderer->open_gl.window_dc = init_open_gl(window_handle);
@@ -245,7 +245,7 @@ Renderer* create_renderer(HINSTANCE hInstance) {
 	return renderer;
 }
 
-void render_clear(Renderer* renderer) {
+void render_clear(MP_Renderer* renderer) {
 	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 	// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
 	//		 preparing it for new drawing.
@@ -254,22 +254,67 @@ void render_clear(Renderer* renderer) {
 	//		 (double buffering). window_dc is the window's device context.
 }
 
-// Copy a portion of the texture to the current renderer target
-// NULL for the entire texture. NULL for the entire rendering target.
-void render_copy(Renderer* renderer, Texture* texture, const Rect* src_rect, const Rect* dst_rect) {
-	Packet result;
+int mp_set_texture_color_mod(MP_Texture* texture, ) {
 
-	Vertex vertex
-
-	// retain the indices positions (size subtraction)
-	renderer->packets.push_back(result);
-	renderer->vertices.push_back();
-	// push back the packet
-	// push back the vertices
-	// push back the indices
 }
 
-void render_present(Renderer* renderer) {
+// Copy a portion of the texture to the current renderer target
+// NULL for the entire texture. NULL for the entire rendering target.
+void render_copy(MP_Renderer* renderer, MP_Texture* texture, const Rect* src_rect, const Rect* dst_rect) {
+	// Texture Packet
+	Packet result;
+
+// Square
+Vertex vertices[] = {
+	//     Position			      Color          Texture Coor
+	{{-0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 0.0f}}, // Bottom left
+	{{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, {1.0f, 0.0f}}, // Bottom Right
+	{{ 0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, {1.0f, 1.0f}}, // Top Right
+	{{-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f}}, // Top Left
+};  
+	// 1 
+	Vertex vertex = {};
+	vertex.pos = {};
+	vertex.texture_coor = {};
+	vertex.color = {};
+	renderer->vertices.push_back(vertex);
+
+	// 2
+	vertex = {};
+	vertex.pos = {};
+	vertex.texture_coor = {};
+	vertex.color = {};
+	renderer->vertices.push_back(vertex);
+
+	// 3
+	vertex = {};
+	vertex.pos = {};
+	vertex.texture_coor = {};
+	vertex.color = {};
+	renderer->vertices.push_back(vertex);
+
+	// 4
+	vertex = {};
+	vertex.pos = {};
+	vertex.texture_coor = {};
+	vertex.color = {};
+	renderer->vertices.push_back(vertex);
+
+	// retain the indices positions (size subtraction)
+	// push back the indices (Draw Order - 6)
+
+	renderer->indices.push_back(0);
+	renderer->indices.push_back(1);
+	renderer->indices.push_back(2);
+	renderer->indices.push_back(2);
+	renderer->indices.push_back(3);
+	renderer->indices.push_back(0);
+
+	renderer->packets.push_back(result);
+	// push back the packet
+}
+
+void mp_render_present(MP_Renderer* renderer) {
 	glBufferData(GL_ARRAY_BUFFER, renderer->vertices.size() * sizeof(Vertex), renderer->vertices.data(), GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	// NOTE: GL_BUFFER_SUB_DATA TO SAVE TIME
@@ -293,8 +338,130 @@ void render_present(Renderer* renderer) {
 	SwapBuffers(renderer->open_gl.window_dc);
 }
 
-Texture create_2d_texture(const char* file_path) {
-	Texture result;
+bool mp_is_valid_blend_mode(MP_BlendMode blend_mode) {
+	switch(blend_mode) {
+	case MP_BLENDMODE_NONE: {
+		return true;
+	} 
+	case MP_BLENDMODE_BLEND: {
+		return true;
+	} 
+	case MP_BLENDMODE_ADD: {
+		return true;
+	} 
+	case MP_BLENDMODE_MOD: {
+		return true;
+	} 
+	case MP_BLENDMODE_MUL: {
+		return true;
+	} 
+	default: {
+		return false;
+	}
+	}
+}
+// Returns 0 on success, -1 on failure
+int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode) {
+	if (texture == NULL) {
+		log("Error: Texture is NULL");
+		return -1;
+	}
+
+	if (!mp_is_valid_blend_mode(blend_mode)) {
+		return -1;
+	}
+
+	if (blend_mode != texture->blend_mode) {
+		texture->blend_mode = blend_mode;
+	}
+	return 0;
+}
+
+int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b) {
+	if (texture == NULL) {
+		log("Error: Texture is NULL");
+		return -1;
+	}
+}
+int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {
+	if (texture == NULL) {
+		log("Error: Texture is NULL");
+		return -1;
+	}
+
+	texture->mod.a = a;
+
+	return 0;
+}
+
+// NOTE: Creates a blank texture
+MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return nullptr;
+	}
+
+	MP_Texture* result = new MP_Texture();
+	result->w = w;
+	result->h = h;
+	result->pitch = 0;
+	result->pixels = NULL;
+
+	// Default values
+	mp_set_texture_blend_mode(result, MP_BLENDMODE_NONE);
+	mp_set_texture_color_mod(result, 255, 255, 255);
+	mp_set_texture_alpha_mod(result, 255);
+
+	glGenTextures(1, &result->gl_handle);  
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, result->gl_handle);
+
+	// Set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	// NOTE: A common mistake is to set one of the mipmap filtering options as the magnification 
+	// filter. This doesn't have any effect since mipmaps are primarily used for when textures
+	// get downscaled: texture magnification doesn't use mipmaps and giving it a mipmap filtering
+	// option will generate an OpenGL GL_INVALID_ENUM error code.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Allocate empty data now
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	return result;
+}
+
+void mp_destroy_texture(MP_Texture* texture) {
+	if (texture->gl_handle != 0) {
+		glDeleteTextures(1, &texture->gl_handle);
+	}
+
+	if (texture->pixels != NULL) {
+		delete texture->pixels;
+	}
+
+	delete texture;
+}
+
+// NOTE: Uploads to the GPU
+int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch) {
+
+}
+
+// NOTE: Allocates a buffer on the CPU side
+void mp_unlock_texture(MP_Texture* texture) {
+	glGenerateMipmap(GL_TEXTURE_2D);
+	// glTexSubImage2D
+}
+
+// Image* create_image() {
+// 
+// }
+
+MP_Texture mp_create_texture(const char* file_path) {
+	MP_Texture result;
 	glGenTextures(1, &result.gl_handle);  
 
 	glActiveTexture(GL_TEXTURE0);

@@ -1,8 +1,35 @@
 #pragma once
 #include "Utility.h"
 #include <unordered_map>
+#include <stdint.h>
 
 typedef unsigned int GLuint;
+
+typedef enum MP_TextureAccess
+{
+    MP_TEXTUREACCESS_STATIC,    /**< Changes rarely, not lockable */
+    MP_TEXTUREACCESS_STREAMING, /**< Changes frequently, lockable */
+    MP_TEXTUREACCESS_TARGET     /**< Texture can be used as a render target */
+} MP_TextureAccess;
+
+typedef enum MP_BlendMode
+{
+    MP_BLENDMODE_NONE = 0x00000000,     /**< no blending
+                                              dstRGBA = srcRGBA */
+    MP_BLENDMODE_BLEND = 0x00000001,    /**< alpha blending
+                                              dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
+                                              dstA = srcA + (dstA * (1-srcA)) */
+    MP_BLENDMODE_ADD = 0x00000002,      /**< additive blending
+                                              dstRGB = (srcRGB * srcA) + dstRGB
+                                              dstA = dstA */
+    MP_BLENDMODE_MOD = 0x00000004,      /**< color modulate
+                                              dstRGB = srcRGB * dstRGB
+                                              dstA = dstA */
+    MP_BLENDMODE_MUL = 0x00000008,      /**< color multiply
+                                              dstRGB = (srcRGB * dstRGB) + (dstRGB * (1-srcA))
+                                              dstA = dstA */
+    MP_BLENDMODE_INVALID = 0x7FFFFFFF
+} MP_BlendMode;
 
 struct MP_Rect {
 	int x, y;
@@ -11,6 +38,15 @@ struct MP_Rect {
 
 struct MP_Texture {
 	GLuint gl_handle;
+
+	UINT32 format;
+	int access;
+	int w, h;
+	int pitch;
+	void* pixels;
+
+	MP_BlendMode blend_mode;
+	Color_4F mod;
 };
 
 enum PACKET_TYPE {
@@ -25,8 +61,6 @@ struct Packet {
 	PACKET_TYPE type;
 
 	Packet_Texture packet_texture;
-
-	
 
 	Color_3F clear_color;
 };
@@ -58,7 +92,19 @@ struct Vertex {
 void get_window_size(HWND window, int& w, int& h);
 HDC init_open_gl(HWND window);
 void load_shaders();
-MP_Renderer* create_renderer(HINSTANCE hInstance);
+
+int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode);
+int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
+int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
+
+MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h);
+void mp_destroy_texture(MP_Texture* texture);
+
+int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
+void mp_unlock_texture(MP_Texture* texture);
+
+MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
+MP_Texture mp_create_texture();
 void mp_render_clear();
 void mp_render_present(MP_Renderer* renderer);
 GLuint create_gl_texture(const char* file_path);
