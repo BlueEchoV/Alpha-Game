@@ -65,6 +65,7 @@ void load_open_gl_functions() {
 	glUniform1f = (glUniform1fFunc)wglGetProcAddress("glUniform1f");
 	glUniform1i = (glUniform1iFunc)wglGetProcAddress("glUniform1i");
 	glUniformMatrix4fv = (glUniformMatrix4fvFunc)wglGetProcAddress("glUniformMatrix4fv");
+	glActiveTexture = (glActiveTextureFunc)wglGetProcAddress("glActiveTexture");
 	
 	wglCreateContextAttribsARB = (wglCreateContextAttribsARBFunc)wglGetProcAddress("wglCreateContextAttribsARB");
 

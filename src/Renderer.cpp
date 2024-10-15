@@ -223,14 +223,29 @@ Renderer* create_renderer(HINSTANCE hInstance) {
 	Renderer* renderer = new Renderer();
 
 	HWND window_handle = init_windows(hInstance);
-	renderer->window_dc = init_open_gl(window_handle);
+	renderer->open_gl.window_dc = init_open_gl(window_handle);
+
+	glGenVertexArrays(1, &renderer->open_gl.vao);
+	glGenBuffers(1, &renderer->open_gl.vbo);
+	glGenBuffers(1, &renderer->open_gl.ebo);
+
+	glBindVertexArray(renderer->open_gl.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, renderer->open_gl.vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->open_gl.ebo);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+	glEnableVertexAttribArray(0);  
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(1);  
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coor));
+	glEnableVertexAttribArray(2);  
 
 	load_shaders();
 
 	return renderer;
 }
 
-void render_clear() {
+void render_clear(Renderer* renderer) {
 	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 	// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
 	//		 preparing it for new drawing.
@@ -239,19 +254,51 @@ void render_clear() {
 	//		 (double buffering). window_dc is the window's device context.
 }
 
-void render_copy() {
+// Copy a portion of the texture to the current renderer target
+// NULL for the entire texture. NULL for the entire rendering target.
+void render_copy(Renderer* renderer, Texture* texture, const Rect* src_rect, const Rect* dst_rect) {
+	Packet result;
 
+	Vertex vertex
+
+	// retain the indices positions (size subtraction)
+	renderer->packets.push_back(result);
+	renderer->vertices.push_back();
+	// push back the packet
+	// push back the vertices
+	// push back the indices
 }
 
 void render_present(Renderer* renderer) {
-	SwapBuffers(renderer->window_dc);
+	glBufferData(GL_ARRAY_BUFFER, renderer->vertices.size() * sizeof(Vertex), renderer->vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	// NOTE: GL_BUFFER_SUB_DATA TO SAVE TIME
+
+	// NOTE: One VAO for now
+	glBindVertexArray(renderer->open_gl.vao);
+	for (Packet& packet : renderer->packets) {
+		if (packet.type == PT_TEXTURE) {
+			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture.gl_handle);
+
+			// ***Why choose glDrawElements***
+			// As you can see, there is some overlap on the vertices specified. 
+			// We specify bottom right and top left twice! This is an overhead 
+			// of 50% since the same rectangle could also be specified with only 
+			// 4 vertices, instead of 6. This will only get worse as soon as we 
+			// have more complex models that have over 1000s of triangles where 
+			// there will be large chunks that overlap
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
+	}
+	SwapBuffers(renderer->open_gl.window_dc);
 }
 
-GLuint create_gl_texture(const char* file_path) {
-	GLuint texture;
-	glGenTextures(1, &texture);  
+Texture create_2d_texture(const char* file_path) {
+	Texture result;
+	glGenTextures(1, &result.gl_handle);  
 
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, result.gl_handle);
 
 	// Set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -262,6 +309,10 @@ GLuint create_gl_texture(const char* file_path) {
 	// option will generate an OpenGL GL_INVALID_ENUM error code.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, 
+	// but images usually have 0.0 at the top of the y-axis.
+	stbi_set_flip_vertically_on_load(true); 
 
 	// Load and generate the texture
 	int width, height, n_channels;
@@ -275,60 +326,29 @@ GLuint create_gl_texture(const char* file_path) {
 		glGenerateMipmap(GL_TEXTURE_2D);
 	} else {
 		log("Error: Failed to stbi_load texture");
-		return 0;
+		return result;
 	}
 
-	return texture;
+	return result;
 }
 
 // Square
-Vertex_2D vertices[] = {
+Vertex vertices[] = {
 	//     Position			      Color          Texture Coor
-	{-0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 0.0f}, // Bottom left
-	{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, {1.0f, 0.0f}, // Bottom Right
-	{ 0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, {1.0f, 1.0f}, // Top Right
-	{-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f}, // Top Left
+	{{-0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 0.0f}}, // Bottom left
+	{{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, {1.0f, 0.0f}}, // Bottom Right
+	{{ 0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, {1.0f, 1.0f}}, // Top Right
+	{{-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f}}, // Top Left
 };  
 unsigned int indices[] = {
 	// The indices order in which we draw the two triangles
 	0, 1, 2, 2, 3, 0 
 };
 
-GLuint vbo;
-GLuint vao;
-GLuint ebo;
 void init_texture() {
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
-
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_2D), (void*)offsetof(Vertex_2D, pos));
-	glEnableVertexAttribArray(0);  
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_2D), (void*)offsetof(Vertex_2D, color));
-	glEnableVertexAttribArray(1);  
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_2D), (void*)offsetof(Vertex_2D, texture_coor));
-	glEnableVertexAttribArray(2);  
 
 	glUseProgram(shader_programs[SP_2D_BASIC]);
 }
 
 void draw_texture(GLuint texture) {
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBindVertexArray(vao);
-
-	// ***Why choose glDrawElements***
-	// As you can see, there is some overlap on the vertices specified. 
-	// We specify bottom right and top left twice! This is an overhead 
-	// of 50% since the same rectangle could also be specified with only 
-	// 4 vertices, instead of 6. This will only get worse as soon as we 
-	// have more complex models that have over 1000s of triangles where 
-	// there will be large chunks that overlap
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
