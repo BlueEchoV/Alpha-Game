@@ -51,4 +51,18 @@ struct Color_3F {
 	float b;
 };
 
+struct Color_4F {
+	float r;
+	float g;
+	float b;
+	float a;
+};
+
+struct Color_RGBA8 {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t a;
+};
+
 void log(const char* format, ...);

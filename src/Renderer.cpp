@@ -219,8 +219,18 @@ HDC init_open_gl(HWND window) {
 	return window_dc;
 }
 
+int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+	renderer->draw_color = { r, g, b, a };
+}
+
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	MP_Renderer* renderer = new MP_Renderer();
+
+	renderer->draw_color = { 255, 255, 255, 255 };
 
 	HWND window_handle = init_windows(hInstance);
 	renderer->open_gl.window_dc = init_open_gl(window_handle);
@@ -246,18 +256,23 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 }
 
 void render_clear(MP_Renderer* renderer) {
-	glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-	// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
-	//		 preparing it for new drawing.
-	glClear(GL_COLOR_BUFFER_BIT);
-	// NOTE: Swaps the front and back buffers, showing the newly drawn frame on the screen 
-	//		 (double buffering). window_dc is the window's device context.
+	if (renderer = NULL) {
+		log("Error: renderer is NULL");
+		return;
+	}
+
+	Packet packet = {};
+	packet.type = PT_CLEAR;
+	packet.packet_clear.clear_color = { renderer->draw_color };
+
+	renderer->packets.push_back(packet);
 }
 
-int mp_set_texture_color_mod(MP_Texture* texture, ) {
+// int mp_set_texture_color_mod(MP_Texture* texture) {
+// 
+// }
 
-}
-
+#if 0
 // Copy a portion of the texture to the current renderer target
 // NULL for the entire texture. NULL for the entire rendering target.
 void render_copy(MP_Renderer* renderer, MP_Texture* texture, const Rect* src_rect, const Rect* dst_rect) {
@@ -313,6 +328,7 @@ Vertex vertices[] = {
 	renderer->packets.push_back(result);
 	// push back the packet
 }
+#endif
 
 void mp_render_present(MP_Renderer* renderer) {
 	glBufferData(GL_ARRAY_BUFFER, renderer->vertices.size() * sizeof(Vertex), renderer->vertices.data(), GL_STATIC_DRAW);
@@ -333,6 +349,14 @@ void mp_render_present(MP_Renderer* renderer) {
 			// have more complex models that have over 1000s of triangles where 
 			// there will be large chunks that overlap
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		} 
+		if (packet.type = PT_CLEAR) {
+			Color_RGBA8 color = renderer->draw_color;
+			glClearColor(((float)color.r / 255.0f), ((float)color.g / 255.0f), ((float)color.b / 255.0f), ((float)color.a / 255.0f));
+
+			// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
+			//		 preparing it for new drawing.
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 	}
 	SwapBuffers(renderer->open_gl.window_dc);
@@ -395,7 +419,9 @@ int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {
 }
 
 // NOTE: Creates a blank texture
+// IMPORTANT: RGBA format by default
 MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h) {
+	REF(format);
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
 		return nullptr;
@@ -445,20 +471,66 @@ void mp_destroy_texture(MP_Texture* texture) {
 	delete texture;
 }
 
-// NOTE: Uploads to the GPU
-int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch) {
-
-}
-
 // NOTE: Allocates a buffer on the CPU side
-void mp_unlock_texture(MP_Texture* texture) {
-	glGenerateMipmap(GL_TEXTURE_2D);
-	// glTexSubImage2D
+int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch) {
+	if (texture == NULL) {
+		log("Error: texture is NULL");
+		return -1;
+	}
+
+	if (rect == NULL) {
+		texture->portion.w = texture->w;
+		texture->portion.h = texture->h;
+		texture->portion.x = 0;
+		texture->portion.y = 0;
+	} else {
+		if (rect->x < 0 || 
+			rect->y < 0 || 
+			rect->x > (rect->x + rect->w) || 
+			rect->y > (rect->y + rect->h)) {
+			log("Error: texture portion out of bounds");
+			return -1;
+		} else {
+			texture->portion = *rect;
+		}
+	}
+
+	//											  4 bytes per pixel
+	int buffer_size = (texture->w * texture->h) * 4;
+	uint8_t* buffer = new uint8_t[buffer_size];
+
+	*pixels = buffer;
+	*pitch = texture->w * 4;
+	texture->pixels = buffer;
+
+	return 0;
 }
 
-// Image* create_image() {
-// 
-// }
+// NOTE: Uploads to the GPU
+void mp_unlock_texture(MP_Texture* texture) {
+	if (texture == NULL) {
+		log("Error: texture is NULL");
+		return;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, texture->gl_handle);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexSubImage2D(
+		GL_TEXTURE_2D,
+		0,
+		texture->portion.x,
+		texture->portion.y,
+		texture->portion.w,
+		texture->portion.h,
+		GL_RGBA,
+		GL_UNSIGNED_BYTE,
+		texture->pixels
+	);
+
+	delete texture->pixels;
+	texture->pixels = nullptr;
+}
 
 MP_Texture mp_create_texture(const char* file_path) {
 	MP_Texture result;

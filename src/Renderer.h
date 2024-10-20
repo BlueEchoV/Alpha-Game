@@ -39,11 +39,11 @@ struct MP_Rect {
 struct MP_Texture {
 	GLuint gl_handle;
 
-	UINT32 format;
 	int access;
 	int w, h;
 	int pitch;
 	void* pixels;
+	MP_Rect portion;
 
 	MP_BlendMode blend_mode;
 	Color_4F mod;
@@ -73,20 +73,22 @@ struct Open_GL {
 	GLuint ebo;
 };
 
-struct MP_Renderer {
-	Open_GL open_gl;
-
-	std::vector<Packet> packets;
-
-	std::vector<Vertex> vertices;
-	std::vector<int> indices;
-};
-
 // 2D Vertex for now
 struct Vertex {
 	V3_F pos;
 	Color_3F color;
 	V2_F texture_coor;
+};
+
+struct MP_Renderer {
+	Open_GL open_gl;
+
+	Color_RGBA8 draw_color;
+
+	std::vector<Packet> packets;
+
+	std::vector<Vertex> vertices;
+	std::vector<int> indices;
 };
 
 void get_window_size(HWND window, int& w, int& h);
@@ -103,7 +105,10 @@ void mp_destroy_texture(MP_Texture* texture);
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
 void mp_unlock_texture(MP_Texture* texture);
 
+int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
+// void MP_DestroyRenderer(SDL_Renderer* renderer);
 MP_Texture mp_create_texture();
 void mp_render_clear();
 void mp_render_present(MP_Renderer* renderer);
@@ -113,12 +118,7 @@ void init_texture();
 void draw_texture(GLuint texture);
 
 #if 0
-struct SDL_Renderer;
-SDL_Renderer* MP_CreateRenderer(SDL_Window* window);
-int MP_GetRendererOutputSize(SDL_Renderer* sdl_renderer, int* w, int* h);
-void MP_DestroyRenderer(SDL_Renderer* renderer);
 
-int MP_SetRenderDrawColor(SDL_Renderer* sdl_renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 int MP_GetRenderDrawColor(SDL_Renderer* sdl_renderer, Uint8* r, Uint8* g, Uint8* b, Uint8* a);
 int MP_RenderClear(SDL_Renderer* sdl_renderer);
 int MP_RenderFillRect(SDL_Renderer* sdl_renderer, const SDL_Rect* rect);
