@@ -50,19 +50,24 @@ struct MP_Texture {
 };
 
 enum PACKET_TYPE {
-	PT_TEXTURE
+	PT_TEXTURE,
+	PT_CLEAR
 };
 
 struct Packet_Texture {
-	MP_Texture texture;
+	MP_Texture* texture;
+	int indices_array_index;
+};
+
+struct Packet_Clear {
+	Color_4F clear_color;
 };
 
 struct Packet {
 	PACKET_TYPE type;
 
 	Packet_Texture packet_texture;
-
-	Color_3F clear_color;
+	Packet_Clear packet_clear;
 };
 
 struct Open_GL {
@@ -83,7 +88,7 @@ struct Vertex {
 struct MP_Renderer {
 	Open_GL open_gl;
 
-	Color_RGBA8 draw_color;
+	Color_4F draw_color;
 
 	std::vector<Packet> packets;
 
@@ -101,6 +106,7 @@ int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
 
 MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h);
 void mp_destroy_texture(MP_Texture* texture);
+void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect);
 
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
 void mp_unlock_texture(MP_Texture* texture);
@@ -109,13 +115,8 @@ int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);
-MP_Texture mp_create_texture();
-void mp_render_clear();
+void mp_render_clear(MP_Renderer* renderer);
 void mp_render_present(MP_Renderer* renderer);
-GLuint create_gl_texture(const char* file_path);
-
-void init_texture();
-void draw_texture(GLuint texture);
 
 #if 0
 

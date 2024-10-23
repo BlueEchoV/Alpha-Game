@@ -22,11 +22,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	REF(lpCmdLine);
 	REF(nShowCmd);
 
-	Renderer* renderer = create_renderer(hInstance);
+	MP_Renderer* renderer = mp_create_renderer(hInstance);
 
-	init_texture();
-
-	GLuint my_texture = create_gl_texture("assets\\sun.png");
+	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
 	bool running = true;
 	while (running) {
@@ -40,11 +38,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		render_clear();
+		mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+		mp_render_clear(renderer);
 
-		draw_texture(my_texture);
-
-		render_present(renderer);
+		mp_render_present(renderer);
 
 	}
 

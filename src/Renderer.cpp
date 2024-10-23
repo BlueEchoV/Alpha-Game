@@ -224,7 +224,10 @@ int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_
 		log("Error: renderer is null");
 		return -1;
 	}
-	renderer->draw_color = { r, g, b, a };
+
+	renderer->draw_color = { (float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, (float)a / 255.0f };
+
+	return 0;
 }
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
@@ -232,8 +235,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 
 	renderer->draw_color = { 255, 255, 255, 255 };
 
-	HWND window_handle = init_windows(hInstance);
-	renderer->open_gl.window_dc = init_open_gl(window_handle);
+	renderer->open_gl.window_handle = init_windows(hInstance);
+	renderer->open_gl.window_dc = init_open_gl(renderer->open_gl.window_handle);
 
 	glGenVertexArrays(1, &renderer->open_gl.vao);
 	glGenBuffers(1, &renderer->open_gl.vbo);
@@ -255,8 +258,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	return renderer;
 }
 
-void render_clear(MP_Renderer* renderer) {
-	if (renderer = NULL) {
+void mp_render_clear(MP_Renderer* renderer) {
+	if (renderer == NULL) {
 		log("Error: renderer is NULL");
 		return;
 	}
@@ -272,74 +275,117 @@ void render_clear(MP_Renderer* renderer) {
 // 
 // }
 
-#if 0
 // Copy a portion of the texture to the current renderer target
+
+V2_F mp_pixel_to_uv(int x, int y, int w, int h) {
+	V2_F result;
+
+	result.x = (float)x / (float)w;
+	result.y = (float)y / (float)h;
+
+	return result;
+}
+
+V3_F mp_pixel_to_ndc(int x, int y, int w, int h) {
+	V3_F result;
+	
+	result.x = (((float)x / (float)w)  * 2.0f) - 1.0f;
+	result.y = (((float)y / (float)h) * 2.0f) - 1.0f;
+	result.z = 0.0f;
+
+	return result;
+}
+
 // NULL for the entire texture. NULL for the entire rendering target.
-void render_copy(MP_Renderer* renderer, MP_Texture* texture, const Rect* src_rect, const Rect* dst_rect) {
+void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect) {
 	// Texture Packet
 	Packet result;
 
-// Square
-Vertex vertices[] = {
-	//     Position			      Color          Texture Coor
-	{{-0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 0.0f}}, // Bottom left
-	{{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, {1.0f, 0.0f}}, // Bottom Right
-	{{ 0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, {1.0f, 1.0f}}, // Top Right
-	{{-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f}}, // Top Left
-};  
-	// 1 
-	Vertex vertex = {};
-	vertex.pos = {};
-	vertex.texture_coor = {};
-	vertex.color = {};
-	renderer->vertices.push_back(vertex);
+	result.type = PT_TEXTURE;
+	result.packet_texture.texture = texture;
 
-	// 2
-	vertex = {};
-	vertex.pos = {};
-	vertex.texture_coor = {};
-	vertex.color = {};
-	renderer->vertices.push_back(vertex);
+	Vertex vertex_1 = {};
+	Vertex vertex_2 = {};
+	Vertex vertex_3 = {};
+	Vertex vertex_4 = {};
 
-	// 3
-	vertex = {};
-	vertex.pos = {};
-	vertex.texture_coor = {};
-	vertex.color = {};
-	renderer->vertices.push_back(vertex);
+	MP_Rect dst = {};
+	if (dst_rect == NULL) {
+		dst.x = 0;
+		dst.y = 0;
+		get_window_size(renderer->open_gl.window_handle, dst.w, dst.h);
+	} else {
+		dst = *dst_rect;
+	}
 
-	// 4
-	vertex = {};
-	vertex.pos = {};
-	vertex.texture_coor = {};
-	vertex.color = {};
-	renderer->vertices.push_back(vertex);
+	// NOTE: My coordinate system draws from the bottom left
+	vertex_1.pos = mp_pixel_to_ndc(dst.x	    , dst.y		   , dst.w, dst.h); // Bottom left (Starting point)
+	vertex_2.pos = mp_pixel_to_ndc(dst.x        , dst.y + dst.w, dst.w, dst.h); // Bottom right 
+	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.h, dst.y + dst.w, dst.w, dst.h); // Top right 
+	vertex_4.pos = mp_pixel_to_ndc(dst.x		, dst.y + dst.h, dst.w, dst.h); // Top left 
+
+	MP_Rect src = {};
+	if (src_rect == NULL) {
+		src.x = 0;
+		src.y = 0;
+		src.w = texture->w;
+		src.h = texture->h;
+	} else {
+		src = *src_rect;
+	}
+
+#if 0
+		vertex_1.texture_coor = { 0.0f, 0.0f };
+		vertex_2.texture_coor = { 1.0f, 0.0f };
+		vertex_3.texture_coor = { 1.0f, 1.0f };
+		vertex_4.texture_coor = { 0.0f, 1.0f };
+#endif
+	vertex_1.texture_coor = mp_pixel_to_uv(texture, );
+	vertex_2.texture_coor = mp_pixel_to_uv(texture, );
+	vertex_3.texture_coor = mp_pixel_to_uv(texture, );
+	vertex_4.texture_coor = mp_pixel_to_uv(texture, );
+
+	vertex_1.color = { 1.0f, 0.0f, 0.0f };
+	vertex_2.color = { 0.0f, 1.0f, 0.0f };
+	vertex_3.color = { 0.0f, 0.0f, 1.0f };
+	vertex_4.color = { 1.0f, 1.0f, 1.0f };
+
+	int vbo_starting_index = (int)renderer->vertices.size();
+	renderer->vertices.push_back(vertex_1);
+	renderer->vertices.push_back(vertex_2);
+	renderer->vertices.push_back(vertex_3);
+	renderer->vertices.push_back(vertex_4);
 
 	// retain the indices positions (size subtraction)
 	// push back the indices (Draw Order - 6)
 
-	renderer->indices.push_back(0);
-	renderer->indices.push_back(1);
-	renderer->indices.push_back(2);
-	renderer->indices.push_back(2);
-	renderer->indices.push_back(3);
-	renderer->indices.push_back(0);
+	result.packet_texture.indices_array_index = (int)renderer->indices.size();
+	renderer->indices.push_back(vbo_starting_index + 0);
+	renderer->indices.push_back(vbo_starting_index + 1);
+	renderer->indices.push_back(vbo_starting_index + 2);
+	renderer->indices.push_back(vbo_starting_index + 2);
+	renderer->indices.push_back(vbo_starting_index + 3);
+	renderer->indices.push_back(vbo_starting_index + 0);
 
 	renderer->packets.push_back(result);
 	// push back the packet
 }
-#endif
 
 void mp_render_present(MP_Renderer* renderer) {
-	glBufferData(GL_ARRAY_BUFFER, renderer->vertices.size() * sizeof(Vertex), renderer->vertices.data(), GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	// NOTE: Buffer the data when I create the renderer (empty buffer)
+	glBindBuffer(GL_ARRAY_BUFFER, renderer->open_gl.vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->open_gl.ebo);
+
 	// NOTE: GL_BUFFER_SUB_DATA TO SAVE TIME
+	glBufferData(GL_ARRAY_BUFFER, renderer->vertices.size() * sizeof(Vertex), renderer->vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(renderer->indices), renderer->indices.data(), GL_STATIC_DRAW);
 
 	// NOTE: One VAO for now
 	glBindVertexArray(renderer->open_gl.vao);
+	
 	for (Packet& packet : renderer->packets) {
 		if (packet.type == PT_TEXTURE) {
-			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture.gl_handle);
+			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture->gl_handle);
 
 			// ***Why choose glDrawElements***
 			// As you can see, there is some overlap on the vertices specified. 
@@ -350,9 +396,9 @@ void mp_render_present(MP_Renderer* renderer) {
 			// there will be large chunks that overlap
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		} 
-		if (packet.type = PT_CLEAR) {
-			Color_RGBA8 color = renderer->draw_color;
-			glClearColor(((float)color.r / 255.0f), ((float)color.g / 255.0f), ((float)color.b / 255.0f), ((float)color.a / 255.0f));
+		if (packet.type == PT_CLEAR) {
+			Color_4F c = packet.packet_clear.clear_color;
+			glClearColor(c.r, c.g, c.b, c.r);
 
 			// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
 			//		 preparing it for new drawing.
@@ -406,14 +452,21 @@ int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t 
 		log("Error: Texture is NULL");
 		return -1;
 	}
+
+	texture->mod.r = (float)r / 255.0f;
+	texture->mod.g = (float)g / 255.0f; 
+	texture->mod.b = (float)b / 255.0f;
+
+	return 0;
 }
+
 int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {
 	if (texture == NULL) {
 		log("Error: Texture is NULL");
 		return -1;
 	}
 
-	texture->mod.a = a;
+	texture->mod.a = (float)a / 255.0f;
 
 	return 0;
 }
@@ -432,6 +485,7 @@ MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access
 	result->h = h;
 	result->pitch = 0;
 	result->pixels = NULL;
+	result->access = access;
 
 	// Default values
 	mp_set_texture_blend_mode(result, MP_BLENDMODE_NONE);
@@ -532,8 +586,9 @@ void mp_unlock_texture(MP_Texture* texture) {
 	texture->pixels = nullptr;
 }
 
-MP_Texture mp_create_texture(const char* file_path) {
-	MP_Texture result;
+#if 0
+MP_Texture* mp_create_texture(const char* file_path) {
+	MP_Texture* result;
 	glGenTextures(1, &result.gl_handle);  
 
 	glActiveTexture(GL_TEXTURE0);
@@ -570,24 +625,4 @@ MP_Texture mp_create_texture(const char* file_path) {
 
 	return result;
 }
-
-// Square
-Vertex vertices[] = {
-	//     Position			      Color          Texture Coor
-	{{-0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 0.0f}}, // Bottom left
-	{{ 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, {1.0f, 0.0f}}, // Bottom Right
-	{{ 0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, {1.0f, 1.0f}}, // Top Right
-	{{-0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, {0.0f, 1.0f}}, // Top Left
-};  
-unsigned int indices[] = {
-	// The indices order in which we draw the two triangles
-	0, 1, 2, 2, 3, 0 
-};
-
-void init_texture() {
-
-	glUseProgram(shader_programs[SP_2D_BASIC]);
-}
-
-void draw_texture(GLuint texture) {
-}
+#endif
