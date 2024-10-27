@@ -66,3 +66,4 @@ struct Color_RGBA8 {
 };
 
 void log(const char* format, ...);
+void my_mem_copy(const void* src, void* dst, size_t n);

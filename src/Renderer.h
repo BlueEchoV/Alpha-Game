@@ -57,6 +57,7 @@ enum PACKET_TYPE {
 struct Packet_Texture {
 	MP_Texture* texture;
 	int indices_array_index;
+	int indices_count;
 };
 
 struct Packet_Clear {
@@ -71,6 +72,7 @@ struct Packet {
 };
 
 struct Open_GL {
+	HWND window_handle;
 	HDC window_dc;
 	// NOTE: Going to use only one of each for now
 	GLuint vao;

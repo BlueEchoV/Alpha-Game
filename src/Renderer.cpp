@@ -1,4 +1,4 @@
-#include "Renderer.h" 
+﻿#include "Renderer.h" 
 #include "GL_Functions.h"
 
 #define GL_REPEAT                         0x2901
@@ -253,6 +253,10 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coor));
 	glEnableVertexAttribArray(2);  
 
+	// For transparency in textures
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	load_shaders();
 
 	return renderer;
@@ -320,8 +324,8 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 
 	// NOTE: My coordinate system draws from the bottom left
 	vertex_1.pos = mp_pixel_to_ndc(dst.x	    , dst.y		   , dst.w, dst.h); // Bottom left (Starting point)
-	vertex_2.pos = mp_pixel_to_ndc(dst.x        , dst.y + dst.w, dst.w, dst.h); // Bottom right 
-	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.h, dst.y + dst.w, dst.w, dst.h); // Top right 
+	vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y		   , dst.w, dst.h); // Bottom right 
+	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, dst.w, dst.h); // Top right 
 	vertex_4.pos = mp_pixel_to_ndc(dst.x		, dst.y + dst.h, dst.w, dst.h); // Top left 
 
 	MP_Rect src = {};
@@ -334,16 +338,10 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 		src = *src_rect;
 	}
 
-#if 0
-		vertex_1.texture_coor = { 0.0f, 0.0f };
-		vertex_2.texture_coor = { 1.0f, 0.0f };
-		vertex_3.texture_coor = { 1.0f, 1.0f };
-		vertex_4.texture_coor = { 0.0f, 1.0f };
-#endif
-	vertex_1.texture_coor = mp_pixel_to_uv(texture, );
-	vertex_2.texture_coor = mp_pixel_to_uv(texture, );
-	vertex_3.texture_coor = mp_pixel_to_uv(texture, );
-	vertex_4.texture_coor = mp_pixel_to_uv(texture, );
+	vertex_1.texture_coor = mp_pixel_to_uv(src.x		, src.y        , src.w, src.h); // Bottom left
+	vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y		   , src.w, src.h); // Bottom right
+	vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, src.w, src.h); // Top right
+	vertex_4.texture_coor = mp_pixel_to_uv(src.x		, src.y + src.h, src.w, src.h); // Top left
 
 	vertex_1.color = { 1.0f, 0.0f, 0.0f };
 	vertex_2.color = { 0.0f, 1.0f, 0.0f };
@@ -360,15 +358,17 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 	// push back the indices (Draw Order - 6)
 
 	result.packet_texture.indices_array_index = (int)renderer->indices.size();
+
+	int current_indices = (int)renderer->indices.size();
 	renderer->indices.push_back(vbo_starting_index + 0);
 	renderer->indices.push_back(vbo_starting_index + 1);
 	renderer->indices.push_back(vbo_starting_index + 2);
 	renderer->indices.push_back(vbo_starting_index + 2);
 	renderer->indices.push_back(vbo_starting_index + 3);
 	renderer->indices.push_back(vbo_starting_index + 0);
+	result.packet_texture.indices_count = (int)renderer->indices.size() - current_indices;
 
 	renderer->packets.push_back(result);
-	// push back the packet
 }
 
 void mp_render_present(MP_Renderer* renderer) {
@@ -378,7 +378,7 @@ void mp_render_present(MP_Renderer* renderer) {
 
 	// NOTE: GL_BUFFER_SUB_DATA TO SAVE TIME
 	glBufferData(GL_ARRAY_BUFFER, renderer->vertices.size() * sizeof(Vertex), renderer->vertices.data(), GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(renderer->indices), renderer->indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, renderer->indices.size() * sizeof(unsigned int), renderer->indices.data(), GL_STATIC_DRAW);
 
 	// NOTE: One VAO for now
 	glBindVertexArray(renderer->open_gl.vao);
@@ -387,6 +387,9 @@ void mp_render_present(MP_Renderer* renderer) {
 		if (packet.type == PT_TEXTURE) {
 			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture->gl_handle);
 
+			GLuint shader = shader_programs[SP_2D_BASIC];
+			glUseProgram(shader);
+
 			// ***Why choose glDrawElements***
 			// As you can see, there is some overlap on the vertices specified. 
 			// We specify bottom right and top left twice! This is an overhead 
@@ -394,7 +397,9 @@ void mp_render_present(MP_Renderer* renderer) {
 			// 4 vertices, instead of 6. This will only get worse as soon as we 
 			// have more complex models that have over 1000s of triangles where 
 			// there will be large chunks that overlap
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			int index = packet.packet_texture.indices_array_index;
+			int count = packet.packet_texture.indices_count;
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
 		} 
 		if (packet.type == PT_CLEAR) {
 			Color_4F c = packet.packet_clear.clear_color;
@@ -406,6 +411,10 @@ void mp_render_present(MP_Renderer* renderer) {
 		}
 	}
 	SwapBuffers(renderer->open_gl.window_dc);
+
+	renderer->indices.clear();
+	renderer->vertices.clear();
+	renderer->packets.clear();
 }
 
 bool mp_is_valid_blend_mode(MP_BlendMode blend_mode) {
@@ -471,8 +480,13 @@ int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {
 	return 0;
 }
 
-// NOTE: Creates a blank texture
-// IMPORTANT: RGBA format by default
+// ***Parameters***
+// Format: Just set it to 0
+//		   RGBA format by default
+// Access: Just set it to 0
+//		   SDL_TEXTUREACCESS_STATIC	   → glTexImage2D			(for rarely changing textures)
+//		   SDL_TEXTUREACCESS_STREAMING → glTexSubImage2D		(for frequently updated textures)
+//		   SDL_TEXTUREACCESS_TARGET    → glFramebufferTexture2D (for render targets)
 MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h) {
 	REF(format);
 	if (renderer == NULL) {
