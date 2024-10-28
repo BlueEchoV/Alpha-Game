@@ -39,6 +39,7 @@ Image load_image(MP_Renderer* renderer, const char* file_path) {
 	return result;
 }
 
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
 	REF(lpCmdLine);
@@ -50,8 +51,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
+	MP_Rect player = {0, 0, 200, 200};
+
 	bool running = true;
 	while (running) {
+		reset_is_pressed();
+
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&message);
@@ -62,10 +67,25 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+		int player_speed = 1;
+
+		if (key_pressed(KEY_W)) {
+			player.y += player_speed;
+		}
+		if (key_pressed(KEY_S)) {
+			player.y -= player_speed;
+		}
+		if (key_pressed(KEY_D)) {
+			player.x += player_speed;
+		}
+		if (key_pressed(KEY_A)) {
+			player.x -= player_speed;
+		}
+
+		mp_set_render_draw_color(renderer, 155, 155, 155, 255);
 		mp_render_clear(renderer);
 
-		mp_render_copy(renderer, sun.texture, NULL, NULL);
+		mp_render_copy(renderer, sun.texture, NULL, &player);
 
 		mp_render_present(renderer);
 

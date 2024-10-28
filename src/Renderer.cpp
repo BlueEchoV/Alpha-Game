@@ -91,38 +91,6 @@ void load_shaders() {
 	shader_programs[SP_2D_BASIC] = sp_2d_basic;
 }
 
-LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
-	// Returning 0 means we processed the message
-	LRESULT result = 0;
-
-	switch(message) {
-	case WM_SIZE: {
-		OutputDebugStringA("WM_SIZE\n");
-		break;
-	}
-	case WM_ACTIVATEAPP: {
-		OutputDebugStringA("WM_ACTIVATEAPP\n");
-		break;
-	} 	
-	case WM_CLOSE: {
-		log("Destroying window");
-		DestroyWindow(window);
-		break; 
-	} 
-	case WM_DESTROY: {
-		PostQuitMessage(0);
-		OutputDebugStringA("WM_DESTROY\n");
-		break;
-	}
-	default: {
-		result = DefWindowProc(window, message, wparam, lparam);
-		break;
-	}
-	}
-
-	return result;
-}
-
 HWND init_windows(HINSTANCE hInstance) {
 	WNDCLASSA wnd_class = {};
 
@@ -290,11 +258,11 @@ V2_F mp_pixel_to_uv(int x, int y, int w, int h) {
 	return result;
 }
 
-V3_F mp_pixel_to_ndc(int x, int y, int w, int h) {
+V3_F mp_pixel_to_ndc(int x, int y, int window_w, int window_h) {
 	V3_F result;
 	
-	result.x = (((float)x / (float)w)  * 2.0f) - 1.0f;
-	result.y = (((float)y / (float)h) * 2.0f) - 1.0f;
+	result.x = (((float)x / (float)window_w) * 2.0f) - 1.0f;
+	result.y = (((float)y / (float)window_h) * 2.0f) - 1.0f;
 	result.z = 0.0f;
 
 	return result;
@@ -314,19 +282,22 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 	Vertex vertex_4 = {};
 
 	MP_Rect dst = {};
+	int window_w, window_h;
+	get_window_size(renderer->open_gl.window_handle, window_w, window_h);
 	if (dst_rect == NULL) {
 		dst.x = 0;
 		dst.y = 0;
-		get_window_size(renderer->open_gl.window_handle, dst.w, dst.h);
+		dst.w = window_w;
+		dst.h = window_h;
 	} else {
 		dst = *dst_rect;
 	}
 
 	// NOTE: My coordinate system draws from the bottom left
-	vertex_1.pos = mp_pixel_to_ndc(dst.x	    , dst.y		   , dst.w, dst.h); // Bottom left (Starting point)
-	vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y		   , dst.w, dst.h); // Bottom right 
-	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, dst.w, dst.h); // Top right 
-	vertex_4.pos = mp_pixel_to_ndc(dst.x		, dst.y + dst.h, dst.w, dst.h); // Top left 
+	vertex_1.pos = mp_pixel_to_ndc(dst.x	    , dst.y		   , window_w, window_h); // Bottom left (Starting point)
+	vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y		   , window_w, window_h); // Bottom right 
+	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, window_w, window_h); // Top right 
+	vertex_4.pos = mp_pixel_to_ndc(dst.x		, dst.y + dst.h, window_w, window_h); // Top left 
 
 	MP_Rect src = {};
 	if (src_rect == NULL) {

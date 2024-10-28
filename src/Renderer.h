@@ -1,5 +1,5 @@
 #pragma once
-#include "Utility.h"
+#include "Windows_Platform.h"
 #include <unordered_map>
 #include <stdint.h>
 
@@ -99,6 +99,7 @@ struct MP_Renderer {
 };
 
 void get_window_size(HWND window, int& w, int& h);
+
 HDC init_open_gl(HWND window);
 void load_shaders();
 
