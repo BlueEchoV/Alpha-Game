@@ -17,7 +17,8 @@ void get_window_size(HWND window, int& w, int& h) {
 }
 
 enum SHADER_PROGRAM {
-	SP_2D_BASIC
+	SP_2D_DRAW,
+	SP_2D_TEXTURE
 };
 
 GLuint create_shader(const char* file_path, GLenum gl_shader_type) {
@@ -87,8 +88,11 @@ GLuint create_shader_program(const char* vs_file_path, const char* fs_file_path)
 
 std::unordered_map<SHADER_PROGRAM, GLuint> shader_programs;
 void load_shaders() {
-	GLuint sp_2d_basic = create_shader_program("shaders\\vs_2d_basic.txt", "shaders\\fs_2d_basic.txt");
-	shader_programs[SP_2D_BASIC] = sp_2d_basic;
+	GLuint sp_2d_draw = create_shader_program("shaders\\vs_2d_draw.txt", "shaders\\fs_2d_draw.txt");
+	shader_programs[SP_2D_DRAW] = sp_2d_draw;
+
+	GLuint sp_2d_texture = create_shader_program("shaders\\vs_2d_texture.txt", "shaders\\fs_2d_texture.txt");
+	shader_programs[SP_2D_TEXTURE] = sp_2d_texture;
 }
 
 HWND init_windows(HINSTANCE hInstance) {
@@ -187,6 +191,113 @@ HDC init_open_gl(HWND window) {
 	return window_dc;
 }
 
+int MP_GetRenderDrawColor(MP_Renderer* renderer, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	*r = (uint8_t)(255.0f * renderer->draw_color.r);
+	*g = (uint8_t)(255.0f * renderer->draw_color.g);
+	*b = (uint8_t)(255.0f * renderer->draw_color.b);
+	*a = (uint8_t)(255.0f * renderer->draw_color.a);
+
+	return 0;
+}
+
+V2_F mp_pixel_to_uv(int x, int y, int w, int h) {
+	V2_F result;
+
+	result.x = (float)x / (float)w;
+	result.y = (float)y / (float)h;
+
+	return result;
+}
+
+V3_F mp_pixel_to_ndc(int x, int y, int window_w, int window_h) {
+	V3_F result;
+	
+	result.x = (((float)x / (float)window_w) * 2.0f) - 1.0f;
+	result.y = (((float)y / (float)window_h) * 2.0f) - 1.0f;
+	result.z = 0.0f;
+
+	return result;
+}
+
+int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	int window_w = renderer->window_width;
+	int window_h = renderer->window_height;
+
+	MP_Rect dst;
+	if (rect == NULL) {
+		dst.x = 0;
+		dst.y = 0;
+		dst.w = window_w;
+		dst.h = window_h;
+	} else {
+		dst = *rect;
+	}
+
+	Packet packet = {};
+
+	packet.type = PT_DRAW;
+	packet.packet_draw.render_draw_color = renderer->draw_color;
+
+	Vertex vertex_1 = {};
+	Vertex vertex_2 = {};
+	Vertex vertex_3 = {};
+	Vertex vertex_4 = {};
+
+	vertex_1.pos = mp_pixel_to_ndc(dst.x	    , dst.y        , window_w, window_h); // Bottom Left
+	vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y        , window_w, window_h); // Bottom Right
+	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, window_w, window_h); // Top Right
+	vertex_4.pos = mp_pixel_to_ndc(dst.x        , dst.y + dst.h, window_w, window_h); // Top Left
+
+	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+	vertex_3.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+	vertex_4.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+
+	int vbo_starting_index = (int)renderer->vertices.size();
+	renderer->vertices.push_back(vertex_1);
+	renderer->vertices.push_back(vertex_2);
+	renderer->vertices.push_back(vertex_3);
+	renderer->vertices.push_back(vertex_4);
+
+	int indices_starting_index = (int)renderer->indices.size();
+	renderer->indices.push_back(vbo_starting_index + 0);
+	renderer->indices.push_back(vbo_starting_index + 1);
+	renderer->indices.push_back(vbo_starting_index + 2);
+	renderer->indices.push_back(vbo_starting_index + 2);
+	renderer->indices.push_back(vbo_starting_index + 3);
+	renderer->indices.push_back(vbo_starting_index + 0);
+
+	packet.packet_draw.indices_array_index = indices_starting_index;
+	packet.packet_draw.indices_count = (int)renderer->indices.size() - indices_starting_index;
+
+	renderer->packets.push_back(packet);
+
+	return 0;
+}
+
+int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	for (int i = 0; i < count; i++) {
+		mp_render_fill_rect(renderer, &rects[i]);
+	}
+
+	return 0;
+}
+
 int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	if (renderer == NULL) {
 		log("Error: renderer is null");
@@ -249,27 +360,12 @@ void mp_render_clear(MP_Renderer* renderer) {
 
 // Copy a portion of the texture to the current renderer target
 
-V2_F mp_pixel_to_uv(int x, int y, int w, int h) {
-	V2_F result;
-
-	result.x = (float)x / (float)w;
-	result.y = (float)y / (float)h;
-
-	return result;
-}
-
-V3_F mp_pixel_to_ndc(int x, int y, int window_w, int window_h) {
-	V3_F result;
-	
-	result.x = (((float)x / (float)window_w) * 2.0f) - 1.0f;
-	result.y = (((float)y / (float)window_h) * 2.0f) - 1.0f;
-	result.z = 0.0f;
-
-	return result;
-}
-
 // NULL for the entire texture. NULL for the entire rendering target.
 void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect) {
+	if (renderer == NULL) {
+		log("Error: renderer is NULL");
+		return;
+	}
 	// Texture Packet
 	Packet result;
 
@@ -282,8 +378,8 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 	Vertex vertex_4 = {};
 
 	MP_Rect dst = {};
-	int window_w, window_h;
-	get_window_size(renderer->open_gl.window_handle, window_w, window_h);
+	int window_w = renderer->window_width; 
+	int	window_h = renderer->window_height;
 	if (dst_rect == NULL) {
 		dst.x = 0;
 		dst.y = 0;
@@ -343,6 +439,10 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 }
 
 void mp_render_present(MP_Renderer* renderer) {
+	if (renderer == NULL) {
+		log("Error: renderer is NULL");
+		return;
+	}
 	// NOTE: Buffer the data when I create the renderer (empty buffer)
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->open_gl.vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->open_gl.ebo);
@@ -355,10 +455,18 @@ void mp_render_present(MP_Renderer* renderer) {
 	glBindVertexArray(renderer->open_gl.vao);
 	
 	for (Packet& packet : renderer->packets) {
-		if (packet.type == PT_TEXTURE) {
+		if (packet.type == PT_DRAW) {
+			GLuint shader = shader_programs[SP_2D_DRAW];
+			glUseProgram(shader);
+
+			int index = packet.packet_draw.indices_array_index;
+			int count = packet.packet_draw.indices_count;
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
+		}
+		else if (packet.type == PT_TEXTURE) {
 			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture->gl_handle);
 
-			GLuint shader = shader_programs[SP_2D_BASIC];
+			GLuint shader = shader_programs[SP_2D_TEXTURE];
 			glUseProgram(shader);
 
 			// ***Why choose glDrawElements***
@@ -372,16 +480,21 @@ void mp_render_present(MP_Renderer* renderer) {
 			int count = packet.packet_texture.indices_count;
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
 		} 
-		if (packet.type == PT_CLEAR) {
+		else if (packet.type == PT_CLEAR) {
 			Color_4F c = packet.packet_clear.clear_color;
 			glClearColor(c.r, c.g, c.b, c.r);
 
 			// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
 			//		 preparing it for new drawing.
 			glClear(GL_COLOR_BUFFER_BIT);
+		} else {
+			log("Error: Packet type isn't specified");
+			assert(false);
 		}
 	}
 	SwapBuffers(renderer->open_gl.window_dc);
+
+	get_window_size(renderer->open_gl.window_handle, renderer->window_width, renderer->window_height);
 
 	renderer->indices.clear();
 	renderer->vertices.clear();
@@ -410,6 +523,7 @@ bool mp_is_valid_blend_mode(MP_BlendMode blend_mode) {
 	}
 	}
 }
+
 // Returns 0 on success, -1 on failure
 int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode) {
 	if (texture == NULL) {

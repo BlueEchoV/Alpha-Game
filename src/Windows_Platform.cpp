@@ -3,11 +3,17 @@
 std::unordered_map<WPARAM, Key_State> player_input;
 
 bool key_pressed(WPARAM key) {
+	if (player_input[key].is_pressed) {
+		return true;
+	}
+	return false;
+}
+
+bool key_pressed_and_held(WPARAM key) {
 	if (player_input[key].is_pressed || player_input[key].is_held_down) {
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
 
 void reset_is_pressed() {

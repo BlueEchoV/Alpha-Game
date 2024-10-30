@@ -50,8 +50,15 @@ struct MP_Texture {
 };
 
 enum PACKET_TYPE {
+	PT_DRAW,
 	PT_TEXTURE,
 	PT_CLEAR
+};
+
+struct Packet_Draw {
+	Color_4F render_draw_color;
+	int indices_array_index;
+	int indices_count;
 };
 
 struct Packet_Texture {
@@ -67,6 +74,7 @@ struct Packet_Clear {
 struct Packet {
 	PACKET_TYPE type;
 
+	Packet_Draw packet_draw;
 	Packet_Texture packet_texture;
 	Packet_Clear packet_clear;
 };
@@ -96,6 +104,9 @@ struct MP_Renderer {
 
 	std::vector<Vertex> vertices;
 	std::vector<int> indices;
+
+	int window_width;
+	int window_height;
 };
 
 void get_window_size(HWND window, int& w, int& h);
@@ -103,6 +114,11 @@ void get_window_size(HWND window, int& w, int& h);
 HDC init_open_gl(HWND window);
 void load_shaders();
 
+int mp_get_render_draw_color(MP_Renderer* renderer, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
+int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect);
+int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
+
+// NOTE: Remember, modify the shader for the color mod
 int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode);
 int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
 int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
@@ -122,11 +138,6 @@ void mp_render_clear(MP_Renderer* renderer);
 void mp_render_present(MP_Renderer* renderer);
 
 #if 0
-
-int MP_GetRenderDrawColor(SDL_Renderer* sdl_renderer, Uint8* r, Uint8* g, Uint8* b, Uint8* a);
-int MP_RenderClear(SDL_Renderer* sdl_renderer);
-int MP_RenderFillRect(SDL_Renderer* sdl_renderer, const SDL_Rect* rect);
-int MP_RenderFillRects(SDL_Renderer* sdl_renderer, const SDL_Rect* rects, int count);
 int MP_RenderDrawLine(SDL_Renderer* sdl_renderer, int x1, int y1, int x2, int y2);
 int MP_RenderDrawLines(SDL_Renderer* sdl_renderer, const SDL_Point* points, int count);
 int MP_RenderDrawPoint(SDL_Renderer* sdl_renderer, int x, int y);

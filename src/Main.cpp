@@ -39,6 +39,64 @@ Image load_image(MP_Renderer* renderer, const char* file_path) {
 	return result;
 }
 
+enum Debug_Image {
+    DI_mp_render_fill_rect,
+    DI_mp_render_fill_rects,
+    DI_Count
+};
+
+void draw_mp_library_debug_images(MP_Renderer* renderer, bool toggle_debug_images) {
+	if (!toggle_debug_images) { 
+		return;
+	}
+
+    int width = 100;
+    int height = 100;
+
+    int starting_x = 50;
+    int starting_y = renderer->window_height - (50 + height);
+
+    int offset_x = 50 + width;
+    int offset_y = -50 - height;
+
+    mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+
+    int images_per_row = 5;
+
+    for (int i = 0; i < DI_Count; i++) {
+        int x = starting_x + (i % images_per_row) * offset_x;
+        int y = starting_y + (i / images_per_row) * offset_y; 
+
+        MP_Rect rect = {x, y, width, height};
+
+        switch ((Debug_Image)i) {
+		case DI_mp_render_fill_rect: {
+			mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+			mp_render_fill_rect(renderer, &rect);
+			break;
+		}
+		case DI_mp_render_fill_rects: {
+			mp_set_render_draw_color(renderer, 0, 255, 0, 255); 
+			MP_Rect bottom_left_and_top_right[2] = {
+				{x		      , y             , width / 2, height / 2}, 
+				{x + width / 2, y + height / 2, width / 2, height / 2}
+			};
+			mp_render_fill_rects(renderer, bottom_left_and_top_right, ARRAYSIZE(bottom_left_and_top_right));
+
+			mp_set_render_draw_color(renderer, 255, 0, 0, 255); 
+			MP_Rect bottom_right_and_top_left[2] = {
+				{x + width / 2, y			  , width / 2, height / 2}, 
+				{x            , y + height / 2, width / 2, height / 2} 
+			};
+			mp_render_fill_rects(renderer, bottom_right_and_top_left, ARRAYSIZE(bottom_right_and_top_left));
+			break;
+		}
+		default: {
+			break;
+		}
+        }
+    }
+}
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
@@ -53,6 +111,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	MP_Rect player = {0, 0, 200, 200};
 
+	bool toggle_debug_images = true;
 	bool running = true;
 	while (running) {
 		reset_is_pressed();
@@ -69,24 +128,29 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		int player_speed = 1;
 
-		if (key_pressed(KEY_W)) {
+		if (key_pressed_and_held(KEY_W)) {
 			player.y += player_speed;
 		}
-		if (key_pressed(KEY_S)) {
+		if (key_pressed_and_held(KEY_S)) {
 			player.y -= player_speed;
 		}
-		if (key_pressed(KEY_D)) {
+		if (key_pressed_and_held(KEY_D)) {
 			player.x += player_speed;
 		}
-		if (key_pressed(KEY_A)) {
+		if (key_pressed_and_held(KEY_A)) {
 			player.x -= player_speed;
+		}
+		if (key_pressed(VK_OEM_3)) {
+			toggle_debug_images = !toggle_debug_images;
 		}
 
 		mp_set_render_draw_color(renderer, 155, 155, 155, 255);
 		mp_render_clear(renderer);
 
+
 		mp_render_copy(renderer, sun.texture, NULL, &player);
 
+		draw_mp_library_debug_images(renderer, toggle_debug_images);
 		mp_render_present(renderer);
 
 	}
