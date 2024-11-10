@@ -31,6 +31,10 @@ typedef enum MP_BlendMode
     MP_BLENDMODE_INVALID = 0x7FFFFFFF
 } MP_BlendMode;
 
+struct MP_Point {
+	int x, y;
+};
+
 struct MP_Rect {
 	int x, y;
 	int w, h;
@@ -56,6 +60,7 @@ enum PACKET_TYPE {
 };
 
 struct Packet_Draw {
+	uint32_t mode;
 	Color_4F render_draw_color;
 	int indices_array_index;
 	int indices_count;
@@ -115,8 +120,20 @@ HDC init_open_gl(HWND window);
 void load_shaders();
 
 int mp_get_render_draw_color(MP_Renderer* renderer, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
+
 int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect);
 int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
+int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2);
+int mp_render_draw_lines(MP_Renderer* renderer, const MP_Point* points, int count);
+int mp_render_draw_point(MP_Renderer* renderer, int x, int y);
+int mp_render_draw_points(MP_Renderer* renderer, const MP_Point* points, int count);
+int mp_render_draw_rect(MP_Renderer* renderer, const MP_Rect* rect);
+int mp_render_draw_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
+
+int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
+int mp_get_texture_color_mod(MP_Texture* texture, uint8_t* r, uint8_t* g, uint8_t* b);
+int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
+int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
 
 // NOTE: Remember, modify the shader for the color mod
 int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode);
@@ -138,22 +155,10 @@ void mp_render_clear(MP_Renderer* renderer);
 void mp_render_present(MP_Renderer* renderer);
 
 #if 0
-int MP_RenderDrawLine(SDL_Renderer* sdl_renderer, int x1, int y1, int x2, int y2);
-int MP_RenderDrawLines(SDL_Renderer* sdl_renderer, const SDL_Point* points, int count);
-int MP_RenderDrawPoint(SDL_Renderer* sdl_renderer, int x, int y);
-int MP_RenderDrawPoints(SDL_Renderer* sdl_renderer, const SDL_Point* points, int count);
-int MP_RenderDrawRect(SDL_Renderer* sdl_renderer, const SDL_Rect* rect);
-int MP_RenderDrawRects(SDL_Renderer* sdl_renderer, const SDL_Rect* rects, int count);
-
 int MP_SetTextureBlendMode(SDL_Texture* texture, SDL_BlendMode blend_mode);
 int MP_GetTextureBlendMode(SDL_Texture* texture, SDL_BlendMode* blendMode);
 int MP_SetRenderDrawBlendMode(SDL_Renderer* sdl_renderer, SDL_BlendMode blendMode);
 int MP_GetRenderDrawBlendMode(SDL_Renderer* sdl_renderer, SDL_BlendMode *blendMode);
-
-int MP_SetTextureColorMod(SDL_Texture* texture, Uint8 r, Uint8 g, Uint8 b);
-int MP_GetTextureColorMod(SDL_Texture* texture, Uint8* r, Uint8* g, Uint8* b);
-int MP_SetTextureAlphaMod(SDL_Texture* texture, Uint8 alpha);
-int MP_GetTextureAlphaMod(SDL_Texture* texture, Uint8* alpha);
 
 void MP_UnlockTexture(SDL_Texture* texture);
 int MP_LockTexture(SDL_Texture* texture, const SDL_Rect* rect, void **pixels, int *pitch);

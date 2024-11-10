@@ -246,6 +246,7 @@ int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect) {
 	Packet packet = {};
 
 	packet.type = PT_DRAW;
+	packet.packet_draw.mode = GL_TRIANGLES;
 	packet.packet_draw.render_draw_color = renderer->draw_color;
 
 	Vertex vertex_1 = {};
@@ -297,6 +298,114 @@ int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count)
 
 	return 0;
 }
+
+int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+	Packet packet = {};
+
+	packet.type = PT_DRAW;
+	packet.packet_draw.mode = GL_LINES;
+
+	Vertex vertex_1 = {};
+	Vertex vertex_2 = {};
+
+	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+
+	int window_w;
+	int window_h;
+	get_window_size(renderer->open_gl.window_handle, window_w, window_h);
+	
+	vertex_1.pos = mp_pixel_to_ndc(x1, y1, window_w, window_h);
+	vertex_2.pos = mp_pixel_to_ndc(x2, y2, window_w, window_h);
+
+	int vertices_starting_index = (int)renderer->vertices.size();
+
+	renderer->vertices.push_back(vertex_1);
+	renderer->vertices.push_back(vertex_2);
+
+	int indices_starting_index = (int)renderer->indices.size();
+
+	renderer->indices.push_back(vertices_starting_index + 0);
+	renderer->indices.push_back(vertices_starting_index + 1);
+
+	int indices_ending_index = (int)renderer->indices.size();
+
+	packet.packet_draw.indices_array_index = indices_starting_index;
+	packet.packet_draw.indices_count = indices_ending_index - indices_starting_index;
+
+	renderer->packets.push_back(packet);
+
+	return 0;
+}
+
+int mp_render_draw_lines(MP_Renderer* renderer, const MP_Point* points, int count) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	for (int i = 0; i < count - 1; i++) {
+		mp_render_draw_line(renderer, points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+	}
+
+	return 0;
+}
+
+int mp_render_draw_point(MP_Renderer* renderer, int x, int y) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+	MP_Rect rect = {};
+
+	rect.w = 4;
+	rect.h = 4;
+	rect.x = x - rect.w / 2;
+	rect.y = y - rect.h / 2;
+
+	mp_render_fill_rect(renderer, &rect);
+
+	return 0;
+}
+
+int mp_render_draw_points(MP_Renderer* renderer, const MP_Point* points, int count) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	for (int i = 0; i < count; i++) {
+		mp_render_draw_point(renderer, points[i].x, points[i].y);
+	}
+
+	return 0;
+}
+
+int mp_render_draw_rect(MP_Renderer* renderer, const MP_Rect* rect) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	mp_render_draw_line(renderer, rect->x		   , rect->y          , rect->x + rect->w, rect->y			);
+	mp_render_draw_line(renderer, rect->x + rect->w, rect->y          , rect->x + rect->w, rect->y + rect->h);
+	mp_render_draw_line(renderer, rect->x + rect->w, rect->y + rect->h, rect->x          , rect->y + rect->h);
+	mp_render_draw_line(renderer, rect->x		   , rect->y + rect->h, rect->x          , rect->y			);
+
+	return 0;
+}
+
+int mp_render_draw_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
+#if 0
+int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
+int mp_get_texture_color_mod(MP_Texture* texture, uint8_t* r, uint8_t* g, uint8_t* b);
+int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
+int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
+#endif
 
 int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	if (renderer == NULL) {
@@ -461,7 +570,7 @@ void mp_render_present(MP_Renderer* renderer) {
 
 			int index = packet.packet_draw.indices_array_index;
 			int count = packet.packet_draw.indices_count;
-			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
+			glDrawElements((GLenum)packet.packet_draw.mode, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
 		}
 		else if (packet.type == PT_TEXTURE) {
 			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture->gl_handle);
