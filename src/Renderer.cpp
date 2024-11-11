@@ -259,10 +259,10 @@ int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect) {
 	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, window_w, window_h); // Top Right
 	vertex_4.pos = mp_pixel_to_ndc(dst.x        , dst.y + dst.h, window_w, window_h); // Top Left
 
-	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
-	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
-	vertex_3.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
-	vertex_4.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
+	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
+	vertex_3.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
+	vertex_4.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
 
 	int vbo_starting_index = (int)renderer->vertices.size();
 	renderer->vertices.push_back(vertex_1);
@@ -312,8 +312,8 @@ int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2) {
 	Vertex vertex_1 = {};
 	Vertex vertex_2 = {};
 
-	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
-	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b };
+	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
+	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
 
 	int window_w;
 	int window_h;
@@ -418,6 +418,32 @@ int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_
 	return 0;
 }
 
+int mp_set_render_draw_color(MP_Renderer* renderer, Color c) {
+    switch (c) {
+        case C_Red:
+            mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+            break;
+        case C_Green:
+            mp_set_render_draw_color(renderer, 0, 255, 0, 255); 
+            break;
+        case C_Blue:
+            mp_set_render_draw_color(renderer, 0, 0, 255, 255);
+            break;
+        case C_Orange:
+            mp_set_render_draw_color(renderer, 255, 165, 0, 255); 
+            break;
+        case C_Dark_Yellow:
+            mp_set_render_draw_color(renderer, 204, 204, 0, 255); 
+            break;
+        case C_Dark_Blue:
+            mp_set_render_draw_color(renderer, 0, 0, 139, 255);
+            break;
+        default:
+            return -1;
+    }
+    return 0; 
+}
+
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	MP_Renderer* renderer = new MP_Renderer();
 
@@ -436,7 +462,7 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
 	glEnableVertexAttribArray(0);  
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 	glEnableVertexAttribArray(1);  
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coor));
 	glEnableVertexAttribArray(2);  
@@ -514,15 +540,16 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 		src = *src_rect;
 	}
 
-	vertex_1.texture_coor = mp_pixel_to_uv(src.x		, src.y        , src.w, src.h); // Bottom left
-	vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y		   , src.w, src.h); // Bottom right
-	vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, src.w, src.h); // Top right
-	vertex_4.texture_coor = mp_pixel_to_uv(src.x		, src.y + src.h, src.w, src.h); // Top left
+	vertex_1.texture_coor = mp_pixel_to_uv(src.x		, src.y        , texture->w, texture->h); // Bottom left
+	vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y		   , texture->w, texture->h); // Bottom right
+	vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h); // Top right
+	vertex_4.texture_coor = mp_pixel_to_uv(src.x		, src.y + src.h, texture->w, texture->h); // Top left
 
-	vertex_1.color = { 1.0f, 0.0f, 0.0f };
-	vertex_2.color = { 0.0f, 1.0f, 0.0f };
-	vertex_3.color = { 0.0f, 0.0f, 1.0f };
-	vertex_4.color = { 1.0f, 1.0f, 1.0f };
+	Color_4F m = texture->mod;
+	vertex_1.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+	vertex_2.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+	vertex_3.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+	vertex_4.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
 
 	int vbo_starting_index = (int)renderer->vertices.size();
 	renderer->vertices.push_back(vertex_1);
@@ -546,6 +573,40 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 
 	renderer->packets.push_back(result);
 }
+
+void gl_set_blend_mode(MP_BlendMode blend_mode) {
+    switch (blend_mode) {
+        case MP_BLENDMODE_NONE:
+            glDisable(GL_BLEND);
+            break;
+
+        case MP_BLENDMODE_BLEND:
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+
+        case MP_BLENDMODE_ADD:
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            break;
+
+        case MP_BLENDMODE_MOD:
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_DST_COLOR, GL_ZERO);
+            break;
+
+        case MP_BLENDMODE_MUL:
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_DST_COLOR, GL_ZERO);
+            break;
+
+        default:
+            glDisable(GL_BLEND);
+			log("Error: Blend mode not supported");
+            break;
+    }
+}
+
 
 void mp_render_present(MP_Renderer* renderer) {
 	if (renderer == NULL) {
@@ -573,10 +634,16 @@ void mp_render_present(MP_Renderer* renderer) {
 			glDrawElements((GLenum)packet.packet_draw.mode, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
 		}
 		else if (packet.type == PT_TEXTURE) {
-			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture->gl_handle);
+			// gl_set_blend_mode(packet.packet_texture.texture->blend_mode);
 
 			GLuint shader = shader_programs[SP_2D_TEXTURE];
 			glUseProgram(shader);
+
+			// GLint samplerLocation = glGetUniformLocation(shader, "my_texture");
+			// glUniform1i(samplerLocation, 0); // Assign texture unit 0 to the sampler
+
+			glActiveTexture(GL_TEXTURE0);      // Activate texture unit 0
+			glBindTexture(GL_TEXTURE_2D, packet.packet_texture.texture->gl_handle);
 
 			// ***Why choose glDrawElements***
 			// As you can see, there is some overlap on the vertices specified. 
@@ -656,6 +723,11 @@ int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t 
 		return -1;
 	}
 
+	if (r > 255 || g > 255 || b > 255 ||
+		r < 0   || g < 0   || b < 0) {
+		log("Error: Color mod not supported");
+		return -1;
+	}
 	texture->mod.r = (float)r / 255.0f;
 	texture->mod.g = (float)g / 255.0f; 
 	texture->mod.b = (float)b / 255.0f;
@@ -696,7 +768,7 @@ MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access
 	result->access = access;
 
 	// Default values
-	mp_set_texture_blend_mode(result, MP_BLENDMODE_NONE);
+	mp_set_texture_blend_mode(result, MP_BLENDMODE_BLEND);
 	mp_set_texture_color_mod(result, 255, 255, 255);
 	mp_set_texture_alpha_mod(result, 255);
 
@@ -706,14 +778,14 @@ MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access
 	glBindTexture(GL_TEXTURE_2D, result->gl_handle);
 
 	// Set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// NOTE: A common mistake is to set one of the mipmap filtering options as the magnification 
 	// filter. This doesn't have any effect since mipmaps are primarily used for when textures
 	// get downscaled: texture magnification doesn't use mipmaps and giving it a mipmap filtering
 	// option will generate an OpenGL GL_INVALID_ENUM error code.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Allocate empty data now
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);

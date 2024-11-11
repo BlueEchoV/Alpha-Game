@@ -1,12 +1,13 @@
 #version 330 core
 out vec4 f_final_color;
 
-in vec3 f_color;
+in vec4 f_color;
 in vec2 f_texture_coordinates;
 
 uniform sampler2D my_texture;
 
 void main()
 {
-    f_final_color = texture(my_texture, f_texture_coordinates) * vec4(f_color, 1.0f);
+    vec4 tex_color = texture(my_texture, f_texture_coordinates) * f_color;
+	f_final_color = tex_color;
 } 

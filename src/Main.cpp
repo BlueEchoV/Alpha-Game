@@ -41,20 +41,107 @@ Image load_image(MP_Renderer* renderer, const char* file_path) {
 struct Font {
 	int char_width;
 	int char_height;
+
+	int bitmap_width;
+	int bitmap_height;
+
 	Image image;
 };
 
-const int bitmap_width = 18;
-const int bitmap_height = 7;
 Font load_font(MP_Renderer* renderer, const char* file_path) {
-	Font font = {};;
+	Font result = {};
 
-	font.image = load_image(renderer, file_path);
+	stbi_set_flip_vertically_on_load(true);
+	int width, height, channels;
+	unsigned char* data = stbi_load(file_path, &width, &height, &channels, 4);
 
-	font.char_width = font.image.w / bitmap_width;
-	font.char_height = font.image.h / bitmap_height;
+	DEFER{
+		stbi_image_free(data);
+	};
 
-	return font;
+	result.image.w = width;
+	result.image.h = height;
+
+	for (int y = 0; y < result.image.h; y++) {
+		for (int x = 0; x < result.image.w; x++) {
+			int index = 0;
+			index = (4 * ((y * width) + x));
+			// Check if the color is black
+			if (data[index] == 0 && data[index + 1] == 0 && data[index + 2] == 0) {
+				// Set alpha to 0 (Transparent)
+				data[index + 3] = 0;
+			}
+		}
+	}
+
+	// Hard coded values (Potentially bad)
+	// This function is for bitmap fonts so 
+	// this could be okay.
+	result.char_width = result.image.w / 18;
+	result.char_height = result.image.h / 7;
+
+	MP_Texture* temp = mp_create_texture(renderer, 0, 0, width, height);
+
+	mp_set_texture_blend_mode(temp, MP_BLENDMODE_BLEND);
+
+	result.image.texture = temp;
+	void* pixels;
+	int pitch;
+	mp_lock_texture(temp, NULL, &pixels, &pitch);
+
+	// Copy what's in my data into the pixels
+	// my_Memory_Copy();
+	// memcpy(pixels, data, (width * height) * 4);
+	my_mem_copy(data, pixels, (width * height) * 4);
+
+	mp_unlock_texture(temp);
+
+	result.bitmap_width = 18;
+	result.bitmap_height = 7;
+
+	result.char_width = result.image.w / result.bitmap_width;
+	result.char_height = result.image.h / result.bitmap_height;
+
+	return result;
+}
+
+// NOTE: It's important to note here that we are currently drawing outside of the UV coordinates.
+// However, setting TexParam to GL_Repeat instead of GL_Mirrored, fixes the issue
+void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background) {
+	REF(background);
+	int ascii = (int)character - (int)' ';
+	int src_x = font.char_width * (ascii % font.bitmap_width);
+	int src_y = font.char_height * ((font.bitmap_height - 1) - (ascii / font.bitmap_width)) + 1;
+
+	MP_Rect src = { src_x, src_y, font.char_width, font.char_height};
+	MP_Rect dst = { x, y, (font.char_width * size), (font.char_height * size)};
+
+	mp_render_copy(renderer, font.image.texture, &src, &dst);
+}
+
+void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background) {
+	int length = (int)strlen(str);
+
+	int final_x = x;
+	int final_y = y;
+
+	if (center_x) {
+		final_x -= (int)(((float)length / 2.0f) * (float)(font.char_width * size));
+		// final_y -= (int)(((float)font.char_height * (float)size) / 2.0f);
+	}
+
+	int padding = 3;
+	MP_Rect rect = {};
+	rect.x = final_x - padding;
+	rect.y = final_y - padding;
+	rect.w = (length * (font.char_width * size)) + (padding * 2);
+	rect.h = (font.char_height * size) + (padding * 2);
+	mp_set_render_draw_color(renderer, 0, 0, 0, 255);
+	mp_render_fill_rect(renderer, &rect);
+
+	for (int i = 0; i < length; i++) {
+		draw_character(renderer, font, str[i], final_x + ((font.char_width * size) * i), final_y, size, background);
+	}
 }
 
 enum Debug_Image {
@@ -67,45 +154,64 @@ enum Debug_Image {
     DI_Count
 };
 
-void draw_mp_library_debug_images(MP_Renderer* renderer, bool toggle_debug_images) {
+void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, bool toggle_debug_images) {
 	if (!toggle_debug_images) { 
 		return;
 	}
 
-    int width = 100;
-    int height = 100;
+    int width = 150;
+    int height = 150;
 
     int starting_x = 50;
     int starting_y = renderer->window_height - (50 + height);
 
-    int offset_x = 50 + width;
+    int offset_x = 20 + width;
     int offset_y = -50 - height;
 
-    mp_set_render_draw_color(renderer, 255, 0, 0, 255);
-
     int images_per_row = 5;
+	int string_size = 2;
 
-    for (int i = 0; i < DI_Count; i++) {
-        int x = starting_x + (i % images_per_row) * offset_x;
+	MP_Rect background_rects[DI_Count] = {};
+	int background_padding = 6;
+
+    mp_set_render_draw_color(renderer, 0, 0, 0, 255);
+	for (int i = 0; i < DI_Count; i++) {
+        int x = (starting_x + (i % images_per_row) * offset_x);
         int y = starting_y + (i / images_per_row) * offset_y; 
+
+		background_rects[i].x = x - background_padding;
+		background_rects[i].y = y - background_padding;
+		background_rects[i].w = width + background_padding * 2;
+		background_rects[i].h = (height + background_padding * 2) + (font.char_height * (string_size + 1)) + 5;
+	}
+	mp_render_fill_rects(renderer, background_rects, DI_Count);
+
+	// First rows
+    for (int i = 0; i < DI_Count; i++) {
+        int x = (starting_x + (i % images_per_row) * offset_x);
+        int y = starting_y + (i / images_per_row) * offset_y; 
+		int title_x = x + width / 2;
+		int title_y = y + (font.char_height * (string_size - 1)) + (height);
 
         MP_Rect rect = {x, y, width, height};
 
         switch ((Debug_Image)i) {
 		case DI_mp_render_fill_rect: {
-			mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+			draw_string(renderer, font, "fill_rect", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Red);
 			mp_render_fill_rect(renderer, &rect);
 			break;
 		}
 		case DI_mp_render_fill_rects: {
-			mp_set_render_draw_color(renderer, 0, 255, 0, 255); 
+			draw_string(renderer, font, "fill_rects", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Green);
 			MP_Rect bottom_left_and_top_right[2] = {
 				{x		      , y             , width / 2, height / 2}, 
 				{x + width / 2, y + height / 2, width / 2, height / 2}
 			};
 			mp_render_fill_rects(renderer, bottom_left_and_top_right, ARRAYSIZE(bottom_left_and_top_right));
 
-			mp_set_render_draw_color(renderer, 0, 0, 255, 255); 
+			mp_set_render_draw_color(renderer, C_Blue);
 			MP_Rect bottom_right_and_top_left[2] = {
 				{x + width / 2, y			  , width / 2, height / 2}, 
 				{x            , y + height / 2, width / 2, height / 2} 
@@ -114,27 +220,29 @@ void draw_mp_library_debug_images(MP_Renderer* renderer, bool toggle_debug_image
 			break;
 		}
 		case DI_mp_render_draw_line: {
-			mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+			draw_string(renderer, font, "draw_line", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Red);
 			mp_render_draw_line(renderer, x, y, x + width, y);
 
-			mp_set_render_draw_color(renderer, 0, 255, 0, 255);
+			mp_set_render_draw_color(renderer, C_Green);
 			mp_render_draw_line(renderer, x, y + height / 2, x + width, y + height / 2);
 
-			mp_set_render_draw_color(renderer, 0, 0, 255, 255);
+			mp_set_render_draw_color(renderer, C_Blue);
 			mp_render_draw_line(renderer, x, y + height, x + width, y + height);
 
-			mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+			mp_set_render_draw_color(renderer, C_Red);
 			mp_render_draw_line(renderer, x, y, x, y + height);
 
-			mp_set_render_draw_color(renderer, 0, 255, 0, 255);
+			mp_set_render_draw_color(renderer, C_Green);
 			mp_render_draw_line(renderer, x + width / 2, y, x + width / 2, y + height);
 
-			mp_set_render_draw_color(renderer, 0, 0, 255, 255);
+			mp_set_render_draw_color(renderer, C_Blue);
 			mp_render_draw_line(renderer, x + width, y, x + width, y + height);
 			break;
 		}
 		case DI_mp_render_draw_lines: {
-			mp_set_render_draw_color(renderer, 255, 255, 0, 255);
+			draw_string(renderer, font, "draw_lines", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Dark_Yellow);
 
 			const int total_points = 5;
 			MP_Point points[total_points];
@@ -158,29 +266,47 @@ void draw_mp_library_debug_images(MP_Renderer* renderer, bool toggle_debug_image
 			break;
 		}
 		case DI_mp_render_draw_point: {
-			mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+			draw_string(renderer, font, "draw_point", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Red);
 			mp_render_draw_point(renderer, x		, y			);
 			mp_render_draw_point(renderer, x + width, y			);
 			mp_render_draw_point(renderer, x		, y + height);
 			mp_render_draw_point(renderer, x + width, y + height);
+
+			mp_render_draw_point(renderer, x + width / 4,		  y + height / 4);
+			mp_render_draw_point(renderer, x + ((width / 4) * 3), y + height / 4);
+			mp_render_draw_point(renderer, x + ((width / 4) * 3), y + ((height / 4) * 3));
+			mp_render_draw_point(renderer, x + width / 4,         y + ((height / 4) * 3));
 			break;
 		}
 		case DI_mp_render_draw_points: {
-			mp_set_render_draw_color(renderer, 0, 255, 0, 255);
-			const int total_points = 4;
-			MP_Point points[total_points];
-			points[0] = { x		   , y          };
-			points[1] = { x + width, y          };
-			points[2] = { x		   , y + height };
-			points[3] = { x + width, y + height };
+			draw_string(renderer, font, "draw_points", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Green);
+			const int grid_size = 4;
+			const int total_points = grid_size * grid_size;
+			MP_Point points[total_points] = {};
+
+			int x_spacing = (int)((float)width / ((float)grid_size - 1.0f));
+			int y_spacing = (int)((float)height / ((float)grid_size - 1.0f));
+
+			// Populate the points array
+			int index = 0;
+			for (int z = 0; z < grid_size; ++z) {
+				for (int j = 0; j < grid_size; ++j) {
+					points[index++] = { x + j * x_spacing, y + z * y_spacing };
+				}
+			}
+
 			mp_render_draw_points(renderer, points, total_points);
 			break;
 		}
+		
 		default: {
 			break;
 		}
         }
     }
+	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
 }
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
@@ -236,7 +362,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		mp_render_copy(renderer, sun.texture, NULL, &player);
 
-		draw_mp_library_debug_images(renderer, toggle_debug_images);
+		draw_mp_library_debug_images(renderer, font_1, toggle_debug_images);
 		mp_render_present(renderer);
 
 	}
