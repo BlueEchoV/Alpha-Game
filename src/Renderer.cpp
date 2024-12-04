@@ -399,7 +399,19 @@ int mp_render_draw_rect(MP_Renderer* renderer, const MP_Rect* rect) {
 	return 0;
 }
 
-int mp_render_draw_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
+int mp_render_draw_rects(MP_Renderer* renderer, const MP_Rect* rects, int count) {
+	if (renderer == NULL) {
+		log("Error: renderer is null");
+		return -1;
+	}
+
+	for (int i = 0; i < count; i++) { 
+		mp_render_draw_rect(renderer, &rects[i]);
+	}
+
+	return 0;
+}
+
 #if 0
 int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
 int mp_get_texture_color_mod(MP_Texture* texture, uint8_t* r, uint8_t* g, uint8_t* b);

@@ -151,10 +151,14 @@ enum Debug_Image {
 	DI_mp_render_draw_lines,
 	DI_mp_render_draw_point,
 	DI_mp_render_draw_points,
+	DI_mp_render_draw_rect,
+	DI_mp_render_draw_rects,
+	DI_mp_render_copy,
+	DI_mp_render_copy_alpha,
     DI_Count
 };
 
-void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, bool toggle_debug_images) {
+void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture* debug_texture, bool toggle_debug_images) {
 	if (!toggle_debug_images) { 
 		return;
 	}
@@ -300,13 +304,58 @@ void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, bool toggle
 			mp_render_draw_points(renderer, points, total_points);
 			break;
 		}
-		
+		case DI_mp_render_draw_rect: {
+			draw_string(renderer, font, "draw_rect", title_x, title_y, string_size, true, true);
+			mp_set_render_draw_color(renderer, C_Red);
+
+			MP_Rect draw_rect = {};
+			draw_rect.x = x;
+			draw_rect.y = y;
+			draw_rect.w = width;
+			draw_rect.h = height;
+
+			mp_render_draw_rect(renderer, &draw_rect);
+			break;
+		}
+		case DI_mp_render_draw_rects: {
+			draw_string(renderer, font, "draw_rect", title_x, title_y, string_size, true, true);
+
+			mp_set_render_draw_color(renderer, C_Dark_Yellow);
+
+			const int total_rects = 4;
+			MP_Rect draw_rects[total_rects] = {};
+
+			draw_rects[0] = {x + width / 2, y			  , width / 2, height / 2};
+			draw_rects[1] = {x			  , y + height / 2, width / 2, height / 2};
+			draw_rects[2] = {x			  , y			  , width / 2, height / 2};
+			draw_rects[3] = {x + width / 2, y + height / 2, width / 2, height / 2};
+
+			mp_render_draw_rects(renderer, draw_rects, total_rects);
+			break;
+		}
+		case DI_mp_render_copy: {
+			draw_string(renderer, font, "render_copy", title_x, title_y, string_size, true, true);
+
+			MP_Rect dst_rect = {x, y, width, height};
+			mp_set_texture_alpha_mod(debug_texture, 255);
+			mp_render_copy(renderer, debug_texture, NULL, &dst_rect);
+			break;
+		}
+		case DI_mp_render_copy_alpha: {
+			draw_string(renderer, font, "alpha_mod", title_x, title_y, string_size, true, true);
+
+			MP_Rect dst_rect = {x, y, width, height};
+			mp_set_texture_alpha_mod(debug_texture, 100);
+			mp_render_copy(renderer, debug_texture, NULL, &dst_rect);
+			break;
+		}
 		default: {
 			break;
 		}
         }
     }
 	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
+	mp_set_texture_alpha_mod(debug_texture, 255);
 }
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
@@ -360,9 +409,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		mp_set_render_draw_color(renderer, 155, 155, 155, 255);
 		mp_render_clear(renderer);
 
+		mp_set_texture_alpha_mod(sun.texture, 100);
 		mp_render_copy(renderer, sun.texture, NULL, &player);
 
-		draw_mp_library_debug_images(renderer, font_1, toggle_debug_images);
+		draw_mp_library_debug_images(renderer, font_1, sun.texture, toggle_debug_images);
 		mp_render_present(renderer);
 
 	}
