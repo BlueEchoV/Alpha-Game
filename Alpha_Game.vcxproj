@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Entity.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\GL_Functions.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -26,7 +29,10 @@
     <ClCompile Include="src\Windows_Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\GL_Functions.h" />
+    <ClInclude Include="src\Image.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\Windows_Platform.h" />

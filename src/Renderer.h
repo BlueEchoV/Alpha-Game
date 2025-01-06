@@ -161,6 +161,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 void mp_render_clear(MP_Renderer* renderer);
 void mp_render_present(MP_Renderer* renderer);
 
+uint64_t mp_get_ticks_64();
+
 #if 0
 int MP_SetTextureBlendMode(SDL_Texture* texture, SDL_BlendMode blend_mode);
 int MP_GetTextureBlendMode(SDL_Texture* texture, SDL_BlendMode* blendMode);
