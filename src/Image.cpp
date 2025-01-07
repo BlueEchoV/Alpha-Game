@@ -85,6 +85,53 @@ Font load_font(MP_Renderer* renderer, const char* file_path) {
 	return result;
 }
 
+Image dummy_image = {};
+std::unordered_map<std::string, Image> images;
+void load_images(MP_Renderer* renderer) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return;
+	}
+
+	// Init the dummy image
+	dummy_image = load_image(renderer, "assets\\dummy_image.png");
+	assert(&dummy_image != NULL);
+
+	images["sun"] = load_image(renderer, "assets\\sun.png");
+}
+Image* get_image(std::string image_name) {
+	auto iterator = images.find(image_name);
+
+	if (iterator != images.end()) {
+		return &iterator->second;
+	} else {
+		// Return the dummy image so it doesn't crash the game
+		return &dummy_image;
+	}
+}
+
+Font dummy_font = {};
+std::unordered_map<std::string, Font> fonts;
+void load_fonts(MP_Renderer* renderer) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return;
+	}
+
+	dummy_font = load_font(renderer, "assets\\dummy_font.png");
+	fonts["basic_font"] = load_font(renderer, "assets\\basic_font.png");
+}
+
+Font* get_font(std::string font_name) {
+	auto iterator = fonts.find(font_name);
+
+	if (iterator != fonts.end()) {
+		return &iterator->second;
+	} else {
+		return &dummy_font;
+	}
+}
+
 // NOTE: It's important to note here that we are currently drawing outside of the UV coordinates.
 // However, setting TexParam to GL_Repeat instead of GL_Mirrored, fixes the issue
 void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background) {

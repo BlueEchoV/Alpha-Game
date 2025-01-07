@@ -2,7 +2,11 @@
 #include "Entity.h"
 
 struct Game_Data {
+	MP_Rect camera;
+
 	Player player;
+
+	std::string selected_font;
 };
 
 struct Camera {

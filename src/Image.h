@@ -1,6 +1,6 @@
 #pragma once
-
 #include "Renderer.h"
+#include <unordered_map>
 
 struct Image {
 	int w;
@@ -33,6 +33,15 @@ enum Debug_Image {
 };
 
 Image load_image(MP_Renderer* renderer, const char* file_path);
+
+extern std::unordered_map<std::string, Image> images;
+void load_images(MP_Renderer* renderer);
+Image* get_image(std::string image_name);
+
+extern std::unordered_map<std::string, Font> fonts;
+void load_fonts(MP_Renderer* renderer);
+Font* get_font(std::string image_name);
+
 Font load_font(MP_Renderer* renderer, const char* file_path);
 void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background);
 void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background);

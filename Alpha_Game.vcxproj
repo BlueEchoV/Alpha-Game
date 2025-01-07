@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Image.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="src\Windows_Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\GL_Functions.h" />
