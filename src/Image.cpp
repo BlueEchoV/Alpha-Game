@@ -99,7 +99,11 @@ void load_images(MP_Renderer* renderer) {
 
 	images["sun"] = load_image(renderer, "assets\\sun.png");
 	images["dummy_player"] = load_image(renderer, "assets\\dummy_player.png");
+	images["rock"] = load_image(renderer, "assets\\rock_32_x_32.png");
+	images["grass"] = load_image(renderer, "assets\\grass_32_x_32.png");
+	images["water"] = load_image(renderer, "assets\\water_32_x_32.png");
 }
+
 Image* get_image(std::string image_name) {
 	auto iterator = images.find(image_name);
 

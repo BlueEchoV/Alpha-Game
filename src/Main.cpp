@@ -18,31 +18,6 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 
 	mp_render_clear(renderer);
 
-	// draw_tile_map(renderer);
-	// Have everything move around the game_data.camera / player
-	// The player is just an offset from the game_data.camera. Camera is always 0,0
-
-	int starting_tile_x = game_data.camera.x;
-	int starting_tile_y = game_data.camera.y;
-
-	// Only render tiles in the view of the player
-	// Currently in world space
-	for (int tile_x = ; tile_x < game_data.camera.w / Globals::tile_w; tile_x++) {
-		for (int tile_y = 0; tile_y < game_data.camera.h / Globals::tile_h; tile_y++) {
-			MP_Rect current_rect = {};
-			current_rect.w = Globals::tile_w;
-			current_rect.h = Globals::tile_h;
-
-			// Move everything around the camera
-			current_rect.x = (Globals::tile_w * r) - game_data.camera.x;
-			current_rect.y = (Globals::tile_h * c) - game_data.camera.y;
-
-			mp_set_render_draw_color(renderer, C_Green);
-
-			mp_render_draw_rect(renderer, &current_rect);
-		}
-	}
-
 	// Create a render scene function that has the follow:
 	// 1) Render player 
 	// 2) Render entities
@@ -57,6 +32,34 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 
 	MP_Rect player_rect = {(int)game_data.player.position_cs.x, (int)game_data.player.position_cs.y, game_data.player.w, game_data.player.h};
 	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
+
+	// draw_tile_map(renderer);
+	// Have everything move around the game_data.camera / player
+	// The player is just an offset from the game_data.camera. Camera is always 0,0
+
+	// Truncates by default
+	int starting_tile_x = game_data.camera.x / Globals::tile_w;
+	int starting_tile_y = game_data.camera.y / Globals::tile_h;
+
+	int ending_tile_x = (game_data.camera.x + game_data.camera.w) / Globals::tile_w;
+	int ending_tile_y = (game_data.camera.y + game_data.camera.h) / Globals::tile_h;
+
+	// Only render tiles in the view of the player
+	// Currently in world space
+	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
+		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
+			MP_Rect current_rect = {};
+			current_rect.w = Globals::tile_w;
+			current_rect.h = Globals::tile_h;
+
+			// Move everything around the camera
+			current_rect.x = (Globals::tile_w * tile_x) - game_data.camera.x;
+			current_rect.y = (Globals::tile_h * tile_y) - game_data.camera.y;
+
+			mp_set_render_draw_color(renderer, C_Green);
+			mp_render_draw_rect(renderer, &current_rect);
+		}
+	}
 
 	Font* font = get_font(game_data.selected_font);
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
