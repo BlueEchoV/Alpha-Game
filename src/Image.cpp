@@ -98,6 +98,7 @@ void load_images(MP_Renderer* renderer) {
 	assert(&dummy_image != NULL);
 
 	images["sun"] = load_image(renderer, "assets\\sun.png");
+	images["dummy_player"] = load_image(renderer, "assets\\dummy_player.png");
 }
 Image* get_image(std::string image_name) {
 	auto iterator = images.find(image_name);

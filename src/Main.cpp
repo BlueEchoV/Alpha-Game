@@ -19,24 +19,23 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	mp_render_clear(renderer);
 
 	// draw_tile_map(renderer);
-
-	// Pixels
-	int tile_w = 32;
-	int tile_h = 32;
-
 	// Have everything move around the game_data.camera / player
 	// The player is just an offset from the game_data.camera. Camera is always 0,0
 
+	int starting_tile_x = game_data.camera.x;
+	int starting_tile_y = game_data.camera.y;
+
 	// Only render tiles in the view of the player
 	// Currently in world space
-	for (int r = 0; r < game_data.camera.w/ tile_w + 1; r++) {
-		for (int c = 0; c < game_data.camera.h / tile_h + 1; c++) {
+	for (int tile_x = ; tile_x < game_data.camera.w / Globals::tile_w; tile_x++) {
+		for (int tile_y = 0; tile_y < game_data.camera.h / Globals::tile_h; tile_y++) {
 			MP_Rect current_rect = {};
-			current_rect.w = tile_w;
-			current_rect.h = tile_h;
+			current_rect.w = Globals::tile_w;
+			current_rect.h = Globals::tile_h;
 
-			current_rect.x = (tile_w * r) - game_data.camera.x;
-			current_rect.y = (tile_h * c) - game_data.camera.y;
+			// Move everything around the camera
+			current_rect.x = (Globals::tile_w * r) - game_data.camera.x;
+			current_rect.y = (Globals::tile_h * c) - game_data.camera.y;
 
 			mp_set_render_draw_color(renderer, C_Green);
 
@@ -54,13 +53,13 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 
 	game_data.player.position_cs.x = (float)game_data.camera.w / 2.0f - game_data.player.w / 2;
 	game_data.player.position_cs.y = (float)game_data.camera.h / 2.0f - game_data.player.h / 2;
-	mp_set_texture_alpha_mod(game_data.player.image->texture, 100);
+	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
 
 	MP_Rect player_rect = {(int)game_data.player.position_cs.x, (int)game_data.player.position_cs.y, game_data.player.w, game_data.player.h};
 	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);
-	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, toggle_debug_images);
+	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
 	mp_render_present(renderer);
 }
 
@@ -77,7 +76,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = "basic_font";
 
 	int player_speed = 1;
-	game_data.player = create_player(get_image("player"), player_speed);
+	game_data.player = create_player(get_image("dummy_player"), player_speed);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
@@ -113,16 +112,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			game_data.player.position_ws.x -= player_speed;
 		}
 		if (key_pressed(VK_OEM_3)) {
-			toggle_debug_images = !toggle_debug_images;
+			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 		}
 
-		// update()
+		// Update
 
-		// render
+		// Render
 		render(renderer, game_data);
-
 	}
 
-	// ReleaseDC(window_handle, window_dc);
+	ReleaseDC(renderer->open_gl.window_handle, renderer->open_gl.window_dc);
 	return 0;
 }
