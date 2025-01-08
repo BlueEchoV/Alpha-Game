@@ -8,6 +8,10 @@ Image load_image(MP_Renderer* renderer, const char* file_path) {
 
 	int width, height, channels;
 	unsigned char* data = stbi_load(file_path, &width, &height, &channels, 4);
+	if (data == NULL) {
+		log("Error: stbi_load is null: %s", file_path);
+	}
+
 	DEFER{
 		stbi_image_free(data);
 	};
@@ -86,7 +90,7 @@ Font load_font(MP_Renderer* renderer, const char* file_path) {
 }
 
 Image dummy_image = {};
-std::unordered_map<std::string, Image> images;
+std::unordered_map<Image_Type, Image> images;
 void load_images(MP_Renderer* renderer) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
@@ -97,15 +101,16 @@ void load_images(MP_Renderer* renderer) {
 	dummy_image = load_image(renderer, "assets\\dummy_image.png");
 	assert(&dummy_image != NULL);
 
-	images["sun"] = load_image(renderer, "assets\\sun.png");
-	images["dummy_player"] = load_image(renderer, "assets\\dummy_player.png");
-	images["rock"] = load_image(renderer, "assets\\rock_32_x_32.png");
-	images["grass"] = load_image(renderer, "assets\\grass_32_x_32.png");
-	images["water"] = load_image(renderer, "assets\\water_32_x_32.png");
+	images[IT_Sun] = load_image(renderer, "assets\\sun.png");
+	images[IT_Dummy_Player] = load_image(renderer, "assets\\dummy_player.png");
+	images[IT_Dummy_Tile_32x32] = load_image(renderer, "assets\\dummy_tile_32x32.png");
+	images[IT_Rock_32x32] = load_image(renderer, "assets\\rock_32x32.png");
+	images[IT_Grass_32x32] = load_image(renderer, "assets\\grass_32x32.png");
+	images[IT_Water_32x32] = load_image(renderer, "assets\\water_32x32.png");
 }
 
-Image* get_image(std::string image_name) {
-	auto iterator = images.find(image_name);
+Image* get_image(Image_Type image_type) {
+	auto iterator = images.find(image_type);
 
 	if (iterator != images.end()) {
 		return &iterator->second;

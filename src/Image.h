@@ -32,11 +32,27 @@ enum Debug_Image {
     DI_Count
 };
 
+enum Tile_Type {
+	TT_Rock,
+	TT_Grass,
+	TT_Water,
+	TT_Total
+};
+
+enum Image_Type {
+	IT_Sun,
+	IT_Dummy_Player,
+	IT_Dummy_Tile_32x32,
+	IT_Rock_32x32,
+	IT_Grass_32x32,
+	IT_Water_32x32
+};
+
 Image load_image(MP_Renderer* renderer, const char* file_path);
 
-extern std::unordered_map<std::string, Image> images;
+extern std::unordered_map<Image_Type, Image> images;
 void load_images(MP_Renderer* renderer);
-Image* get_image(std::string image_name);
+Image* get_image(Image_Type image_type);
 
 extern std::unordered_map<std::string, Font> fonts;
 void load_fonts(MP_Renderer* renderer);

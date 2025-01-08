@@ -6,6 +6,48 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return;
+	}
+	Image_Type type = IT_Rock_32x32;
+
+	// Move everything around the camera
+	int tile_ws_x = (Globals::tile_w * tile_index_x);
+	int tile_ws_y = (Globals::tile_h * tile_index_y);
+
+	int tile_cs_x = tile_ws_x - game_data.camera.x;
+	int tile_cs_y = tile_ws_y - game_data.camera.y;
+
+	int hash = tile_ws_x * 73856093 ^ tile_ws_y * 19349663;
+	switch (hash % (TT_Total)) {
+	case 0: {
+		type = IT_Rock_32x32;
+		break;
+	}
+	case 1: {
+		type = IT_Grass_32x32;
+		break;
+	}
+	case 2: {
+		type = IT_Water_32x32;
+		break;
+	}
+	default: {
+		log("Error: Default case hit in tile generation");
+		type = IT_Rock_32x32;
+		break;
+	}
+	}
+
+	Image* image = get_image(type);
+
+	MP_Rect dst = {tile_cs_x, tile_cs_y, Globals::tile_w, Globals::tile_h};
+
+	mp_render_copy(renderer, image->texture, NULL, &dst);
+}
+
 void render(MP_Renderer* renderer, Game_Data& game_data) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
@@ -26,13 +68,6 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	game_data.camera.x = (int)((float)game_data.player.position_ws.x - (float)game_data.camera.w / 2.0f);
 	game_data.camera.y = (int)((float)game_data.player.position_ws.y - (float)game_data.camera.h / 2.0f);
 
-	game_data.player.position_cs.x = (float)game_data.camera.w / 2.0f - game_data.player.w / 2;
-	game_data.player.position_cs.y = (float)game_data.camera.h / 2.0f - game_data.player.h / 2;
-	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
-
-	MP_Rect player_rect = {(int)game_data.player.position_cs.x, (int)game_data.player.position_cs.y, game_data.player.w, game_data.player.h};
-	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
-
 	// draw_tile_map(renderer);
 	// Have everything move around the game_data.camera / player
 	// The player is just an offset from the game_data.camera. Camera is always 0,0
@@ -46,20 +81,19 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 
 	// Only render tiles in the view of the player
 	// Currently in world space
+	// Draw the tiles around the player
 	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
 		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
-			MP_Rect current_rect = {};
-			current_rect.w = Globals::tile_w;
-			current_rect.h = Globals::tile_h;
-
-			// Move everything around the camera
-			current_rect.x = (Globals::tile_w * tile_x) - game_data.camera.x;
-			current_rect.y = (Globals::tile_h * tile_y) - game_data.camera.y;
-
-			mp_set_render_draw_color(renderer, C_Green);
-			mp_render_draw_rect(renderer, &current_rect);
+			draw_tile(renderer, game_data, tile_x, tile_y);
 		}
 	}
+
+	game_data.player.position_cs.x = (float)game_data.camera.w / 2.0f - game_data.player.w / 2;
+	game_data.player.position_cs.y = (float)game_data.camera.h / 2.0f - game_data.player.h / 2;
+	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
+
+	MP_Rect player_rect = {(int)game_data.player.position_cs.x, (int)game_data.player.position_cs.y, game_data.player.w, game_data.player.h};
+	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
@@ -79,7 +113,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = "basic_font";
 
 	int player_speed = 1;
-	game_data.player = create_player(get_image("dummy_player"), player_speed);
+	game_data.player = create_player(get_image(IT_Dummy_Player), player_speed);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
