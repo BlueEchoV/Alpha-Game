@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Image.h"
 #include "Globals.h"
+#include <perlin.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
