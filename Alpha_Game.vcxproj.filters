@@ -57,5 +57,8 @@
     <ClInclude Include="src\Globals.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Perlin.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

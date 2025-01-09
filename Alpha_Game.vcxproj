@@ -34,6 +34,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\GL_Functions.h" />
     <ClInclude Include="src\Image.h" />
+    <ClInclude Include="src\Perlin.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\Windows_Platform.h" />
@@ -91,10 +92,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

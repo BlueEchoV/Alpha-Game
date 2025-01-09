@@ -2,12 +2,14 @@
 #include "Game.h"
 #include "Image.h"
 #include "Globals.h"
+
+#define STB_PERLIN_IMPLEMENTATION
 #include <perlin.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y) {
+void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
 		return;
@@ -21,25 +23,16 @@ void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, in
 	int tile_cs_x = tile_ws_x - game_data.camera.x;
 	int tile_cs_y = tile_ws_y - game_data.camera.y;
 
-	int hash = tile_ws_x * 73856093 ^ tile_ws_y * 19349663;
-	switch (hash % (TT_Total)) {
-	case 0: {
-		type = IT_Rock_32x32;
-		break;
-	}
-	case 1: {
-		type = IT_Grass_32x32;
-		break;
-	}
-	case 2: {
+	float perlin_x = tile_index_x * noise_frequency;
+	float perlin_y = tile_index_y * noise_frequency;
+	float perlin = stb_perlin_noise3(perlin_x, perlin_y, 0, 0, 0, 0);
+
+	if (perlin <= -0.2f) {
 		type = IT_Water_32x32;
-		break;
-	}
-	default: {
-		log("Error: Default case hit in tile generation");
+	} else if (perlin > -0.2f && perlin < 0.3f) {
+		type = IT_Grass_32x32;
+	} else {
 		type = IT_Rock_32x32;
-		break;
-	}
 	}
 
 	Image* image = get_image(type);
@@ -85,7 +78,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	// Draw the tiles around the player
 	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
 		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
-			draw_tile(renderer, game_data, tile_x, tile_y);
+			draw_tile(renderer, game_data, tile_x, tile_y, Globals::noise_frequency);
 		}
 	}
 
