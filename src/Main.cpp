@@ -91,6 +91,75 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 
 	Font* font = get_font(game_data.selected_font);
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
+
+	// *********Visualization code****************
+	mp_set_render_draw_color(renderer, C_Orange);
+	V2_F c = {};
+	c.x = game_data.player.position_cs.x + 400;
+	c.y = game_data.player.position_cs.y;
+
+	int w = 150;
+	int h = 150;
+	static MP_Point top_left =	   { (int)c.x - (w / 2), (int)c.y + (h / 2)};
+	static MP_Point top_right =    { (int)c.x + (w / 2), (int)c.y + (h / 2)};
+	static MP_Point bottom_right = { (int)c.x + (w / 2), (int)c.y - (h / 2)};
+	static MP_Point bottom_left =  { (int)c.x - (w / 2), (int)c.y - (h / 2)};
+
+	static float angle = 0.0f;
+	static float last_angle = 0.0f;
+	float rotation_speed = 1.0f;
+	if (key_pressed(KEY_R)) {
+		angle += rotation_speed;
+	}
+	if (key_pressed(KEY_F)) {
+		angle -= rotation_speed;
+	}
+	if (angle != last_angle) {
+		V2_F top_left_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)top_left.x, (float)top_left.y);
+		top_left.x = (int)top_left_v2.x;
+		top_left.y = (int)top_left_v2.y;
+		V2_F top_right_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)top_right.x, (float)top_right.y);
+		top_right.x = (int)top_right_v2.x;
+		top_right.y = (int)top_right_v2.y;
+		V2_F bottom_right_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)bottom_right.x, (float)bottom_right.y);
+		bottom_right.x = (int)bottom_right_v2.x;
+		bottom_right.y = (int)bottom_right_v2.y;
+		V2_F bottom_left_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)bottom_left.x, (float)bottom_left.y);
+		bottom_left.x = (int)bottom_left_v2.x;
+		bottom_left.y = (int)bottom_left_v2.y;
+		last_angle = angle;
+	} 	
+	int string_size = 1;
+	std::string center_string = {};
+	center_string = "(" + std::to_string(c.x) + " " + std::to_string(c.y) + ")";
+	draw_string(renderer, *font, center_string.c_str(), (int)c.x, (int)c.y, string_size, true, false);
+
+	std::string angle_string = {};
+	center_string = std::to_string(angle);
+	draw_string(renderer, *font, center_string.c_str(), (int)c.x, (int)c.y + (font->char_height * 2) * string_size, string_size, true, false);
+
+	std::string top_left_string = {};
+	top_left_string = "(" + std::to_string(top_left.x) + " " + std::to_string(top_left.y) + ")";
+	draw_string(renderer, *font, top_left_string.c_str(), top_left.x, top_left.y, string_size, true, false);
+
+	std::string top_right_string = {};
+	top_right_string = "(" + std::to_string(top_right.x) + " " + std::to_string(top_right.y) + ")";
+	draw_string(renderer, *font, top_right_string.c_str(), top_right.x, top_right.y, string_size, true, false);
+
+	std::string bottom_right_string = {};
+	bottom_right_string = "(" + std::to_string(bottom_right.x) + " " + std::to_string(bottom_right.y) + ")";
+	draw_string(renderer, *font, bottom_right_string.c_str(), bottom_right.x, bottom_right.y, string_size, true, false);
+
+	std::string bottom_left_string = {};
+	bottom_left_string = "(" + std::to_string(bottom_left.x) + " " + std::to_string(bottom_left.y) + ")";
+	draw_string(renderer, *font, bottom_left_string.c_str(), bottom_left.x, bottom_left.y, string_size, true, false);
+
+	mp_render_draw_line(renderer, top_left.x,	  top_left.y,     top_right.x,    top_right.y);
+	mp_render_draw_line(renderer, top_right.x,	  top_right.y,    bottom_right.x, bottom_right.y);
+	mp_render_draw_line(renderer, bottom_right.x, bottom_right.y, bottom_left.x,  bottom_left.y);
+	mp_render_draw_line(renderer, bottom_left.x,  bottom_left.y,  top_left.x,     top_left.y);
+	// *******************************************
+
 	mp_render_present(renderer);
 }
 

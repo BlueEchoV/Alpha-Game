@@ -5,6 +5,9 @@
 #include <string>
 #include <stb_image.h>
 #include <assert.h>
+#include <math.h>
+
+#define M_PI 3.141592653589793238462643383279502884197
 
 #define REF(v) (void)v;
 
@@ -67,3 +70,4 @@ struct Color_RGBA8 {
 
 void log(const char* format, ...);
 void my_mem_copy(const void* src, void* dst, size_t n);
+V2_F rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float ws_x, float ws_y);

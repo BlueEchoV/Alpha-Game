@@ -41,6 +41,13 @@ typedef enum MP_BlendMode
     MP_BLENDMODE_INVALID = 0x7FFFFFFF
 } MP_BlendMode;
 
+typedef enum MP_RendererFlip
+{
+    SDL_FLIP_NONE = 0x00000000,			 /**< Do not flip */
+    SDL_FLIP_HORIZONTAL = 0x00000001,    /**< flip horizontally */
+    SDL_FLIP_VERTICAL = 0x00000002       /**< flip vertically */
+} MP_RendererFlip;
+
 struct MP_Point {
 	int x, y;
 };
@@ -150,6 +157,8 @@ int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
 MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h);
 void mp_destroy_texture(MP_Texture* texture);
 void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect);
+int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
+				      const float angle, const MP_Point* center, const MP_RendererFlip flip);
 
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
 void mp_unlock_texture(MP_Texture* texture);

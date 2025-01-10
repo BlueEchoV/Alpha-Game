@@ -586,6 +586,94 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 	renderer->packets.push_back(result);
 }
 
+int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
+					  const float angle, const MP_Point* center, const MP_RendererFlip flip) {
+	if (renderer == NULL) {
+		log("Error: Renderer is null");
+		return -1;
+	}
+	REF(flip);
+	REF(center);
+	REF(angle);
+
+	// Texture Packet
+	Packet result;
+
+	result.type = PT_TEXTURE;
+	result.packet_texture.texture = texture;
+
+	Vertex vertex_1 = {};
+	Vertex vertex_2 = {};
+	Vertex vertex_3 = {};
+	Vertex vertex_4 = {};
+
+	MP_Rect dst = {};
+	int window_w = renderer->window_width; 
+	int	window_h = renderer->window_height;
+	if (dst_rect == NULL) {
+		dst.x = 0;
+		dst.y = 0;
+		dst.w = window_w;
+		dst.h = window_h;
+	} else {
+		dst = *dst_rect;
+	}
+
+	// float cosine = cos(angle);
+	// float sine = sin(angle);
+
+	// NOTE: My coordinate system draws from the bottom left
+	vertex_1.pos = mp_pixel_to_ndc(dst.x 	    , dst.y		   , window_w, window_h); // Bottom left (Starting point)
+	vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y		   , window_w, window_h); // Bottom right 
+	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, window_w, window_h); // Top right 
+	vertex_4.pos = mp_pixel_to_ndc(dst.x		, dst.y + dst.h, window_w, window_h); // Top left 
+
+	MP_Rect src = {};
+	if (src_rect == NULL) {
+		src.x = 0;
+		src.y = 0;
+		src.w = texture->w;
+		src.h = texture->h;
+	} else {
+		src = *src_rect;
+	}
+
+	vertex_1.texture_coor = mp_pixel_to_uv(src.x		, src.y        , texture->w, texture->h); // Bottom left
+	vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y		   , texture->w, texture->h); // Bottom right
+	vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h); // Top right
+	vertex_4.texture_coor = mp_pixel_to_uv(src.x		, src.y + src.h, texture->w, texture->h); // Top left
+
+	Color_4F m = texture->mod;
+	vertex_1.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+	vertex_2.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+	vertex_3.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+	vertex_4.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};
+
+	int vbo_starting_index = (int)renderer->vertices.size();
+	renderer->vertices.push_back(vertex_1);
+	renderer->vertices.push_back(vertex_2);
+	renderer->vertices.push_back(vertex_3);
+	renderer->vertices.push_back(vertex_4);
+
+	// retain the indices positions (size subtraction)
+	// push back the indices (Draw Order - 6)
+
+	result.packet_texture.indices_array_index = (int)renderer->indices.size();
+
+	int current_indices = (int)renderer->indices.size();
+	renderer->indices.push_back(vbo_starting_index + 0);
+	renderer->indices.push_back(vbo_starting_index + 1);
+	renderer->indices.push_back(vbo_starting_index + 2);
+	renderer->indices.push_back(vbo_starting_index + 2);
+	renderer->indices.push_back(vbo_starting_index + 3);
+	renderer->indices.push_back(vbo_starting_index + 0);
+	result.packet_texture.indices_count = (int)renderer->indices.size() - current_indices;
+
+	renderer->packets.push_back(result);
+
+	return 0;
+}
+
 void gl_set_blend_mode(MP_BlendMode blend_mode) {
     switch (blend_mode) {
         case MP_BLENDMODE_NONE:
