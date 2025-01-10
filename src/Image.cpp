@@ -104,6 +104,7 @@ void load_images(MP_Renderer* renderer) {
 	images[IT_Sun] = load_image(renderer, "assets\\sun.png");
 	images[IT_Dummy_Player] = load_image(renderer, "assets\\dummy_player.png");
 	images[IT_Top_Down_Player_Demo] = load_image(renderer, "assets\\top_down_player_demo.png");
+	images[IT_Arrow_1] = load_image(renderer, "assets\\arrow_1.png");
 	images[IT_Dummy_Tile_32x32] = load_image(renderer, "assets\\dummy_tile_32x32.png");
 	images[IT_Rock_32x32] = load_image(renderer, "assets\\rock_32x32.png");
 	images[IT_Grass_32x32] = load_image(renderer, "assets\\grass_32x32.png");
