@@ -176,7 +176,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = "basic_font";
 
 	int player_speed = 1;
-	game_data.player = create_player(get_image(IT_Dummy_Player), player_speed);
+	game_data.player = create_player(get_image(IT_Top_Down_Player_Demo), player_speed);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
