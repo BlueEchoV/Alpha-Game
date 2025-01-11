@@ -180,13 +180,12 @@ HDC init_open_gl(HWND window) {
 	// Delete the garbage context
 	wglDeleteContext(temp_context);
 
-	int width = 0;
-	int height = 0;
-	get_window_size(window, width, height);
+	int w, h;
+	get_window_size(window, w, h);
 
 	// NOTE: Sets the area of the window where the scene will be drawn. In this case, it 
 	//		 starts at the bottom-left corner (0, 0) and stretches to the specified width and height.
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, w, h);
 
 	return window_dc;
 }
@@ -315,12 +314,8 @@ int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2) {
 	vertex_1.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
 	vertex_2.color = { renderer->draw_color.r, renderer->draw_color.g, renderer->draw_color.b, 1.0f };
 
-	int window_w;
-	int window_h;
-	get_window_size(renderer->open_gl.window_handle, window_w, window_h);
-	
-	vertex_1.pos = mp_pixel_to_ndc(x1, y1, window_w, window_h);
-	vertex_2.pos = mp_pixel_to_ndc(x2, y2, window_w, window_h);
+	vertex_1.pos = mp_pixel_to_ndc(x1, y1, renderer->window_width, renderer->window_height);
+	vertex_2.pos = mp_pixel_to_ndc(x2, y2, renderer->window_width, renderer->window_height);
 
 	int vertices_starting_index = (int)renderer->vertices.size();
 
@@ -484,6 +479,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	load_shaders();
+
+	get_window_size(renderer->open_gl.window_handle, renderer->window_width, renderer->window_height);
 
 	return renderer;
 }

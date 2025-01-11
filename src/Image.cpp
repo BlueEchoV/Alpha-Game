@@ -187,6 +187,71 @@ void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int 
 	}
 }
 
+void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2_F center, Font* font) {
+	V2_F c = {};
+	c.x = center.x;
+	c.y = center.y;
+
+	float w = 100;
+	float h = 100;
+	static V2_F original_top_left = { c.x - (w / 2.0f), (int)c.y + (h / 2) };
+	static V2_F original_top_right = { c.x + (w / 2.0f), (int)c.y + (h / 2) };
+	static V2_F original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2) };
+	static V2_F original_bottom_left = { c.x - (w / 2.0f), (int)c.y - (h / 2) };
+
+	static V2_F new_top_left = original_top_left;
+	static V2_F new_top_right = original_top_right;
+	static V2_F new_bottom_right = original_bottom_right;
+	static V2_F new_bottom_left = original_bottom_left;
+
+	static float angle = 0.0f;
+	static float last_angle = 0.0f;
+	float rotation_speed = 1.0f;
+	if (key_pressed_and_held(KEY_R)) {
+		angle += rotation_speed;
+	}
+	if (key_pressed_and_held(KEY_F)) {
+		angle -= rotation_speed;
+	}
+	if (angle != last_angle) {
+		new_top_left = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_left.x, (float)original_top_left.y);
+		new_top_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_right.x, (float)original_top_right.y);
+		new_bottom_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_bottom_right.x, (float)original_bottom_right.y);
+		new_bottom_left = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_bottom_left.x, (float)original_bottom_left.y);
+		last_angle = angle;
+	}
+	int string_size = 1;
+	std::string center_string = {};
+	center_string = "(" + std::to_string((int)c.x) + " " + std::to_string((int)c.y) + ")";
+	draw_string(renderer, *font, center_string.c_str(), (int)c.x, (int)c.y, string_size, true, false);
+
+	std::string angle_string = {};
+	center_string = std::to_string((int)angle);
+	draw_string(renderer, *font, center_string.c_str(), (int)c.x, (int)c.y + (font->char_height * 2) * string_size, string_size, true, false);
+
+	std::string top_left_string = {};
+	top_left_string = "(" + std::to_string((int)new_top_left.x) + " " + std::to_string((int)new_top_left.y) + ")";
+	draw_string(renderer, *font, top_left_string.c_str(), new_top_left.x, new_top_left.y, string_size, true, false);
+
+	std::string top_right_string = {};
+	top_right_string = "(" + std::to_string((int)new_top_right.x) + " " + std::to_string((int)new_top_right.y) + ")";
+	draw_string(renderer, *font, top_right_string.c_str(), new_top_right.x, new_top_right.y, string_size, true, false);
+
+	std::string bottom_right_string = {};
+	bottom_right_string = "(" + std::to_string((int)new_bottom_right.x) + " " + std::to_string((int)new_bottom_right.y) + ")";
+	draw_string(renderer, *font, bottom_right_string.c_str(), new_bottom_right.x, new_bottom_right.y, string_size, true, false);
+
+	std::string bottom_left_string = {};
+	bottom_left_string = "(" + std::to_string((int)new_bottom_left.x) + " " + std::to_string((int)new_bottom_left.y) + ")";
+	draw_string(renderer, *font, bottom_left_string.c_str(), new_bottom_left.x, new_bottom_left.y, string_size, true, false);
+
+	mp_set_render_draw_color(renderer, C_Orange);
+	mp_render_draw_line(renderer, (int)new_top_left.x, (int)new_top_left.y, (int)new_top_right.x, (int)new_top_right.y);
+	mp_render_draw_line(renderer, (int)new_top_right.x, (int)new_top_right.y, (int)new_bottom_right.x, (int)new_bottom_right.y);
+	mp_render_draw_line(renderer, (int)new_bottom_right.x, (int)new_bottom_right.y, (int)new_bottom_left.x, (int)new_bottom_left.y);
+	mp_render_draw_line(renderer, (int)new_bottom_left.x, (int)new_bottom_left.y, (int)new_top_left.x, (int)new_top_left.y);
+}
+
 void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture* debug_texture, bool toggle_debug_images) {
 	if (!toggle_debug_images) { 
 		return;
@@ -378,7 +443,13 @@ void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture*
 			mp_render_copy(renderer, debug_texture, NULL, &dst_rect);
 			break;
 		}
+		case DI_2d_matrix_transformation_rect: {
+			draw_string(renderer, font, "2d_rotation", title_x, title_y, string_size, true, true);
+			draw_debug_2d_rotation_matrix_rect(renderer, { (float)50.0f, (float)164.0f }, &font);
+			break;
+		}
 		default: {
+			draw_string(renderer, font, "Error. Image default case hit in debug string", x, y, 1, true, true);
 			break;
 		}
         }
