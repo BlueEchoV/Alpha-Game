@@ -207,10 +207,10 @@ void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2_F center, Font
 	static float angle = 0.0f;
 	static float last_angle = 0.0f;
 	float rotation_speed = 1.0f;
-	if (key_pressed_and_held(KEY_R)) {
+	if (key_pressed_and_held(KEY_A)) {
 		angle += rotation_speed;
 	}
-	if (key_pressed_and_held(KEY_F)) {
+	if (key_pressed_and_held(KEY_D)) {
 		angle -= rotation_speed;
 	}
 	if (angle != last_angle) {
@@ -445,7 +445,7 @@ void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture*
 		}
 		case DI_2d_matrix_transformation_rect: {
 			draw_string(renderer, font, "2d_rotation", title_x, title_y, string_size, true, true);
-			draw_debug_2d_rotation_matrix_rect(renderer, { (float)50.0f, (float)164.0f }, &font);
+			draw_debug_2d_rotation_matrix_rect(renderer, { (float)x + width / 2, (float)y + height / 2 }, &font);
 			break;
 		}
 		default: {
