@@ -63,4 +63,5 @@ Font* get_font(std::string image_name);
 Font load_font(MP_Renderer* renderer, const char* file_path);
 void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background);
 void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background);
+void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, float y, int size, bool center_x, bool background);
 void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture* debug_texture, bool toggle_debug_images);

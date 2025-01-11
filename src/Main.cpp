@@ -98,66 +98,63 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	c.x = game_data.player.position_cs.x + 400;
 	c.y = game_data.player.position_cs.y;
 
-	int w = 150;
-	int h = 150;
-	static MP_Point top_left =	   { (int)c.x - (w / 2), (int)c.y + (h / 2)};
-	static MP_Point top_right =    { (int)c.x + (w / 2), (int)c.y + (h / 2)};
-	static MP_Point bottom_right = { (int)c.x + (w / 2), (int)c.y - (h / 2)};
-	static MP_Point bottom_left =  { (int)c.x - (w / 2), (int)c.y - (h / 2)};
+	float w = 150;
+	float h = 150;
+	static V2_F original_top_left =	    { c.x - (w / 2.0f), (int)c.y + (h / 2)};
+	static V2_F original_top_right =    { c.x + (w / 2.0f), (int)c.y + (h / 2)};
+	static V2_F original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2)};
+	static V2_F original_bottom_left =  { c.x - (w / 2.0f), (int)c.y - (h / 2)};
+
+	static V2_F new_top_left = original_top_left;
+	static V2_F new_top_right = original_top_right;
+	static V2_F new_bottom_right = original_bottom_right;
+	static V2_F new_bottom_left = original_bottom_left;
 
 	static float angle = 0.0f;
 	static float last_angle = 0.0f;
 	float rotation_speed = 1.0f;
-	if (key_pressed(KEY_R)) {
+	if (key_pressed_and_held(KEY_R)) {
 		angle += rotation_speed;
 	}
-	if (key_pressed(KEY_F)) {
+	if (key_pressed_and_held(KEY_F)) {
 		angle -= rotation_speed;
 	}
 	if (angle != last_angle) {
-		V2_F top_left_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)top_left.x, (float)top_left.y);
-		top_left.x = (int)top_left_v2.x;
-		top_left.y = (int)top_left_v2.y;
-		V2_F top_right_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)top_right.x, (float)top_right.y);
-		top_right.x = (int)top_right_v2.x;
-		top_right.y = (int)top_right_v2.y;
-		V2_F bottom_right_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)bottom_right.x, (float)bottom_right.y);
-		bottom_right.x = (int)bottom_right_v2.x;
-		bottom_right.y = (int)bottom_right_v2.y;
-		V2_F bottom_left_v2 = rotate_point_based_off_angle(angle, c.x, c.y, (float)bottom_left.x, (float)bottom_left.y);
-		bottom_left.x = (int)bottom_left_v2.x;
-		bottom_left.y = (int)bottom_left_v2.y;
+		new_top_left = rotate_point_based_off_angle(angle, c.x, c.y,     (float)original_top_left.x,     (float)original_top_left.y);
+		new_top_right = rotate_point_based_off_angle(angle, c.x, c.y,    (float)original_top_right.x,    (float)original_top_right.y);
+		new_bottom_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_bottom_right.x, (float)original_bottom_right.y);
+		new_bottom_left = rotate_point_based_off_angle(angle, c.x, c.y,  (float)original_bottom_left.x,  (float)original_bottom_left.y);
 		last_angle = angle;
 	} 	
 	int string_size = 1;
 	std::string center_string = {};
-	center_string = "(" + std::to_string(c.x) + " " + std::to_string(c.y) + ")";
+	center_string = "(" + std::to_string((int)c.x) + " " + std::to_string((int)c.y) + ")";
 	draw_string(renderer, *font, center_string.c_str(), (int)c.x, (int)c.y, string_size, true, false);
 
 	std::string angle_string = {};
-	center_string = std::to_string(angle);
+	center_string = std::to_string((int)angle);
 	draw_string(renderer, *font, center_string.c_str(), (int)c.x, (int)c.y + (font->char_height * 2) * string_size, string_size, true, false);
 
 	std::string top_left_string = {};
-	top_left_string = "(" + std::to_string(top_left.x) + " " + std::to_string(top_left.y) + ")";
-	draw_string(renderer, *font, top_left_string.c_str(), top_left.x, top_left.y, string_size, true, false);
+	top_left_string = "(" + std::to_string((int)new_top_left.x) + " " + std::to_string((int)new_top_left.y) + ")";
+	draw_string(renderer, *font, top_left_string.c_str(), new_top_left.x, new_top_left.y, string_size, true, false);
 
 	std::string top_right_string = {};
-	top_right_string = "(" + std::to_string(top_right.x) + " " + std::to_string(top_right.y) + ")";
-	draw_string(renderer, *font, top_right_string.c_str(), top_right.x, top_right.y, string_size, true, false);
+	top_right_string = "(" + std::to_string((int)new_top_right.x) + " " + std::to_string((int)new_top_right.y) + ")";
+	draw_string(renderer, *font, top_right_string.c_str(), new_top_right.x, new_top_right.y, string_size, true, false);
 
 	std::string bottom_right_string = {};
-	bottom_right_string = "(" + std::to_string(bottom_right.x) + " " + std::to_string(bottom_right.y) + ")";
-	draw_string(renderer, *font, bottom_right_string.c_str(), bottom_right.x, bottom_right.y, string_size, true, false);
+	bottom_right_string = "(" + std::to_string((int)new_bottom_right.x) + " " + std::to_string((int)new_bottom_right.y) + ")";
+	draw_string(renderer, *font, bottom_right_string.c_str(), new_bottom_right.x, new_bottom_right.y, string_size, true, false);
 
 	std::string bottom_left_string = {};
-	bottom_left_string = "(" + std::to_string(bottom_left.x) + " " + std::to_string(bottom_left.y) + ")";
-	draw_string(renderer, *font, bottom_left_string.c_str(), bottom_left.x, bottom_left.y, string_size, true, false);
+	bottom_left_string = "(" + std::to_string((int)new_bottom_left.x) + " " + std::to_string((int)new_bottom_left.y) + ")";
+	draw_string(renderer, *font, bottom_left_string.c_str(), new_bottom_left.x, new_bottom_left.y, string_size, true, false);
 
-	mp_render_draw_line(renderer, top_left.x,	  top_left.y,     top_right.x,    top_right.y);
-	mp_render_draw_line(renderer, top_right.x,	  top_right.y,    bottom_right.x, bottom_right.y);
-	mp_render_draw_line(renderer, bottom_right.x, bottom_right.y, bottom_left.x,  bottom_left.y);
-	mp_render_draw_line(renderer, bottom_left.x,  bottom_left.y,  top_left.x,     top_left.y);
+	mp_render_draw_line(renderer, (int)new_top_left.x,	  (int)new_top_left.y,     (int)new_top_right.x,    (int)new_top_right.y);
+	mp_render_draw_line(renderer, (int)new_top_right.x,	  (int)new_top_right.y,    (int)new_bottom_right.x, (int)new_bottom_right.y);
+	mp_render_draw_line(renderer, (int)new_bottom_right.x,(int)new_bottom_right.y, (int)new_bottom_left.x,  (int)new_bottom_left.y);
+	mp_render_draw_line(renderer, (int)new_bottom_left.x, (int)new_bottom_left.y,  (int)new_top_left.x,     (int)new_top_left.y);
 	// *******************************************
 
 	mp_render_present(renderer);

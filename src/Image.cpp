@@ -158,6 +158,10 @@ void draw_character(MP_Renderer* renderer, Font& font, char character, int x, in
 	mp_render_copy(renderer, font.image.texture, &src, &dst);
 }
 
+void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, float y, int size, bool center_x, bool background) {
+	draw_string(renderer, font, str, (int)x, (int)y, size, center_x, background);
+}
+
 void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background) {
 	int length = (int)strlen(str);
 
