@@ -589,7 +589,6 @@ int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect*
 		log("Error: Renderer is null");
 		return -1;
 	}
-	REF(flip);
 	REF(center);
 	REF(angle);
 
@@ -635,10 +634,22 @@ int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect*
 		src = *src_rect;
 	}
 
-	vertex_1.texture_coor = mp_pixel_to_uv(src.x		, src.y        , texture->w, texture->h); // Bottom left
-	vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y		   , texture->w, texture->h); // Bottom right
-	vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h); // Top right
-	vertex_4.texture_coor = mp_pixel_to_uv(src.x		, src.y + src.h, texture->w, texture->h); // Top left
+	if (flip == SDL_FLIP_HORIZONTAL) {
+		vertex_1.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y        , texture->w, texture->h); // Bottom right 
+		vertex_2.texture_coor = mp_pixel_to_uv(src.x	    , src.y        , texture->w, texture->h); // Bottom left 
+		vertex_3.texture_coor = mp_pixel_to_uv(src.x        , src.y + src.h, texture->w, texture->h); // Top left 
+		vertex_4.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h); // Top right 
+	} else if (flip == SDL_FLIP_VERTICAL) {
+		vertex_1.texture_coor = mp_pixel_to_uv(src.x + src.h, src.y + src.h, texture->w, texture->h); // Top right 
+		vertex_2.texture_coor = mp_pixel_to_uv(src.x        , src.y + src.h, texture->w, texture->h); // Top left
+		vertex_3.texture_coor = mp_pixel_to_uv(src.x        , src.y        , texture->w, texture->h); // Bottom left
+		vertex_4.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y        , texture->w, texture->h); // Bottom right
+	} else if (flip == SDL_FLIP_NONE) {
+		vertex_1.texture_coor = mp_pixel_to_uv(src.x        , src.y        , texture->w, texture->h); // Bottom left
+		vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y        , texture->w, texture->h); // Bottom right
+		vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h); // Top right
+		vertex_4.texture_coor = mp_pixel_to_uv(src.x        , src.y + src.h, texture->w, texture->h); // Top left
+	}
 
 	Color_4F m = texture->mod;
 	vertex_1.color = { 1.0f * m.r, 1.0f * m.g, 1.0f * m.b, 1.0f * m.a};

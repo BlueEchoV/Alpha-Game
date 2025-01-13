@@ -52,3 +52,9 @@ V2_F rotate_point_based_off_angle(float angle_in_degrees, float center_x, float 
 
 	return result;
 }
+
+void swap(V2_F& vec_1, V2_F& vec_2) {
+	V2_F temp = vec_1;
+	vec_1 = vec_2;
+	vec_2 = temp;
+}
