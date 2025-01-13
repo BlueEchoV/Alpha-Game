@@ -29,6 +29,8 @@
 #define KEY_Y 0x59  
 #define KEY_Z 0x5A  
 
+#define VK_SHIFT 0x10
+
 struct Key_State {
 	bool is_pressed;
 	bool is_held_down;

@@ -132,17 +132,23 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		// input()
 		if (key_pressed_and_held(KEY_W)) {
-			game_data.player.position_ws.y += player_speed;
+			game_data.player.position_ws.y += game_data.player.speed;
 		}
 		if (key_pressed_and_held(KEY_S)) {
-			game_data.player.position_ws.y -= player_speed;
+			game_data.player.position_ws.y -= game_data.player.speed;
 		}
 		if (key_pressed_and_held(KEY_D)) {
-			game_data.player.position_ws.x += player_speed;
+			game_data.player.position_ws.x += game_data.player.speed;
 		}
 		if (key_pressed_and_held(KEY_A)) {
-			game_data.player.position_ws.x -= player_speed;
+			game_data.player.position_ws.x -= game_data.player.speed;
 		}
+		if (key_pressed_and_held(VK_SHIFT)) {
+			game_data.player.speed = player_speed * 2;
+		} else {
+			game_data.player.speed = player_speed;
+		}
+
 		if (key_pressed(VK_OEM_3)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 		}
