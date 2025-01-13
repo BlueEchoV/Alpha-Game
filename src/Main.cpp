@@ -116,6 +116,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.w = 200;
 	game_data.player.h = 200;
 
+	V2_F test_vec1 = { 20, 20 };
+	V2_F test_vec2 = { 10, 10 };
+
+	V2_F result_vec = test_vec1 - test_vec2;
+
 	bool running = true;
 	while (running) {
 		reset_is_pressed();

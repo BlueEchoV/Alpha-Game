@@ -1,5 +1,15 @@
 #include "Utility.h" 
 
+// NOTE: Subtracts the left vec1 from the right vec2
+V2_F operator-(const V2_F vec1, const V2_F vec2) {
+	V2_F result = {};
+
+	result.x = vec1.x - vec2.x;
+	result.y = vec1.y - vec2.y;
+
+	return result;
+}
+
 void log(const char* format, ...) {
 	char buffer[256];
 	va_list arguments;

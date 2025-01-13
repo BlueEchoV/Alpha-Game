@@ -48,6 +48,8 @@ struct V3_F {
 	float z;
 };
 
+V2_F operator-(const V2_F vec1, const V2_F vec2);
+
 struct Color_3F {
 	float r;
 	float g;
