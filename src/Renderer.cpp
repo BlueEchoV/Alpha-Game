@@ -589,9 +589,8 @@ int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect*
 		log("Error: Renderer is null");
 		return -1;
 	}
-	REF(center);
-	REF(angle);
 
+	REF(angle);
 	// Texture Packet
 	Packet result;
 
@@ -615,14 +614,31 @@ int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect*
 		dst = *dst_rect;
 	}
 
-	// float cosine = cos(angle);
-	// float sine = sin(angle);
+	MP_Point c = {};
+	if (center == NULL) {
+		c.x = (dst.w / 2) + dst.x;
+		c.y = (dst.h / 2) + dst.y;
+	} else {
+		c = *center;
+	}
+
+	V2_F bottom_left =  { (float)dst.x 	             , (float)dst.y	               };
+	V2_F top_left =	    { (float)dst.x		         , (float)dst.y + (float)dst.h };
+	V2_F top_right =    { (float)dst.x + (float)dst.w, (float)dst.y + (float)dst.h };
+	V2_F bottom_right = { (float)dst.x + (float)dst.w, (float)dst.y		           };
+
+	if (angle != 0) {
+		bottom_left = rotate_point_based_off_angle(angle,  (float)c.x, (float)c.y, bottom_left.x, bottom_left.y);
+		top_left = rotate_point_based_off_angle(angle,     (float)c.x, (float)c.y, top_left.x, top_left.y);
+		top_right = rotate_point_based_off_angle(angle,    (float)c.x, (float)c.y, top_right.x, top_right.y);
+		bottom_right = rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, bottom_right.x, bottom_right.y);
+	}
 
 	// NOTE: My coordinate system draws from the bottom left
-	vertex_1.pos = mp_pixel_to_ndc(dst.x 	    , dst.y		   , window_w, window_h); // Bottom left (Starting point)
-	vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y		   , window_w, window_h); // Bottom right 
-	vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, window_w, window_h); // Top right 
-	vertex_4.pos = mp_pixel_to_ndc(dst.x		, dst.y + dst.h, window_w, window_h); // Top left 
+	vertex_1.pos = mp_pixel_to_ndc((int)bottom_left.x,  (int)bottom_left.y, window_w, window_h); 
+	vertex_2.pos = mp_pixel_to_ndc((int)bottom_right.x, (int)bottom_right.y, window_w, window_h);
+	vertex_3.pos = mp_pixel_to_ndc((int)top_right.x,    (int)top_right.y, window_w, window_h);
+	vertex_4.pos = mp_pixel_to_ndc((int)top_left.x,     (int)top_left.y, window_w, window_h); 
 
 	MP_Rect src = {};
 	if (src_rect == NULL) {

@@ -448,8 +448,22 @@ void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture*
 			draw_debug_2d_rotation_matrix_rect(renderer, { (float)x + width / 2, (float)y + height / 2 }, &font);
 			break;
 		}
+		case DI_copy_ex: {
+			draw_string(renderer, font, "rnd_cpy_ex", title_x, title_y, string_size, true, true);
+
+			MP_Rect temp_rect = { x, y, width, height};
+			static float temp_angle = 0;
+			if (key_pressed_and_held(KEY_A)) {
+				temp_angle += 1;
+			} 
+			if (key_pressed_and_held(KEY_D)) {
+				temp_angle -= 1;
+			}
+			mp_render_copy_ex(renderer, images[IT_Sun].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
+			break;
+		}
 		default: {
-			draw_string(renderer, font, "Error. Image default case hit in debug string", x, y, 1, true, true);
+			draw_string(renderer, font, "Error. Image default case hit in draw debug image function", x, y, 1, true, true);
 			break;
 		}
         }

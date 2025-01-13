@@ -36,10 +36,14 @@ struct ExitScopeHelp
 #define SG_CONCAT(a, b) _SG_CONCAT(a, b)
 #define DEFER auto SG_CONCAT(defer__, __LINE__) = ExitScopeHelp() + [&]()
 
-
 struct V2_F {
 	float x;
 	float y;
+};
+
+struct V2_I {
+	int x;
+	int y;
 };
 
 struct V3_F {

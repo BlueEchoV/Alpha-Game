@@ -91,10 +91,6 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	Font* font = get_font(game_data.selected_font);
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
 
-	MP_Rect temp_rect = {500, 100, 200, 200};
-	MP_Point center = {};
-	mp_render_copy_ex(renderer, images[IT_Dummy_Player].texture, NULL, &temp_rect, 0, &center, SDL_FLIP_VERTICAL);
-
 	mp_render_present(renderer);
 }
 
