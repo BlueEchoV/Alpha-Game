@@ -51,15 +51,19 @@ enum Image_Type {
 	IT_Water_32x32
 };
 
+enum Font_Type {
+	FT_Basic
+};
+
 Image load_image(MP_Renderer* renderer, const char* file_path);
 
 extern std::unordered_map<Image_Type, Image> images;
 void load_images(MP_Renderer* renderer);
 Image* get_image(Image_Type image_type);
 
-extern std::unordered_map<std::string, Font> fonts;
+extern std::unordered_map<Font_Type, Font> fonts;
 void load_fonts(MP_Renderer* renderer);
-Font* get_font(std::string image_name);
+Font* get_font(Font_Type type);
 
 Font load_font(MP_Renderer* renderer, const char* file_path);
 void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background);

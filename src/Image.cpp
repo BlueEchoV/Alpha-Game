@@ -123,7 +123,7 @@ Image* get_image(Image_Type image_type) {
 }
 
 Font dummy_font = {};
-std::unordered_map<std::string, Font> fonts;
+std::unordered_map<Font_Type, Font> fonts;
 void load_fonts(MP_Renderer* renderer) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
@@ -131,11 +131,11 @@ void load_fonts(MP_Renderer* renderer) {
 	}
 
 	dummy_font = load_font(renderer, "assets\\dummy_font.png");
-	fonts["basic_font"] = load_font(renderer, "assets\\basic_font.png");
+	fonts[FT_Basic]  = load_font(renderer, "assets\\basic_font.png");
 }
 
-Font* get_font(std::string font_name) {
-	auto iterator = fonts.find(font_name);
+Font* get_font(Font_Type type) {
+	auto iterator = fonts.find(type);
 
 	if (iterator != fonts.end()) {
 		return &iterator->second;

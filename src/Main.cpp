@@ -104,7 +104,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	load_fonts(renderer);
 
 	Game_Data game_data = {};
-	game_data.selected_font = "basic_font";
+	game_data.selected_font = FT_Basic;
 
 	int player_speed = 1;
 	game_data.player = create_player(get_image(IT_Top_Down_Player_Demo), player_speed);

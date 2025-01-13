@@ -6,7 +6,7 @@ struct Game_Data {
 
 	Player player;
 
-	std::string selected_font;
+	Font_Type selected_font;
 };
 
 struct Camera {
