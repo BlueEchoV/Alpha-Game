@@ -80,3 +80,5 @@ void log(const char* format, ...);
 void my_mem_copy(const void* src, void* dst, size_t n);
 V2_F rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float ws_x, float ws_y);
 void swap(V2_F& vec_1, V2_F& vec_2);
+
+float hypotenuse(float a, float b);

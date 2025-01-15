@@ -47,18 +47,36 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		// input()
+		float player_x_delta = 0.0f;
+		float player_y_delta = 0.0f;
 		if (key_pressed_and_held(KEY_W)) {
-			game_data.player.position_ws.y += game_data.player.speed;
+			player_y_delta = 1.0f;
 		}
 		if (key_pressed_and_held(KEY_S)) {
-			game_data.player.position_ws.y -= game_data.player.speed;
+			player_y_delta = -1.0f;
 		}
 		if (key_pressed_and_held(KEY_D)) {
-			game_data.player.position_ws.x += game_data.player.speed;
+			player_x_delta = 1.0f;
 		}
 		if (key_pressed_and_held(KEY_A)) {
-			game_data.player.position_ws.x -= game_data.player.speed;
+			player_x_delta = -1.0f;
 		}
+
+		player_x_delta *= game_data.player.speed;
+		player_y_delta *= game_data.player.speed;
+
+		if (player_x_delta != 0.0f && player_y_delta != 0.0f) {
+			// See HMH 042 at 24:30 for reference. 
+			// a^2 + b^2 = c^2
+			// v^2 + v^2 = d^2 to d sqrt(1/2)
+			// player_x_delta represents the d and sqrt of 1/2 is the hard coded value
+			player_x_delta *= 0.707106781187f;
+			player_y_delta *= 0.707106781187f;
+		}
+
+		game_data.player.position_ws.x += player_x_delta;
+		game_data.player.position_ws.y += player_y_delta;
+
 		if (key_pressed_and_held(VK_SHIFT)) {
 			game_data.player.speed = player_speed * 2;
 		} else {

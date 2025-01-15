@@ -58,3 +58,11 @@ void swap(V2_F& vec_1, V2_F& vec_2) {
 	vec_1 = vec_2;
 	vec_2 = temp;
 }
+
+float hypotenuse(float a, float b) {
+	float c = {};
+
+	c = (float)sqrt((a * 2) + (b * 2));
+
+	return c;
+}
