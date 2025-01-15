@@ -13,4 +13,6 @@ struct Camera {
 	V2_F pos;
 };
 
-void draw_tile_map(MP_Renderer* renderer);
+
+void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);
+void render(MP_Renderer* renderer, Game_Data& game_data);

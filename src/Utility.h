@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <math.h>
 
+#include "Globals.h"
+
 #define M_PI 3.141592653589793238462643383279502884197
 
 #define REF(v) (void)v;

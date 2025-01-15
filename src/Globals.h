@@ -1,10 +1,10 @@
 #pragma once
 
 namespace Globals {
-	bool toggle_debug_images = true;
+	extern bool toggle_debug_images;
 
-	float noise_frequency = 0.05f;
+	extern float noise_frequency;
 	// Pixels
-	int tile_w = 32;
-	int tile_h = 32;
+	extern int tile_w;
+	extern int tile_h;
 }
