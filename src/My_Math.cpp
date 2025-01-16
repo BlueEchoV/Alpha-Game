@@ -1,6 +1,42 @@
 #include "My_Math.h"
 
-// NOTE: Subtracts the left vec1 from the right vec2
+V2 operator*(const float a, V2 b) {
+	V2 result = {};
+
+	result.x = a * b.x;
+	result.y = a * b.y;
+
+	return result;
+}
+
+V2& V2::operator*=(float a) {
+	*this = a * *this;
+	return *this;
+}
+
+V2 operator-(V2 a) {
+	V2 result = {};
+
+	result.x = -a.x;
+	result.y = -a.y;
+
+	return result;
+}
+
+V2 operator+(V2 a, V2 b) {
+	V2 result = {};
+
+	result.x = a.x + b.x;
+	result.y = a.y + b.y;
+
+	return result;
+}
+
+V2& V2::operator+=(V2 a) {
+	*this = a + *this;
+	return *this;
+}
+
 V2 operator-(const V2 vec1, const V2 vec2) {
 	V2 result = {};
 
