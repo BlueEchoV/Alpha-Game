@@ -5,6 +5,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+static inline int64_t GetTicks()
+{
+    LARGE_INTEGER ticks;
+    if (!QueryPerformanceCounter(&ticks)) {
+		log("Error: QueryPerformanceCounter failed.");
+		assert(false);
+    }
+    return ticks.QuadPart;
+}
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
 	REF(lpCmdLine);
@@ -61,6 +71,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed_and_held(KEY_A)) {
 			player_x_delta = -1.0f;
 		}
+
+		uint64_t temp = GetTicks();
+		REF(temp);
 
 		player_x_delta *= game_data.player.speed;
 		player_y_delta *= game_data.player.speed;
