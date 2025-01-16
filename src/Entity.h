@@ -9,9 +9,9 @@ struct Player {
 	Image* image;
 
 	// World Space
-	V2_F position_ws;
+	V2 position_ws;
 	// Camera Space
-	V2_F position_cs;
+	V2 position_cs;
 
 	int w, h;
 

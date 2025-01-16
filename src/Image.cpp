@@ -187,22 +187,22 @@ void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int 
 	}
 }
 
-void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2_F center, Font* font) {
-	V2_F c = {};
+void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2 center, Font* font) {
+	V2 c = {};
 	c.x = center.x;
 	c.y = center.y;
 
 	float w = 100;
 	float h = 100;
-	static V2_F original_top_left = { c.x - (w / 2.0f), (int)c.y + (h / 2) };
-	static V2_F original_top_right = { c.x + (w / 2.0f), (int)c.y + (h / 2) };
-	static V2_F original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2) };
-	static V2_F original_bottom_left = { c.x - (w / 2.0f), (int)c.y - (h / 2) };
+	static V2 original_top_left = { c.x - (w / 2.0f), (int)c.y + (h / 2) };
+	static V2 original_top_right = { c.x + (w / 2.0f), (int)c.y + (h / 2) };
+	static V2 original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2) };
+	static V2 original_bottom_left = { c.x - (w / 2.0f), (int)c.y - (h / 2) };
 
-	static V2_F new_top_left = original_top_left;
-	static V2_F new_top_right = original_top_right;
-	static V2_F new_bottom_right = original_bottom_right;
-	static V2_F new_bottom_left = original_bottom_left;
+	static V2 new_top_left = original_top_left;
+	static V2 new_top_right = original_top_right;
+	static V2 new_bottom_right = original_bottom_right;
+	static V2 new_bottom_left = original_bottom_left;
 
 	static float angle = 0.0f;
 	static float last_angle = 0.0f;

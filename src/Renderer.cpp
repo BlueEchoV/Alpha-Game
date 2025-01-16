@@ -204,8 +204,8 @@ int MP_GetRenderDrawColor(MP_Renderer* renderer, uint8_t* r, uint8_t* g, uint8_t
 	return 0;
 }
 
-V2_F mp_pixel_to_uv(int x, int y, int w, int h) {
-	V2_F result;
+V2 mp_pixel_to_uv(int x, int y, int w, int h) {
+	V2 result;
 
 	result.x = (float)x / (float)w;
 	result.y = (float)y / (float)h;
@@ -213,8 +213,8 @@ V2_F mp_pixel_to_uv(int x, int y, int w, int h) {
 	return result;
 }
 
-V3_F mp_pixel_to_ndc(int x, int y, int window_w, int window_h) {
-	V3_F result;
+V3 mp_pixel_to_ndc(int x, int y, int window_w, int window_h) {
+	V3 result;
 	
 	result.x = (((float)x / (float)window_w) * 2.0f) - 1.0f;
 	result.y = (((float)y / (float)window_h) * 2.0f) - 1.0f;
@@ -622,10 +622,10 @@ int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect*
 		c = *center;
 	}
 
-	V2_F bottom_left =  { (float)dst.x 	             , (float)dst.y	               };
-	V2_F top_left =	    { (float)dst.x		         , (float)dst.y + (float)dst.h };
-	V2_F top_right =    { (float)dst.x + (float)dst.w, (float)dst.y + (float)dst.h };
-	V2_F bottom_right = { (float)dst.x + (float)dst.w, (float)dst.y		           };
+	V2 bottom_left =  { (float)dst.x 	           , (float)dst.y	             };
+	V2 top_left =     { (float)dst.x		       , (float)dst.y + (float)dst.h };
+	V2 top_right =    { (float)dst.x + (float)dst.w, (float)dst.y + (float)dst.h };
+	V2 bottom_right = { (float)dst.x + (float)dst.w, (float)dst.y		         };
 
 	if (angle != 0) {
 		bottom_left = rotate_point_based_off_angle(angle,  (float)c.x, (float)c.y, bottom_left.x, bottom_left.y);

@@ -1,8 +1,8 @@
 #include "My_Math.h"
 
 // NOTE: Subtracts the left vec1 from the right vec2
-V2_F operator-(const V2_F vec1, const V2_F vec2) {
-	V2_F result = {};
+V2 operator-(const V2 vec1, const V2 vec2) {
+	V2 result = {};
 
 	result.x = vec1.x - vec2.x;
 	result.y = vec1.y - vec2.y;
@@ -11,8 +11,8 @@ V2_F operator-(const V2_F vec1, const V2_F vec2) {
 }
 
 // Rotates a point based off an angle
-V2_F rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float ws_x, float ws_y) {
-	V2_F result = {};
+V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float ws_x, float ws_y) {
+	V2 result = {};
 
 	float angle_in_radians = angle_in_degrees * ((float)M_PI / 180.0f);
 
@@ -39,8 +39,8 @@ float hypotenuse(float a, float b) {
 	return c;
 }
 
-void swap(V2_F& vec_1, V2_F& vec_2) {
-	V2_F temp = vec_1;
+void swap(V2& vec_1, V2& vec_2) {
+	V2 temp = vec_1;
 	vec_1 = vec_2;
 	vec_2 = temp;
 }

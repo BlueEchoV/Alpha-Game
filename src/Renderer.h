@@ -112,9 +112,9 @@ struct Open_GL {
 
 // 2D Vertex for now
 struct Vertex {
-	V3_F pos;
+	V3 pos;
 	Color_4F color;
-	V2_F texture_coor;
+	V2 texture_coor;
 };
 
 struct MP_Renderer {

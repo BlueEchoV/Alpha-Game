@@ -10,7 +10,7 @@ struct Game_Data {
 };
 
 struct Camera {
-	V2_F pos;
+	V2 pos;
 };
 
 void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);
