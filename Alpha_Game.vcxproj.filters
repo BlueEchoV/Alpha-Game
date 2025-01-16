@@ -34,6 +34,9 @@
     <ClCompile Include="src\Globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\My_Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -61,6 +64,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Perlin.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\My_Math.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

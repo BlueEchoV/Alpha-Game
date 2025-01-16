@@ -8,8 +8,7 @@
 #include <math.h>
 
 #include "Globals.h"
-
-#define M_PI 3.141592653589793238462643383279502884197
+#include "My_Math.h"
 
 #define REF(v) (void)v;
 
@@ -38,24 +37,6 @@ struct ExitScopeHelp
 #define SG_CONCAT(a, b) _SG_CONCAT(a, b)
 #define DEFER auto SG_CONCAT(defer__, __LINE__) = ExitScopeHelp() + [&]()
 
-struct V2_F {
-	float x;
-	float y;
-};
-
-struct V2_I {
-	int x;
-	int y;
-};
-
-struct V3_F {
-	float x;
-	float y;
-	float z;
-};
-
-V2_F operator-(const V2_F vec1, const V2_F vec2);
-
 struct Color_3F {
 	float r;
 	float g;
@@ -78,7 +59,3 @@ struct Color_RGBA8 {
 
 void log(const char* format, ...);
 void my_mem_copy(const void* src, void* dst, size_t n);
-V2_F rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float ws_x, float ws_y);
-void swap(V2_F& vec_1, V2_F& vec_2);
-
-float hypotenuse(float a, float b);
