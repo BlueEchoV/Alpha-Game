@@ -4,18 +4,6 @@
 #define GL_REPEAT                         0x2901
 #define GL_MIRRORED_REPEAT                0x8370
 
-void get_window_size(HWND window, int& w, int& h) {
-	RECT rect = {};
-	if (GetClientRect(window, &rect) != 0) {
-		w = rect.right - rect.left;
-		h = rect.bottom - rect.top;
-	} else {
-		w = 0;
-		h = 0;
-		log("Window width and height are 0");
-	}
-}
-
 enum SHADER_PROGRAM {
 	SP_2D_DRAW,
 	SP_2D_TEXTURE
@@ -105,16 +93,17 @@ HWND init_windows(HINSTANCE hInstance) {
 	wnd_class.lpszClassName = "Alpha Game";
 
 	HWND window_handle = {};
+
 	if(RegisterClassA(&wnd_class)) {
 		window_handle = CreateWindowExA(
 			0,
 			wnd_class.lpszClassName,	
 			"Alpha Game",
 			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
+			200, // Where on my screen it is drawn
+			100, // ^^^^
+			1600,
+			900,
 			0,
 			0,
 			hInstance,
@@ -425,6 +414,15 @@ int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_
 	return 0;
 }
 
+void mp_render_set_viewport(MP_Renderer* renderer, const MP_Rect* rect) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return;
+	}
+
+	glViewport(rect->x, rect->y, rect->w, rect->h);
+}
+
 int mp_set_render_draw_color(MP_Renderer* renderer, Color c) {
     switch (c) {
         case C_Red:
@@ -453,7 +451,7 @@ int mp_set_render_draw_color(MP_Renderer* renderer, Color c) {
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	MP_Renderer* renderer = new MP_Renderer();
-
+	
 	renderer->draw_color = { 255, 255, 255, 255 };
 
 	renderer->open_gl.window_handle = init_windows(hInstance);
@@ -479,8 +477,6 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	load_shaders();
-
-	get_window_size(renderer->open_gl.window_handle, renderer->window_width, renderer->window_height);
 
 	return renderer;
 }
@@ -792,9 +788,8 @@ void mp_render_present(MP_Renderer* renderer) {
 			assert(false);
 		}
 	}
-	SwapBuffers(renderer->open_gl.window_dc);
 
-	get_window_size(renderer->open_gl.window_handle, renderer->window_width, renderer->window_height);
+	SwapBuffers(renderer->open_gl.window_dc);
 
 	renderer->indices.clear();
 	renderer->vertices.clear();

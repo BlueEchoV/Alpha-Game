@@ -189,6 +189,8 @@ void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int 
 	}
 }
 
+int window_w = 0;
+int window_h = 0;
 void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2 center, Font* font) {
 	V2 c = {};
 	c.x = center.x;
@@ -196,10 +198,19 @@ void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2 center, Font* 
 
 	float w = 100;
 	float h = 100;
-	static V2 original_top_left = { c.x - (w / 2.0f), (int)c.y + (h / 2) };
-	static V2 original_top_right = { c.x + (w / 2.0f), (int)c.y + (h / 2) };
-	static V2 original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2) };
-	static V2 original_bottom_left = { c.x - (w / 2.0f), (int)c.y - (h / 2) };
+
+	bool recalculate_points = false;
+	if (window_w != renderer->window_width || 
+		window_h != renderer->window_height) {
+		recalculate_points = true;
+	}
+	window_w = renderer->window_width;
+	window_h = renderer->window_height;
+
+	V2 original_top_left = { c.x - (w / 2.0f), (int)c.y + (h / 2) };
+	V2 original_top_right = { c.x + (w / 2.0f), (int)c.y + (h / 2) };
+	V2 original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2) };
+	V2 original_bottom_left = { c.x - (w / 2.0f), (int)c.y - (h / 2) };
 
 	static V2 new_top_left = original_top_left;
 	static V2 new_top_right = original_top_right;
@@ -215,7 +226,7 @@ void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2 center, Font* 
 	if (key_pressed_and_held(KEY_D)) {
 		angle -= rotation_speed;
 	}
-	if (angle != last_angle) {
+	if (angle != last_angle || recalculate_points) {
 		new_top_left = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_left.x, (float)original_top_left.y);
 		new_top_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_right.x, (float)original_top_right.y);
 		new_bottom_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_bottom_right.x, (float)original_bottom_right.y);

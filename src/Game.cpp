@@ -42,6 +42,17 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 		return;
 	}
 
+	int window_width = 0;
+	int window_height = 0;
+	get_window_size(renderer->open_gl.window_handle, window_width, window_height);
+	MP_Rect viewport = { 0, 0, window_width, window_height};
+	mp_render_set_viewport(renderer, &viewport);
+
+	renderer->window_width= window_width;
+	renderer->window_height = window_height;
+	game_data.camera.w = renderer->window_width;
+	game_data.camera.h = renderer->window_height;
+
 	mp_set_render_draw_color(renderer, 155, 155, 155, 255);
 	mp_set_render_draw_color(renderer, 155, 155, 155, 255);
 	mp_render_clear(renderer);

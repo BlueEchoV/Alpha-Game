@@ -43,6 +43,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	V2 result_vec = test_vec1 - test_vec2;
 
 	bool running = true;
+
 	while (running) {
 		reset_is_pressed();
 

@@ -131,8 +131,6 @@ struct MP_Renderer {
 	int window_height;
 };
 
-void get_window_size(HWND window, int& w, int& h);
-
 HDC init_open_gl(HWND window);
 void load_shaders();
 
@@ -164,6 +162,8 @@ int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int
 void mp_unlock_texture(MP_Texture* texture);
 
 int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
+void mp_render_set_viewport(MP_Renderer* renderer, const MP_Rect* rect);
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);

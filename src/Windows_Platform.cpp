@@ -22,6 +22,18 @@ void reset_is_pressed() {
 	}
 }
 
+void get_window_size(HWND window, int& w, int& h) {
+	RECT rect = {};
+	if (GetClientRect(window, &rect) != 0) {
+		w = rect.right - rect.left;
+		h = rect.bottom - rect.top;
+	} else {
+		w = 0;
+		h = 0;
+		log("Window width and height are 0");
+	}
+}
+
 LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
 	// Returning 0 means we processed the message
 	LRESULT result = 0;
@@ -38,7 +50,19 @@ LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
 		break;
 	}
 	case WM_SIZE: {
-		OutputDebugStringA("WM_SIZE\n");
+		switch (wparam) {
+		case SIZE_RESTORED:
+			// The window has been resized, but neither the 
+			break;
+		case SIZE_MINIMIZED:
+			// Handle when the window is minimized
+			break;
+		case SIZE_MAXIMIZED:
+			// Handle when the window is maximized
+			break;
+		default:
+			break;
+		}
 		break;
 	}
 	case WM_ACTIVATEAPP: {
