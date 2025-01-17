@@ -28,14 +28,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 1;
-	game_data.player = create_player(get_image(IT_Top_Down_Player_Demo), player_speed);
+	game_data.player = create_player(get_image(IT_Player_Rugged_Male), player_speed);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
 	game_data.camera.w = renderer->window_width;
 	game_data.camera.h = renderer->window_height;
-	game_data.player.w = 200;
-	game_data.player.h = 200;
+	game_data.player.w = 96;
+	game_data.player.h = 96;
 
 	V2 test_vec1 = { 20, 20 };
 	V2 test_vec2 = { 10, 10 };
