@@ -45,6 +45,7 @@ enum Image_Type {
 	IT_Sun,
 	IT_Dummy_Player,
 	IT_Player_Rugged_Male,
+	IT_Enemy_Clothed_Zombie,
 	IT_Top_Down_Player_Demo,
 	IT_Arrow_1,
 	IT_Dummy_Tile_32x32,
