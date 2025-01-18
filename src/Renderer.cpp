@@ -449,6 +449,39 @@ int mp_set_render_draw_color(MP_Renderer* renderer, Color c) {
     return 0; 
 }
 
+static inline int64_t GetTicks() {
+    LARGE_INTEGER ticks;
+    if (!QueryPerformanceCounter(&ticks)) {
+		log("Error: QueryPerformanceCounter failed.");
+		assert(false);
+    }
+    return ticks.QuadPart;
+}
+
+LARGE_INTEGER start_time = {};
+LARGE_INTEGER frequency = {};
+
+void mp_init_ticks() {
+	// The count itself
+    QueryPerformanceCounter(&start_time); 
+	// How many counts there are per second
+	QueryPerformanceFrequency(&frequency);  
+}
+
+// Get the number of milliseconds since MP library initialization.
+// Requires for the renderer to be created for it to work
+uint64_t mp_get_ticks_64() {
+	uint64_t elapsed = {};
+	LARGE_INTEGER current_time = {};
+
+    QueryPerformanceCounter(&current_time); 
+
+	// Time in seconds
+	elapsed = (current_time.QuadPart - start_time.QuadPart) / (frequency.QuadPart / 1000);
+
+	return elapsed;
+}
+
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	MP_Renderer* renderer = new MP_Renderer();
 	
@@ -477,6 +510,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	load_shaders();
+
+	mp_init_ticks();
 
 	return renderer;
 }
@@ -726,7 +761,6 @@ void gl_set_blend_mode(MP_BlendMode blend_mode) {
             break;
     }
 }
-
 
 void mp_render_present(MP_Renderer* renderer) {
 	if (renderer == NULL) {

@@ -5,16 +5,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-static inline int64_t GetTicks()
-{
-    LARGE_INTEGER ticks;
-    if (!QueryPerformanceCounter(&ticks)) {
-		log("Error: QueryPerformanceCounter failed.");
-		assert(false);
-    }
-    return ticks.QuadPart;
-}
-
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
 	REF(lpCmdLine);
@@ -37,11 +27,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.w = 96;
 	game_data.player.h = 96;
 
-	V2 test_vec1 = { 20, 20 };
-	V2 test_vec2 = { 10, 10 };
-
-	V2 result_vec = test_vec1 - test_vec2;
-
 	bool running = true;
 
 	while (running) {
@@ -56,6 +41,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				running = false;
 			}
 		}
+
+		uint64_t current_time = mp_get_ticks_64();
+		log("%i", current_time);
 
 		// input()
 		float player_x_delta = 0.0f;
@@ -72,9 +60,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed_and_held(KEY_A)) {
 			player_x_delta = -1.0f;
 		}
-
-		uint64_t temp = GetTicks();
-		REF(temp);
 
 		player_x_delta *= game_data.player.speed;
 		player_y_delta *= game_data.player.speed;

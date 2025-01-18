@@ -165,12 +165,12 @@ int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_
 
 void mp_render_set_viewport(MP_Renderer* renderer, const MP_Rect* rect);
 
+uint64_t mp_get_ticks_64();
+
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);
 void mp_render_clear(MP_Renderer* renderer);
 void mp_render_present(MP_Renderer* renderer);
-
-uint64_t mp_get_ticks_64();
 
 #if 0
 int MP_SetTextureBlendMode(SDL_Texture* texture, SDL_BlendMode blend_mode);
