@@ -462,10 +462,13 @@ LARGE_INTEGER start_time = {};
 LARGE_INTEGER frequency = {};
 
 void mp_init_ticks() {
-	// The count itself
-    QueryPerformanceCounter(&start_time); 
-	// How many counts there are per second
-	QueryPerformanceFrequency(&frequency);  
+	if (!QueryPerformanceCounter(&start_time)) {
+		log("Error: QueryPerformanceCounter() failed");
+	}
+	// For getting the seconds
+	if (!QueryPerformanceFrequency(&frequency)) {
+		log("Error: QueryPerformanceFrequency() failed");
+	}
 }
 
 // Get the number of milliseconds since MP library initialization.
@@ -474,7 +477,9 @@ uint64_t mp_get_ticks_64() {
 	uint64_t elapsed = {};
 	LARGE_INTEGER current_time = {};
 
-    QueryPerformanceCounter(&current_time); 
+	if (!QueryPerformanceCounter(&current_time)) {
+		log("Error: QueryPerformanceCounter() failed");
+	}
 
 	// Time in seconds
 	elapsed = (current_time.QuadPart - start_time.QuadPart) / (frequency.QuadPart / 1000);

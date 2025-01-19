@@ -17,7 +17,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	Game_Data game_data = {};
 	game_data.selected_font = FT_Basic;
 
-	int player_speed = 1;
+	// Per second
+	int player_speed = 100;
 	game_data.player = create_player(get_image(IT_Player_Rugged_Male), player_speed);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
@@ -29,6 +30,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	bool running = true;
 
+	uint64_t current_frame_time = 0;
+	uint64_t last_frame_time = 0;
+	float delta_time = 0;
 	while (running) {
 		reset_is_pressed();
 
@@ -42,8 +46,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		uint64_t current_time = mp_get_ticks_64();
-		log("%i", current_time);
+		current_frame_time = mp_get_ticks_64();
+		// Convert to seconds
+		delta_time = (float)(current_frame_time - last_frame_time) / 1000;
+		last_frame_time = current_frame_time;
+		log("Current Time %i", current_frame_time);
+		uint64_t temp = uint64_t(delta_time * 1000.0f);
+		log("Frame Time milliseconds %i", temp);
 
 		// input()
 		float player_x_delta = 0.0f;
@@ -61,8 +70,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_x_delta = -1.0f;
 		}
 
-		player_x_delta *= game_data.player.speed;
-		player_y_delta *= game_data.player.speed;
+		player_x_delta *= game_data.player.speed * delta_time;
+		player_y_delta *= game_data.player.speed * delta_time;
 
 		if (player_x_delta != 0.0f && player_y_delta != 0.0f) {
 			// See HMH 042 at 24:30 for reference. 
