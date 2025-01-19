@@ -5,6 +5,7 @@ struct Game_Data {
 	MP_Rect camera;
 
 	Player player;
+	Arrow arrow;
 
 	Font_Type selected_font;
 };

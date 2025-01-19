@@ -95,6 +95,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 		}
 
+		Image* image = get_image(IT_Arrow_1);
+		int arrow_speed = 10;
+		game_data.arrow = create_arrow(image, { game_data.player.position_ws.x + 100, game_data.player.position_ws.y }, arrow_speed);
+
 		// Update
 
 		// Render

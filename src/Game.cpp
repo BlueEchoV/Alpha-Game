@@ -97,6 +97,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	Font* font = get_font(game_data.selected_font);
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
 
+	draw_arrow(renderer, game_data.arrow);
+
 	mp_render_present(renderer);
 }
 

@@ -129,6 +129,9 @@ struct MP_Renderer {
 
 	int window_width;
 	int window_height;
+
+	// the current frame's total time
+	int delta_time;
 };
 
 HDC init_open_gl(HWND window);
