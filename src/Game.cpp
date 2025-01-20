@@ -14,8 +14,8 @@ void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, in
 	int tile_ws_x = (Globals::tile_w * tile_index_x);
 	int tile_ws_y = (Globals::tile_h * tile_index_y);
 
-	int tile_cs_x = tile_ws_x - game_data.camera.x;
-	int tile_cs_y = tile_ws_y - game_data.camera.y;
+	int tile_cs_x = tile_ws_x - (int)game_data.camera.pos_ws.x;
+	int tile_cs_y = tile_ws_y - (int)game_data.camera.pos_ws.y;
 
 	float perlin_x = tile_index_x * noise_frequency;
 	float perlin_y = tile_index_y * noise_frequency;
@@ -51,6 +51,10 @@ void fire_arrow(Game_Data& game_data, Image_Type it, int speed, V2 target, V2 or
 	new_vel.x = new_vel.x / length;
 	new_vel.y = new_vel.y / length;
 
+	// Center the image
+	origin.x -= image->w / 2;
+	origin.y -= image->h / 2;
+
 	Arrow result = create_arrow(image, origin, new_vel, speed);
 
 	game_data.arrows.push_back(result);
@@ -74,29 +78,20 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	game_data.camera.h = renderer->window_height;
 
 	mp_set_render_draw_color(renderer, 155, 155, 155, 255);
-	mp_set_render_draw_color(renderer, 155, 155, 155, 255);
 	mp_render_clear(renderer);
 
 	mp_render_clear(renderer);
-
-	// Create a render scene function that has the follow:
-	// 1) Render player 
-	// 2) Render entities
 
 	// Camera relative to the game_data.player
-	game_data.camera.x = (int)((float)game_data.player.position_ws.x - (float)game_data.camera.w / 2.0f);
-	game_data.camera.y = (int)((float)game_data.player.position_ws.y - (float)game_data.camera.h / 2.0f);
-
-	// draw_tile_map(renderer);
-	// Have everything move around the game_data.camera / player
-	// The player is just an offset from the game_data.camera. Camera is always 0,0
+	game_data.camera.pos_ws.x = ((float)game_data.player.position_ws.x - (float)game_data.camera.w / 2.0f);
+	game_data.camera.pos_ws.y = ((float)game_data.player.position_ws.y - (float)game_data.camera.h / 2.0f);
 
 	// Truncates by default
-	int starting_tile_x = game_data.camera.x / Globals::tile_w;
-	int starting_tile_y = game_data.camera.y / Globals::tile_h;
+	int starting_tile_x = (int)game_data.camera.pos_ws.x / Globals::tile_w;
+	int starting_tile_y = (int)game_data.camera.pos_ws.y / Globals::tile_h;
 
-	int ending_tile_x = (game_data.camera.x + game_data.camera.w) / Globals::tile_w;
-	int ending_tile_y = (game_data.camera.y + game_data.camera.h) / Globals::tile_h;
+	int ending_tile_x = ((int)game_data.camera.pos_ws.x + game_data.camera.w) / Globals::tile_w;
+	int ending_tile_y = ((int)game_data.camera.pos_ws.y + game_data.camera.h) / Globals::tile_h;
 
 	// Only render tiles in the view of the player
 	// Currently in world space
@@ -118,7 +113,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
 
 	for (Arrow& arrow : game_data.arrows) {
-		draw_arrow(renderer, game_data.camera.x, game_data.camera.y, arrow);
+		draw_arrow(renderer, (int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
 	}
 
 	mp_render_present(renderer);
