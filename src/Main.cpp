@@ -50,9 +50,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// Convert to seconds
 		delta_time = (float)(current_frame_time - last_frame_time) / 1000;
 		last_frame_time = current_frame_time;
-		log("Current Time %i", current_frame_time);
-		uint64_t temp = uint64_t(delta_time * 1000.0f);
-		log("Frame Time milliseconds %i", temp);
+		// log("Current Time %i", current_frame_time);
+		// uint64_t temp = uint64_t(delta_time * 1000.0f);
+		// log("Frame Time milliseconds %i", temp);
 
 		// input()
 		float player_x_delta = 0.0f;
@@ -68,6 +68,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		if (key_pressed_and_held(KEY_A)) {
 			player_x_delta = -1.0f;
+		}
+		if (key_pressed_and_held(VK_SPACE)) {
+			fire_arrow(
+				game_data, 
+				IT_Arrow_1, 
+				10, 
+				{ (float)game_data.player.position_ws.x + 200, (float)game_data.camera.y + 200 }, 
+				{ (float)game_data.player.position_ws.x, (float)game_data.camera.y }
+			);
 		}
 
 		player_x_delta *= game_data.player.speed * delta_time;
@@ -95,11 +104,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 		}
 
-		Image* image = get_image(IT_Arrow_1);
-		int arrow_speed = 10;
-		game_data.arrow = create_arrow(image, { game_data.player.position_ws.x + 100, game_data.player.position_ws.y }, arrow_speed);
-
 		// Update
+		for (Arrow& arrow : game_data.arrows) {
+			log("Drawing arrow at x = %f, y = %f", arrow.pos.x, arrow.pos.y);
+			update_arrow(arrow, delta_time);
+		}
 
 		// Render
 		render(renderer, game_data);

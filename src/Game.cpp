@@ -36,6 +36,26 @@ void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, in
 	mp_render_copy(renderer, image->texture, NULL, &dst);
 }
 
+void fire_arrow(Game_Data& game_data, Image_Type it, int speed, V2 target, V2 origin) {
+	Image* image = get_image(it);
+
+	V2 new_vel = {};
+	// Calculate the direction vector target <--- origin
+	new_vel = target - origin;
+
+	// Calculate length
+	float length = new_vel.x * 2 + new_vel.y * 2;
+	length = sqrt(length);
+
+	// Normalize the vel vector
+	new_vel.x = new_vel.x / length;
+	new_vel.y = new_vel.y / length;
+
+	Arrow result = create_arrow(image, origin, new_vel, speed);
+
+	game_data.arrows.push_back(result);
+}
+
 void render(MP_Renderer* renderer, Game_Data& game_data) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
@@ -97,7 +117,9 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	Font* font = get_font(game_data.selected_font);
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
 
-	draw_arrow(renderer, game_data.arrow);
+	for (Arrow& arrow : game_data.arrows) {
+		draw_arrow(renderer, game_data.camera, arrow);
+	}
 
 	mp_render_present(renderer);
 }

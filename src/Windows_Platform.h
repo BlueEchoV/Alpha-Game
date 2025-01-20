@@ -32,6 +32,7 @@
 #define KEY_Z 0x5A  
 
 #define VK_SHIFT 0x10
+#define VK_SPACE 0x20
 
 struct Key_State {
 	bool is_pressed;
