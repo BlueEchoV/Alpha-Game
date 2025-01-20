@@ -70,12 +70,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_x_delta = -1.0f;
 		}
 		if (key_pressed_and_held(VK_SPACE)) {
+			V2 arrow_pos = {(float)game_data.player.position_ws.x, (float)game_data.player.position_ws.y};
+			log("Spawning arrow at x = %f, y = %f", arrow_pos.x, arrow_pos.y);
 			fire_arrow(
 				game_data, 
 				IT_Arrow_1, 
 				10, 
-				{ (float)game_data.player.position_ws.x + 200, (float)game_data.camera.y + 200 }, 
-				{ (float)game_data.player.position_ws.x, (float)game_data.camera.y }
+				{ arrow_pos.x + 300, arrow_pos.y + 300 },
+				arrow_pos	
 			);
 		}
 
@@ -106,7 +108,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		// Update
 		for (Arrow& arrow : game_data.arrows) {
-			log("Drawing arrow at x = %f, y = %f", arrow.pos.x, arrow.pos.y);
 			update_arrow(arrow, delta_time);
 		}
 

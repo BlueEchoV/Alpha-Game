@@ -25,8 +25,8 @@ void update_arrow(Arrow& arrow, float delta_time) {
 	arrow.pos.y += arrow.speed * (arrow.vel.y * delta_time);
 }
 
-void draw_arrow(MP_Renderer* renderer, MP_Rect& camera, Arrow& arrow) {
+void draw_arrow(MP_Renderer* renderer, int camera_pos_x, int camera_pos_y, Arrow& arrow) {
 	MP_Rect src = {};
-	MP_Rect dst = {(int)arrow.pos.x - camera.x , (int)arrow.pos.y - camera.y, 200, 200};
+	MP_Rect dst = {(int)arrow.pos.x - camera_pos_x, (int)arrow.pos.y - camera_pos_y, 200, 200};
 	mp_render_copy_ex(renderer, arrow.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
 }

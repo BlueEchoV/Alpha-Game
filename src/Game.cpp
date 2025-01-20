@@ -118,7 +118,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	draw_mp_library_debug_images(renderer, *font, game_data.player.image->texture, Globals::toggle_debug_images);
 
 	for (Arrow& arrow : game_data.arrows) {
-		draw_arrow(renderer, game_data.camera, arrow);
+		draw_arrow(renderer, game_data.camera.x, game_data.camera.y, arrow);
 	}
 
 	mp_render_present(renderer);
