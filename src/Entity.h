@@ -9,7 +9,7 @@ struct Player {
 	Image* image;
 
 	// World Space
-	V2 position_ws;
+	V2 pos;
 
 	int w, h;
 

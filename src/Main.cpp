@@ -71,7 +71,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		if (key_pressed_and_held(VK_SPACE)) {
 			Player* p = &game_data.player;
-			V2 arrow_pos = {(float)p->position_ws.x - (p->w / 2), (float)p->position_ws.y - (p->h / 2)};
+			V2 arrow_pos = {(float)p->pos.x - (p->w / 2), (float)p->pos.y - (p->h / 2)};
 			log("Spawning arrow at x = %f, y = %f", arrow_pos.x, arrow_pos.y);
 			fire_arrow(
 				game_data, 
@@ -94,8 +94,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_y_delta *= 0.707106781187f;
 		}
 
-		game_data.player.position_ws.x += player_x_delta;
-		game_data.player.position_ws.y += player_y_delta;
+		game_data.player.pos.x += player_x_delta;
+		game_data.player.pos.y += player_y_delta;
 
 		if (key_pressed_and_held(VK_SHIFT)) {
 			game_data.player.speed = player_speed * 2;

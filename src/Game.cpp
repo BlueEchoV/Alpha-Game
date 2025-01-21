@@ -3,15 +3,13 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include <perlin.h>
 
-void draw_circle(MP_Renderer* renderer, Color c, V2 pos_ws, V2 camera_pos, int radius_size, float total_lines) {
+void draw_circle(MP_Renderer* renderer, Color c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
 		return;
 	}
 
-	V2 pos_cs = convert_to_camera_space(camera_pos, pos_ws);
-
-	int radius = radius_size;
+	V2 pos_cs = convert_to_camera_space(camera_pos, center_pos_ws);
 
 	mp_set_render_draw_color(renderer, c);
 
@@ -31,11 +29,11 @@ void draw_circle(MP_Renderer* renderer, Color c, V2 pos_ws, V2 camera_pos, int r
 		float x2 = force_x * radius;
 		float y2 = force_y * radius;
 
-		x1 += pos_cs.x;
-		y1 += pos_cs.y;
+		x1 += pos_cs.x + radius / 2;
+		y1 += pos_cs.y + radius / 2;
+		x2 += pos_cs.x + radius / 2;
+		y2 += pos_cs.y + radius / 2;
 
-		x2 += pos_cs.x;
-		y2 += pos_cs.y;
 		mp_render_draw_line(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
 	}
 }
@@ -121,8 +119,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	mp_render_clear(renderer);
 
 	// Camera relative to the game_data.player
-	game_data.camera.pos_ws.x = ((float)game_data.player.position_ws.x - ((float)game_data.camera.w / 2.0f));
-	game_data.camera.pos_ws.y = ((float)game_data.player.position_ws.y - ((float)game_data.camera.h / 2.0f));
+	game_data.camera.pos_ws.x = ((float)game_data.player.pos.x - ((float)game_data.camera.w / 2.0f));
+	game_data.camera.pos_ws.y = ((float)game_data.player.pos.y - ((float)game_data.camera.h / 2.0f));
 	// 
 	game_data.camera.pos_ws.x += game_data.player.w / 2;
 	game_data.camera.pos_ws.y += game_data.player.h / 2;
@@ -145,7 +143,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
 
 	// Convert the player's position to camera space
-	MP_Rect player_rect = {(int)game_data.player.position_ws.x, (int)game_data.player.position_ws.y, game_data.player.w, game_data.player.h};
+	MP_Rect player_rect = {(int)game_data.player.pos.x, (int)game_data.player.pos.y, game_data.player.w, game_data.player.h};
 	V2 player_pos = convert_to_camera_space(game_data.camera.pos_ws, { (float)player_rect.x, (float)player_rect.y });
 	player_rect.x = (int)player_pos.x;
 	player_rect.y = (int)player_pos.y;
@@ -158,7 +156,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 		draw_arrow(renderer, (int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
 	}
 
-	draw_circle(renderer, C_Green, { 500, 500 }, game_data.camera.pos_ws, 100, 10);
+	draw_circle(renderer, C_Green, game_data.player.pos, game_data.camera.pos_ws, 100, 20);
 
 	mp_render_present(renderer);
 }
