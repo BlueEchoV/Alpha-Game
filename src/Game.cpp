@@ -26,8 +26,8 @@ void draw_circle(MP_Renderer* renderer, Color c, V2 pos_ws, V2 camera_pos, int r
 		current_degrees += increment_angle;
 
 		current_radians = convert_degrees_to_radians(current_degrees);
-		force_x = cos(current_degrees);
-		force_y = sin(current_degrees);
+		force_x = cos(current_radians);
+		force_y = sin(current_radians);
 		float x2 = force_x * radius;
 		float y2 = force_y * radius;
 
@@ -158,7 +158,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 		draw_arrow(renderer, (int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
 	}
 
-	draw_circle(renderer, C_Green, { 500, 500 }, game_data.camera.pos_ws, 1, 4);
+	draw_circle(renderer, C_Green, { 500, 500 }, game_data.camera.pos_ws, 100, 10);
 
 	mp_render_present(renderer);
 }
