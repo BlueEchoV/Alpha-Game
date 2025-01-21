@@ -121,9 +121,11 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	mp_render_clear(renderer);
 
 	// Camera relative to the game_data.player
-	game_data.camera.pos_ws.x = (float)game_data.player.position_ws.x /*- (float)game_data.camera.w / 2.0f)*/;
-	game_data.camera.pos_ws.y = (float)game_data.player.position_ws.y /*- (float)game_data.camera.h / 2.0f)*/;
-
+	game_data.camera.pos_ws.x = ((float)game_data.player.position_ws.x - ((float)game_data.camera.w / 2.0f));
+	game_data.camera.pos_ws.y = ((float)game_data.player.position_ws.y - ((float)game_data.camera.h / 2.0f));
+	// 
+	game_data.camera.pos_ws.x += game_data.player.w / 2;
+	game_data.camera.pos_ws.y += game_data.player.h / 2;
 	// Truncates by default
 	int starting_tile_x = (int)game_data.camera.pos_ws.x / Globals::tile_w;
 	int starting_tile_y = (int)game_data.camera.pos_ws.y / Globals::tile_h;
@@ -140,11 +142,13 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 		}
 	}
 
-	game_data.player.position_cs.x = (float)game_data.camera.w / 2.0f - game_data.player.w / 2;
-	game_data.player.position_cs.y = (float)game_data.camera.h / 2.0f - game_data.player.h / 2;
 	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
 
-	MP_Rect player_rect = {(int)game_data.player.position_cs.x, (int)game_data.player.position_cs.y, game_data.player.w, game_data.player.h};
+	// Convert the player's position to camera space
+	MP_Rect player_rect = {(int)game_data.player.position_ws.x, (int)game_data.player.position_ws.y, game_data.player.w, game_data.player.h};
+	V2 player_pos = convert_to_camera_space(game_data.camera.pos_ws, { (float)player_rect.x, (float)player_rect.y });
+	player_rect.x = (int)player_pos.x;
+	player_rect.y = (int)player_pos.y;
 	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);

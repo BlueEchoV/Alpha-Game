@@ -10,8 +10,6 @@ struct Player {
 
 	// World Space
 	V2 position_ws;
-	// Camera Space
-	V2 position_cs;
 
 	int w, h;
 
