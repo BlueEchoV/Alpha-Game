@@ -1,7 +1,7 @@
 #pragma once
-#include <math.h> 
+#define _USE_MATH_DEFINES
+#include <math.h>
 
-#define M_PI 3.141592653589793238462643383279502884197
 
 struct V2 {
 	float x, y;
@@ -25,3 +25,5 @@ V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float ce
 
 void swap(V2& vec_1, V2& vec_2);
 float hypotenuse(float a, float b);
+
+float convert_degrees_to_radians(float degrees);

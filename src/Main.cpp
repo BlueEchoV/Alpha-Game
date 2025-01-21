@@ -111,7 +111,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Arrow& arrow : game_data.arrows) {
 			update_arrow(arrow, delta_time);
 		}
-
 		// Render
 		render(renderer, game_data);
 	}

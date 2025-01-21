@@ -3,6 +3,43 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include <perlin.h>
 
+void draw_circle(MP_Renderer* renderer, Color c, V2 pos_ws, V2 camera_pos, int radius_size, float total_lines) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return;
+	}
+
+	V2 pos_cs = convert_to_camera_space(camera_pos, pos_ws);
+
+	int radius = radius_size;
+
+	mp_set_render_draw_color(renderer, c);
+
+	float increment_angle = 360.0f / total_lines;
+	float current_degrees = 0;
+	for (int i = 0; i < total_lines; i++) {
+		float current_radians = convert_degrees_to_radians(current_degrees);
+		float force_x = cos(current_radians);
+		float force_y = sin(current_radians);
+		float x1 = force_x * radius;
+		float y1 = force_y * radius;
+		current_degrees += increment_angle;
+
+		current_radians = convert_degrees_to_radians(current_degrees);
+		force_x = cos(current_degrees);
+		force_y = sin(current_degrees);
+		float x2 = force_x * radius;
+		float y2 = force_y * radius;
+
+		x1 += pos_cs.x;
+		y1 += pos_cs.y;
+
+		x2 += pos_cs.x;
+		y2 += pos_cs.y;
+		mp_render_draw_line(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
+	}
+}
+
 void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
@@ -39,23 +76,24 @@ void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, in
 void fire_arrow(Game_Data& game_data, Image_Type it, int speed, V2 target, V2 origin) {
 	Image* image = get_image(it);
 
-	V2 new_vel = {};
+	V2 pos = origin;
+
+	// Center the image
+	pos.x -= image->w / 2;
+	pos.y -= image->h / 2;
+
 	// Calculate the direction vector target <--- origin
-	new_vel = target - origin;
+	V2 vel =  target - origin;
 
 	// Calculate length
-	float length = new_vel.x * 2 + new_vel.y * 2;
+	float length = vel.x * 2 + vel.y * 2;
 	length = sqrt(length);
 
 	// Normalize the vel vector
-	new_vel.x = new_vel.x / length;
-	new_vel.y = new_vel.y / length;
+	vel.x = vel.x / length;
+	vel.y = vel.y / length;
 
-	// Center the image
-	origin.x -= image->w / 2;
-	origin.y -= image->h / 2;
-
-	Arrow result = create_arrow(image, origin, new_vel, speed);
+	Arrow result = create_arrow(image, pos, vel, speed);
 
 	game_data.arrows.push_back(result);
 }
@@ -83,8 +121,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	mp_render_clear(renderer);
 
 	// Camera relative to the game_data.player
-	game_data.camera.pos_ws.x = ((float)game_data.player.position_ws.x - (float)game_data.camera.w / 2.0f);
-	game_data.camera.pos_ws.y = ((float)game_data.player.position_ws.y - (float)game_data.camera.h / 2.0f);
+	game_data.camera.pos_ws.x = (float)game_data.player.position_ws.x /*- (float)game_data.camera.w / 2.0f)*/;
+	game_data.camera.pos_ws.y = (float)game_data.player.position_ws.y /*- (float)game_data.camera.h / 2.0f)*/;
 
 	// Truncates by default
 	int starting_tile_x = (int)game_data.camera.pos_ws.x / Globals::tile_w;
@@ -115,6 +153,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	for (Arrow& arrow : game_data.arrows) {
 		draw_arrow(renderer, (int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
 	}
+
+	draw_circle(renderer, C_Green, { 500, 500 }, game_data.camera.pos_ws, 1, 4);
 
 	mp_render_present(renderer);
 }

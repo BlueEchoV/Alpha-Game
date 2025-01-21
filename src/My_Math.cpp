@@ -80,3 +80,7 @@ void swap(V2& vec_1, V2& vec_2) {
 	vec_1 = vec_2;
 	vec_2 = temp;
 }
+
+float convert_degrees_to_radians(float degrees) {
+	return degrees * ((float)M_PI / 180.0f);
+}
