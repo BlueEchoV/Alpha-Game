@@ -28,8 +28,10 @@ struct Arrow {
 	Image* image;
 };
 
-V2 convert_to_camera_space(V2 entity_pos, V2 camera_pos);
-V2 convert_to_camera_space(int entity_x, int entity_y, int camera_x, int camera_y);
+V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos);
+V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
+V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos);
+V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y);
 
 Player create_player(Image* image, int player_speed);
 

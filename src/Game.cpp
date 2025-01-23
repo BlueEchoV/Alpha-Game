@@ -4,7 +4,7 @@
 #include <perlin.h>
 
 void draw_circle(Color c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
-	V2 pos_cs = convert_to_camera_space(center_pos_ws, camera_pos);
+	V2 pos_cs = convert_ws_to_cs(center_pos_ws, camera_pos);
 
 	mp_set_render_draw_color(c);
 
@@ -33,22 +33,280 @@ void draw_circle(Color c, V2 center_pos_ws, V2 camera_pos, int radius, float tot
 	}
 }
 
+int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
-void debug_draw_coor(V2 camera_pos, int x_ws, int y_ws) {
-	mp_set_render_draw_color(C_Dark_Yellow);
-
+void debug_draw_coor_cs(Color c, V2 camera_pos, int x, int y, bool coordinates_are_in_ws) {
 	Font* font = get_font(debug_font); 
 	int y_offset = font->char_height;
 
-	V2 pos_cs = convert_to_camera_space({ (float)x_ws, (float)y_ws }, camera_pos);
-	std::string player_str = "x = " + std::to_string(x_ws) + ", y = " + std::to_string(y_ws);
-	draw_string(player_str.c_str(), (int)pos_cs.x, (int)pos_cs.y + y_offset);
-	draw_circle(C_Green, { (float)x_ws, (float)y_ws }, camera_pos, 5, 4);
+	V2 pos_cs = { (float)x, (float)y };
+	if (coordinates_are_in_ws) {
+		pos_cs = convert_ws_to_cs({ (float)x, (float)y }, camera_pos);
+	}
+	std::string coordinates = "CS: x = " + std::to_string(x) + ", y = " + std::to_string(y);
+	draw_string(coordinates.c_str(), (int)pos_cs.x, (int)pos_cs.y + y_offset);
+	MP_Rect rect = {}; 
+	rect.w = debug_point_size;
+	rect.h = debug_point_size;
+	rect.x = (int)pos_cs.x - rect.w / 2;;
+	rect.y = (int)pos_cs.y - rect.h / 2;;
+	mp_set_render_draw_color(c);
+	mp_render_fill_rect(&rect);
 }
 
-void debug_draw_line() {
+void debug_draw_coor_ws(Color c, V2 camera_pos, int x, int y, bool coordinates_are_in_cs) {
+	Font* font = get_font(debug_font); 
+	int y_offset = font->char_height;
 
+	V2 pos_ws = { (float)x, (float)y };
+	if (coordinates_are_in_cs) {
+		// The coordinates are in camera space
+		pos_ws = convert_cs_to_ws({ (float)x, (float)y }, camera_pos);
+	}
+	std::string coordinates = "WS: x = " + std::to_string(x) + ", y = " + std::to_string(y);
+	draw_string(coordinates.c_str(), (int)pos_ws.x, (int)pos_ws.y + y_offset);
+	MP_Rect rect = {}; 
+	rect.w = debug_point_size;
+	rect.h = debug_point_size;
+	rect.x = (int)pos_ws.x - rect.w / 2;
+	rect.y = (int)pos_ws.y - rect.h / 2;
+
+	mp_set_render_draw_color(c);
+	mp_render_fill_rect(&rect);
 }
+
+void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture) {
+	if (!Globals::toggle_debug_images && !Globals::debug_show_coordinates) { 
+		return;
+	}
+
+	MP_Renderer* renderer = Globals::renderer;
+
+	if (Globals::toggle_debug_images) {
+		int width = 150;
+		int height = 150;
+
+		int starting_x = 50;
+		int starting_y = renderer->window_height - (50 + height);
+
+		int offset_x = 20 + width;
+		int offset_y = -50 - height;
+
+		int images_per_row = 5;
+		int string_size = 2;
+
+		MP_Rect background_rects[DI_Count] = {};
+		int background_padding = 6;
+
+		mp_set_render_draw_color(0, 0, 0, 255);
+		for (int i = 0; i < DI_Count; i++) {
+			int x = (starting_x + (i % images_per_row) * offset_x);
+			int y = starting_y + (i / images_per_row) * offset_y;
+
+			background_rects[i].x = x - background_padding;
+			background_rects[i].y = y - background_padding;
+			background_rects[i].w = width + background_padding * 2;
+			background_rects[i].h = (height + background_padding * 2) + (font.char_height * (string_size + 1)) + 5;
+		}
+		mp_render_fill_rects(background_rects, DI_Count);
+
+		// First rows
+		for (int i = 0; i < DI_Count; i++) {
+			int x = (starting_x + (i % images_per_row) * offset_x);
+			int y = starting_y + (i / images_per_row) * offset_y;
+			int title_x = x + width / 2;
+			int title_y = y + (font.char_height * (string_size - 1)) + (height);
+
+			MP_Rect rect = { x, y, width, height };
+
+			switch ((Debug_Image)i) {
+			case DI_mp_render_fill_rect: {
+				draw_string(font, "fill_rect", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Red);
+				mp_render_fill_rect(&rect);
+				break;
+			}
+			case DI_mp_render_fill_rects: {
+				draw_string(font, "fill_rects", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Green);
+				MP_Rect bottom_left_and_top_right[2] = {
+					{x		      , y             , width / 2, height / 2},
+					{x + width / 2, y + height / 2, width / 2, height / 2}
+				};
+				mp_render_fill_rects(bottom_left_and_top_right, ARRAYSIZE(bottom_left_and_top_right));
+
+				mp_set_render_draw_color(C_Blue);
+				MP_Rect bottom_right_and_top_left[2] = {
+					{x + width / 2, y			  , width / 2, height / 2},
+					{x            , y + height / 2, width / 2, height / 2}
+				};
+				mp_render_fill_rects(bottom_right_and_top_left, ARRAYSIZE(bottom_right_and_top_left));
+				break;
+			}
+			case DI_mp_render_draw_line: {
+				draw_string(font, "draw_line", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Red);
+				mp_render_draw_line(x, y, x + width, y);
+
+				mp_set_render_draw_color(C_Green);
+				mp_render_draw_line(x, y + height / 2, x + width, y + height / 2);
+
+				mp_set_render_draw_color(C_Blue);
+				mp_render_draw_line(x, y + height, x + width, y + height);
+
+				mp_set_render_draw_color(C_Red);
+				mp_render_draw_line(x, y, x, y + height);
+
+				mp_set_render_draw_color(C_Green);
+				mp_render_draw_line(x + width / 2, y, x + width / 2, y + height);
+
+				mp_set_render_draw_color(C_Blue);
+				mp_render_draw_line(x + width, y, x + width, y + height);
+				break;
+			}
+			case DI_mp_render_draw_lines: {
+				draw_string(font, "draw_lines", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Dark_Yellow);
+
+				const int total_points = 5;
+				MP_Point points[total_points];
+
+				points[0].x = x;
+				points[0].y = y;
+
+				points[1].x = x;
+				points[1].y = y + height;
+
+				points[2].x = x + width;
+				points[2].y = y + height;
+
+				points[3].x = x + width;
+				points[3].y = y;
+
+				points[4].x = x;
+				points[4].y = y;
+
+				mp_render_draw_lines(points, total_points);
+				break;
+			}
+			case DI_mp_render_draw_point: {
+				draw_string(font, "draw_point", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Red);
+				mp_render_draw_point(x, y);
+				mp_render_draw_point(x + width, y);
+				mp_render_draw_point(x, y + height);
+				mp_render_draw_point(x + width, y + height);
+
+				mp_render_draw_point(x + width / 4, y + height / 4);
+				mp_render_draw_point(x + ((width / 4) * 3), y + height / 4);
+				mp_render_draw_point(x + ((width / 4) * 3), y + ((height / 4) * 3));
+				mp_render_draw_point(x + width / 4, y + ((height / 4) * 3));
+				break;
+			}
+			case DI_mp_render_draw_points: {
+				draw_string(font, "draw_points", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Green);
+				const int grid_size = 4;
+				const int total_points = grid_size * grid_size;
+				MP_Point points[total_points] = {};
+
+				int x_spacing = (int)((float)width / ((float)grid_size - 1.0f));
+				int y_spacing = (int)((float)height / ((float)grid_size - 1.0f));
+
+				// Populate the points array
+				int index = 0;
+				for (int z = 0; z < grid_size; ++z) {
+					for (int j = 0; j < grid_size; ++j) {
+						points[index++] = { x + j * x_spacing, y + z * y_spacing };
+					}
+				}
+
+				mp_render_draw_points(points, total_points);
+				break;
+			}
+			case DI_mp_render_draw_rect: {
+				draw_string(font, "draw_rect", title_x, title_y, string_size, true, true);
+				mp_set_render_draw_color(C_Red);
+
+				MP_Rect draw_rect = {};
+				draw_rect.x = x;
+				draw_rect.y = y;
+				draw_rect.w = width;
+				draw_rect.h = height;
+
+				mp_render_draw_rect(&draw_rect);
+				break;
+			}
+			case DI_mp_render_draw_rects: {
+				draw_string(font, "draw_rect", title_x, title_y, string_size, true, true);
+
+				mp_set_render_draw_color(C_Dark_Yellow);
+
+				const int total_rects = 4;
+				MP_Rect draw_rects[total_rects] = {};
+
+				draw_rects[0] = { x + width / 2, y			  , width / 2, height / 2 };
+				draw_rects[1] = { x			  , y + height / 2, width / 2, height / 2 };
+				draw_rects[2] = { x			  , y			  , width / 2, height / 2 };
+				draw_rects[3] = { x + width / 2, y + height / 2, width / 2, height / 2 };
+
+				mp_render_draw_rects(draw_rects, total_rects);
+				break;
+			}
+			case DI_mp_render_copy: {
+				draw_string(font, "render_copy", title_x, title_y, string_size, true, true);
+
+				MP_Rect dst_rect = { x, y, width, height };
+				mp_set_texture_alpha_mod(debug_texture, 255);
+				mp_render_copy(debug_texture, NULL, &dst_rect);
+				break;
+			}
+			case DI_mp_render_copy_alpha: {
+				draw_string(font, "alpha_mod", title_x, title_y, string_size, true, true);
+
+				MP_Rect dst_rect = { x, y, width, height };
+				mp_set_texture_alpha_mod(debug_texture, 100);
+				mp_render_copy(debug_texture, NULL, &dst_rect);
+				break;
+			}
+			case DI_2d_matrix_transformation_rect: {
+				draw_string(font, "2d_rotation", title_x, title_y, string_size, true, true);
+				draw_debug_2d_rotation_matrix_rect({ (float)x + width / 2, (float)y + height / 2 }, &font);
+				break;
+			}
+			case DI_copy_ex: {
+				draw_string(font, "rnd_cpy_ex", title_x, title_y, string_size, true, true);
+
+				MP_Rect temp_rect = { x, y, width, height };
+				static float temp_angle = 0;
+				if (key_pressed_and_held(KEY_A)) {
+					temp_angle += 1;
+				}
+				if (key_pressed_and_held(KEY_D)) {
+					temp_angle -= 1;
+				}
+				mp_render_copy_ex(images[IT_Sun].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
+				break;
+			}
+			default: {
+				draw_string(font, "Error. Image default case hit in draw debug image function", x, y, 1, true, true);
+				break;
+			}
+			}
+		}
+	}
+
+	if (Globals::debug_show_coordinates) {
+		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
+		debug_draw_coor_cs(C_Green, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, false);
+		debug_draw_coor_cs(C_Green, game_data.camera.pos_ws, (int)game_data.player.pos.x, (int)game_data.player.pos.y, true);
+	}
+
+	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
+	mp_set_texture_alpha_mod(debug_texture, 255);
+}
+
+
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
 	Image_Type type = IT_Rock_32x32;
@@ -82,7 +340,7 @@ void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float n
 void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arrow_h, int speed) {
 	Image* image = get_image(it);
 
-	V2 player_cs_pos = convert_to_camera_space(game_data.player.pos, game_data.camera.pos_ws);
+	V2 player_cs_pos = convert_ws_to_cs(game_data.player.pos, game_data.camera.pos_ws);
 
 	V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 
@@ -146,33 +404,18 @@ void render(Game_Data& game_data) {
 
 	// Convert the player's position to camera space
 	MP_Rect player_rect = {(int)game_data.player.pos.x, (int)game_data.player.pos.y, game_data.player.w, game_data.player.h};
-	V2 player_pos = convert_to_camera_space({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
+	V2 player_pos = convert_ws_to_cs({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
 	player_rect.x = (int)player_pos.x - game_data.player.w / 2;
 	player_rect.y = (int)player_pos.y - game_data.player.h / 2;
 	mp_render_copy(game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);
-	draw_mp_library_debug_images(*font, game_data.player.image->texture, Globals::toggle_debug_images);
+	draw_debug_info(game_data, *font, game_data.player.image->texture);
 
 	for (Arrow& arrow : game_data.arrows) {
 		draw_arrow((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
+		debug_draw_coor_cs(C_Green, game_data.camera.pos_ws, (int)arrow.pos_ws.x, (int)arrow.pos_ws.y, true);
 	}
-
-	// In camera space
-	V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
-
-	// Convert to world space
-	mouse += game_data.camera.pos_ws;
-	debug_draw_coor(game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y);
-
-	debug_draw_coor(game_data.camera.pos_ws, (int)game_data.player.pos.x, (int)game_data.player.pos.y);
-
-	mp_set_render_draw_color(C_Green);
-	// mp_render_draw_line(renderer, p_pos_cs.x, p_pos_cs.y, mouse.x, mouse.y);
-	// mp_set_render_draw_color(renderer, C_Red);
-	// mp_render_draw_line(renderer, arrow_pos.x, arrow_pos.y, mouse.x, mouse.y);
-
-	// draw_circle(renderer, C_Green, game_data.player.pos, game_data.camera.pos_ws, 100, 20);
 
 	mp_render_present();
 }

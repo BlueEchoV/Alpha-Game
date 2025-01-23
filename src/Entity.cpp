@@ -1,11 +1,19 @@
 #include "Entity.h"
 
-V2 convert_to_camera_space(V2 entity_pos, V2 camera_pos) {
+V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos) {
+	return entity_pos + camera_pos;
+}
+
+V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y) {
+	return convert_cs_to_ws({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
+}
+
+V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos) {
 	return entity_pos - camera_pos;
 }
 
-V2 convert_to_camera_space(int entity_x, int entity_y, int camera_x, int camera_y) {
-	return convert_to_camera_space({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
+V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
+	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
 Player create_player(Image* image, int player_speed) {
@@ -50,12 +58,9 @@ void update_arrow(Arrow& arrow, float delta_time) {
 
 void draw_arrow(int camera_pos_x, int camera_pos_y, Arrow& arrow) {
 	// Draw everything around the camera (converting to camera space)
-	V2 entity_pos_cs = convert_to_camera_space(arrow.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
+	V2 entity_pos_cs = convert_ws_to_cs(arrow.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - arrow.w / 2, (int)entity_pos_cs.y - arrow.h / 2, arrow.w, arrow.h };
-
-	std::string arrow_angle = std::to_string(arrow.angle);
-	draw_string(arrow_angle.c_str(), dst.x, dst.y);
 
 	mp_render_copy_ex(arrow.image->texture, NULL, &dst, arrow.angle, NULL, SDL_FLIP_NONE);
 }

@@ -7,6 +7,7 @@ namespace Globals {
 	int resolution_y = 900;
 
 	bool toggle_debug_images = true;
+	bool debug_show_coordinates = true;
 
 	float noise_frequency = 0.05f;
 	// Pixels

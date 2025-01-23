@@ -18,22 +18,6 @@ struct Font {
 	Image image;
 };
 
-enum Debug_Image {
-    DI_mp_render_fill_rect,
-    DI_mp_render_fill_rects,
-	DI_mp_render_draw_line,
-	DI_mp_render_draw_lines,
-	DI_mp_render_draw_point,
-	DI_mp_render_draw_points,
-	DI_mp_render_draw_rect,
-	DI_mp_render_draw_rects,
-	DI_mp_render_copy,
-	DI_mp_render_copy_alpha,
-	DI_2d_matrix_transformation_rect,
-	DI_copy_ex,
-    DI_Count
-};
-
 enum Tile_Type {
 	TT_Rock,
 	TT_Grass,
@@ -75,4 +59,3 @@ void draw_string(Font& font, const char* str, float x, float y, int size, bool c
 void draw_string(const char* str, int x, int y);
 
 void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font);
-void draw_mp_library_debug_images(Font& font, MP_Texture* debug_texture, bool toggle_debug_images);

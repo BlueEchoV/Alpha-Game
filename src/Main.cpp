@@ -101,8 +101,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			game_data.player.speed = player_speed;
 		}
 
-		if (key_pressed(VK_OEM_3)) {
+		if (key_pressed(VK_F1)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
+		}
+		if (key_pressed(VK_F2)) {
+			Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
 		}
 
 		// Update

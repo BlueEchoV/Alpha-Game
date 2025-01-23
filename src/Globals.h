@@ -11,9 +11,10 @@ namespace Globals {
 	extern int resolution_x;
 	extern int resolution_y;
 	extern bool toggle_debug_images;
+	extern bool debug_show_coordinates;
 
 	extern float noise_frequency;
-	// Pixels
+
 	extern int tile_w;
 	extern int tile_h;
 
