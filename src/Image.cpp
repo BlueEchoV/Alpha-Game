@@ -160,11 +160,11 @@ void draw_character(MP_Renderer* renderer, Font& font, char character, int x, in
 	mp_render_copy(renderer, font.image.texture, &src, &dst);
 }
 
-void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, float y, int size, bool center_x, bool background) {
-	draw_string(renderer, font, str, (int)x, (int)y, size, center_x, background);
-}
-
 void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background) {
+	if (renderer == NULL) {
+		log("Error: Renderer is null");
+		return;
+	}
 	int length = (int)strlen(str);
 
 	int final_x = x;
@@ -187,6 +187,14 @@ void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int 
 	for (int i = 0; i < length; i++) {
 		draw_character(renderer, font, str[i], final_x + ((font.char_width * size) * i), final_y, size, background);
 	}
+}
+
+void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, float y, int size, bool center_x, bool background) {
+	draw_string(renderer, font, str, (int)x, (int)y, size, center_x, background);
+}
+
+void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y) {
+	draw_string(renderer, font, str, x, y, 1, true, true);
 }
 
 int window_w = 0;

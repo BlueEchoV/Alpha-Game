@@ -25,8 +25,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.camera.w = renderer->window_width;
 	game_data.camera.h = renderer->window_height;
-	game_data.player.w = 96;
-	game_data.player.h = 96;
+	game_data.player.w = Globals::player_width;
+	game_data.player.h = Globals::player_height;
 
 	bool running = true;
 
@@ -69,16 +69,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed_and_held(KEY_A)) {
 			player_x_delta = -1.0f;
 		}
-		if (key_pressed_and_held(VK_SPACE)) {
-			Player* p = &game_data.player;
-			V2 arrow_pos = {(float)p->pos.x - (p->w / 2), (float)p->pos.y - (p->h / 2)};
-			log("Spawning arrow at x = %f, y = %f", arrow_pos.x, arrow_pos.y);
-			fire_arrow(
+
+		if (key_pressed(VK_SPACE)) {
+			fire_player_arrow(
+				renderer,
 				game_data, 
 				IT_Arrow_1, 
-				10, 
-				{ arrow_pos.x + 500, arrow_pos.y },
-				arrow_pos	
+				100
 			);
 		}
 

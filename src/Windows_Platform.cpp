@@ -22,6 +22,25 @@ void reset_is_pressed() {
 	}
 }
 
+V2 get_mouse_position(HWND hwnd) {
+	V2 result = {};
+
+	POINT ptr;
+	if (GetCursorPos(&ptr)) {
+		if (ScreenToClient(hwnd, &ptr)) {
+			// Current in windows coordinate system. (Top Left)
+			result.x = (float)ptr.x;
+			result.y = (float)ptr.y;
+			// Convert to bottom right
+			result.y = Globals::resolution_y - result.y;
+		}
+	} else {
+		log("Error: GetCursorPos failed.");
+		assert(false);
+	}
+	return result;
+}
+
 void get_window_size(HWND window, int& w, int& h) {
 	RECT rect = {};
 	if (GetClientRect(window, &rect) != 0) {

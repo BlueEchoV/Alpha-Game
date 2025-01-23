@@ -143,6 +143,7 @@ int mp_set_render_draw_color(MP_Renderer* renderer, Color c);
 int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect);
 int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
 int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2);
+int mp_render_draw_line(MP_Renderer* renderer, float x1, float y1, float x2, float y2);
 int mp_render_draw_lines(MP_Renderer* renderer, const MP_Point* points, int count);
 int mp_render_draw_point(MP_Renderer* renderer, int x, int y);
 int mp_render_draw_points(MP_Renderer* renderer, const MP_Point* points, int count);

@@ -9,7 +9,7 @@ void draw_circle(MP_Renderer* renderer, Color c, V2 center_pos_ws, V2 camera_pos
 		return;
 	}
 
-	V2 pos_cs = convert_to_camera_space(camera_pos, center_pos_ws);
+	V2 pos_cs = convert_to_camera_space(center_pos_ws, camera_pos);
 
 	mp_set_render_draw_color(renderer, c);
 
@@ -71,27 +71,29 @@ void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, in
 	mp_render_copy(renderer, image->texture, NULL, &dst);
 }
 
-void fire_arrow(Game_Data& game_data, Image_Type it, int speed, V2 target, V2 origin) {
+void fire_player_arrow(MP_Renderer* renderer, Game_Data& game_data, Image_Type it, int speed) {
 	Image* image = get_image(it);
 
-	V2 pos = origin;
+	V2 player_cs_pos = convert_to_camera_space(game_data.player.pos, game_data.camera.pos_ws);
 
 	// Center the image
-	pos.x -= image->w / 2;
-	pos.y -= image->h / 2;
+	player_cs_pos.x -= game_data.player.w / 2;
+	player_cs_pos.y -= game_data.player.h / 2;
+
+	V2 mouse_cs_pos = get_mouse_position(renderer->open_gl.window_handle);
 
 	// Calculate the direction vector target <--- origin
-	V2 vel =  target - origin;
+	V2 vel = mouse_cs_pos - player_cs_pos;
 
 	// Calculate length
-	float length = vel.x * 2 + vel.y * 2;
-	length = sqrt(length);
+	float length = vel.x * vel.x + vel.y * vel.y;
+	length = sqrt(abs(length));
 
 	// Normalize the vel vector
 	vel.x = vel.x / length;
 	vel.y = vel.y / length;
 
-	Arrow result = create_arrow(image, pos, vel, speed);
+	Arrow result = create_arrow(image, game_data.player.pos, vel, speed);
 
 	game_data.arrows.push_back(result);
 }
@@ -119,8 +121,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	mp_render_clear(renderer);
 
 	// Camera relative to the game_data.player
-	game_data.camera.pos_ws.x = ((float)game_data.player.pos.x - ((float)game_data.camera.w / 2.0f));
-	game_data.camera.pos_ws.y = ((float)game_data.player.pos.y - ((float)game_data.camera.h / 2.0f));
+	game_data.camera.pos_ws.x = ((float)game_data.player.pos.x - (Globals::resolution_x / 2.0f));
+	game_data.camera.pos_ws.y = ((float)game_data.player.pos.y - (Globals::resolution_y / 2.0f));
 	// 
 	game_data.camera.pos_ws.x += game_data.player.w / 2;
 	game_data.camera.pos_ws.y += game_data.player.h / 2;
@@ -144,7 +146,7 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 
 	// Convert the player's position to camera space
 	MP_Rect player_rect = {(int)game_data.player.pos.x, (int)game_data.player.pos.y, game_data.player.w, game_data.player.h};
-	V2 player_pos = convert_to_camera_space(game_data.camera.pos_ws, { (float)player_rect.x, (float)player_rect.y });
+	V2 player_pos = convert_to_camera_space({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
 	player_rect.x = (int)player_pos.x;
 	player_rect.y = (int)player_pos.y;
 	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
@@ -157,6 +159,23 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	}
 
 	draw_circle(renderer, C_Green, game_data.player.pos, game_data.camera.pos_ws, 100, 20);
+
+	Player* p = &game_data.player;
+	V2 arrow_pos = {(float)p->pos.x - (p->w / 2), (float)p->pos.y - (p->h / 2)};
+	V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
+	std::string mouse_str = "x = " + std::to_string(mouse.x) + ", y = " + std::to_string(mouse.y);
+	draw_string(renderer, *font, mouse_str.c_str(), (int)mouse.x, (int)mouse.y);
+
+	V2 p_pos_cs = convert_to_camera_space(p->pos, game_data.camera.pos_ws);
+	std::string player_str = "x = " + std::to_string(p_pos_cs.x) + ", y = " + std::to_string(p_pos_cs.y);
+	draw_string(renderer, *font, player_str.c_str(), (int)p_pos_cs.x, (int)p_pos_cs.y);
+
+	mp_set_render_draw_color(renderer, C_Green);
+	mp_render_draw_line(renderer, p_pos_cs.x, p_pos_cs.y, mouse.x, mouse.y);
+	// mp_set_render_draw_color(renderer, C_Red);
+	// mp_render_draw_line(renderer, arrow_pos.x, arrow_pos.y, mouse.x, mouse.y);
+
+	draw_circle(renderer, C_Orange, p->pos, game_data.camera.pos_ws, 5, 10);
 
 	mp_render_present(renderer);
 }

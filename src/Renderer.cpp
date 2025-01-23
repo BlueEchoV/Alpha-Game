@@ -102,8 +102,8 @@ HWND init_windows(HINSTANCE hInstance) {
 			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 			200, // Where on my screen it is drawn
 			100, // ^^^^
-			1600,
-			900,
+			Globals::resolution_x,
+			Globals::resolution_y,
 			0,
 			0,
 			hInstance,
@@ -324,6 +324,10 @@ int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2) {
 	renderer->packets.push_back(packet);
 
 	return 0;
+}
+
+int mp_render_draw_line(MP_Renderer* renderer, float x1, float y1, float x2, float y2) {
+	return mp_render_draw_line(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
 }
 
 int mp_render_draw_lines(MP_Renderer* renderer, const MP_Point* points, int count) {

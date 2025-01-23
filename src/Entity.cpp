@@ -1,11 +1,11 @@
 #include "Entity.h"
 
 V2 convert_to_camera_space(V2 entity_pos, V2 camera_pos) {
-	return camera_pos - entity_pos;
+	return entity_pos - camera_pos;
 }
 
 V2 convert_to_camera_space(int entity_x, int entity_y, int camera_x, int camera_y) {
-	return convert_to_camera_space({(float)entity_x, (float)entity_y }, { (float)camera_x, (float)camera_y });
+	return convert_to_camera_space({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
 Player create_player(Image* image, int player_speed) {
@@ -35,7 +35,7 @@ void update_arrow(Arrow& arrow, float delta_time) {
 
 void draw_arrow(MP_Renderer* renderer, int camera_pos_x, int camera_pos_y, Arrow& arrow) {
 	// Draw everything around the camera (converting to camera space)
-	V2 entity_pos_cs = convert_to_camera_space({ (float)camera_pos_x, (float)camera_pos_y }, arrow.pos_ws);
+	V2 entity_pos_cs = convert_to_camera_space(arrow.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
 	MP_Rect dst = { (int)entity_pos_cs.x, (int)entity_pos_cs.y, 200, 200 };
 	mp_render_copy_ex(renderer, arrow.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
 }
