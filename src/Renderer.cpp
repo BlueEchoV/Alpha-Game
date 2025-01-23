@@ -179,16 +179,11 @@ HDC init_open_gl(HWND window) {
 	return window_dc;
 }
 
-int MP_GetRenderDrawColor(MP_Renderer* renderer, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
-
-	*r = (uint8_t)(255.0f * renderer->draw_color.r);
-	*g = (uint8_t)(255.0f * renderer->draw_color.g);
-	*b = (uint8_t)(255.0f * renderer->draw_color.b);
-	*a = (uint8_t)(255.0f * renderer->draw_color.a);
+int MP_GetRenderDrawColor(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
+	*r = (uint8_t)(255.0f * Globals::renderer->draw_color.r);
+	*g = (uint8_t)(255.0f * Globals::renderer->draw_color.g);
+	*b = (uint8_t)(255.0f * Globals::renderer->draw_color.b);
+	*a = (uint8_t)(255.0f * Globals::renderer->draw_color.a);
 
 	return 0;
 }
@@ -212,11 +207,8 @@ V3 mp_pixel_to_ndc(int x, int y, int window_w, int window_h) {
 	return result;
 }
 
-int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
+int mp_render_fill_rect(const MP_Rect* rect) {
+	MP_Renderer* renderer = Globals::renderer;
 
 	int window_w = renderer->window_width;
 	int window_h = renderer->window_height;
@@ -235,7 +227,7 @@ int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect) {
 
 	packet.type = PT_DRAW;
 	packet.packet_draw.mode = GL_TRIANGLES;
-	packet.packet_draw.render_draw_color = renderer->draw_color;
+	packet.packet_draw.render_draw_color = Globals::renderer->draw_color;
 
 	Vertex vertex_1 = {};
 	Vertex vertex_2 = {};
@@ -274,24 +266,17 @@ int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect) {
 	return 0;
 }
 
-int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
-
+int mp_render_fill_rects(const MP_Rect* rects, int count) {
 	for (int i = 0; i < count; i++) {
-		mp_render_fill_rect(renderer, &rects[i]);
+		mp_render_fill_rect(&rects[i]);
 	}
 
 	return 0;
 }
 
-int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
+int mp_render_draw_line(int x1, int y1, int x2, int y2) {
+	MP_Renderer* renderer = Globals::renderer;
+
 	Packet packet = {};
 
 	packet.type = PT_DRAW;
@@ -326,28 +311,19 @@ int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2) {
 	return 0;
 }
 
-int mp_render_draw_line(MP_Renderer* renderer, float x1, float y1, float x2, float y2) {
-	return mp_render_draw_line(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
+int mp_render_draw_line(float x1, float y1, float x2, float y2) {
+	return mp_render_draw_line((int)x1, (int)y1, (int)x2, (int)y2);
 }
 
-int mp_render_draw_lines(MP_Renderer* renderer, const MP_Point* points, int count) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
-
+int mp_render_draw_lines(const MP_Point* points, int count) {
 	for (int i = 0; i < count - 1; i++) {
-		mp_render_draw_line(renderer, points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+		mp_render_draw_line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 	}
 
 	return 0;
 }
 
-int mp_render_draw_point(MP_Renderer* renderer, int x, int y) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
+int mp_render_draw_point(int x, int y) {
 	MP_Rect rect = {};
 
 	rect.w = 4;
@@ -355,46 +331,31 @@ int mp_render_draw_point(MP_Renderer* renderer, int x, int y) {
 	rect.x = x - rect.w / 2;
 	rect.y = y - rect.h / 2;
 
-	mp_render_fill_rect(renderer, &rect);
+	mp_render_fill_rect(&rect);
 
 	return 0;
 }
 
-int mp_render_draw_points(MP_Renderer* renderer, const MP_Point* points, int count) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
-
+int mp_render_draw_points(const MP_Point* points, int count) {
 	for (int i = 0; i < count; i++) {
-		mp_render_draw_point(renderer, points[i].x, points[i].y);
+		mp_render_draw_point(points[i].x, points[i].y);
 	}
 
 	return 0;
 }
 
-int mp_render_draw_rect(MP_Renderer* renderer, const MP_Rect* rect) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
-
-	mp_render_draw_line(renderer, rect->x		   , rect->y          , rect->x + rect->w, rect->y			);
-	mp_render_draw_line(renderer, rect->x + rect->w, rect->y          , rect->x + rect->w, rect->y + rect->h);
-	mp_render_draw_line(renderer, rect->x + rect->w, rect->y + rect->h, rect->x          , rect->y + rect->h);
-	mp_render_draw_line(renderer, rect->x		   , rect->y + rect->h, rect->x          , rect->y			);
+int mp_render_draw_rect(const MP_Rect* rect) {
+	mp_render_draw_line(rect->x		   , rect->y          , rect->x + rect->w, rect->y			);
+	mp_render_draw_line(rect->x + rect->w, rect->y          , rect->x + rect->w, rect->y + rect->h);
+	mp_render_draw_line(rect->x + rect->w, rect->y + rect->h, rect->x          , rect->y + rect->h);
+	mp_render_draw_line(rect->x		   , rect->y + rect->h, rect->x          , rect->y			);
 
 	return 0;
 }
 
-int mp_render_draw_rects(MP_Renderer* renderer, const MP_Rect* rects, int count) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
-
+int mp_render_draw_rects(const MP_Rect* rects, int count) {
 	for (int i = 0; i < count; i++) { 
-		mp_render_draw_rect(renderer, &rects[i]);
+		mp_render_draw_rect(&rects[i]);
 	}
 
 	return 0;
@@ -407,45 +368,37 @@ int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
 int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
 #endif
 
-int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-	if (renderer == NULL) {
-		log("Error: renderer is null");
-		return -1;
-	}
+int mp_set_render_draw_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+	MP_Renderer* renderer = Globals::renderer;
 
 	renderer->draw_color = { (float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, (float)a / 255.0f };
 
 	return 0;
 }
 
-void mp_render_set_viewport(MP_Renderer* renderer, const MP_Rect* rect) {
-	if (renderer == NULL) {
-		log("Error: Renderer is NULL");
-		return;
-	}
-
+void mp_render_set_viewport(const MP_Rect* rect) {
 	glViewport(rect->x, rect->y, rect->w, rect->h);
 }
 
-int mp_set_render_draw_color(MP_Renderer* renderer, Color c) {
+int mp_set_render_draw_color(Color c) {
     switch (c) {
         case C_Red:
-            mp_set_render_draw_color(renderer, 255, 0, 0, 255);
+            mp_set_render_draw_color(255, 0, 0, 255);
             break;
         case C_Green:
-            mp_set_render_draw_color(renderer, 0, 255, 0, 255); 
+            mp_set_render_draw_color(0, 255, 0, 255); 
             break;
         case C_Blue:
-            mp_set_render_draw_color(renderer, 0, 0, 255, 255);
+            mp_set_render_draw_color(0, 0, 255, 255);
             break;
         case C_Orange:
-            mp_set_render_draw_color(renderer, 255, 165, 0, 255); 
+            mp_set_render_draw_color(255, 165, 0, 255); 
             break;
         case C_Dark_Yellow:
-            mp_set_render_draw_color(renderer, 204, 204, 0, 255); 
+            mp_set_render_draw_color(204, 204, 0, 255); 
             break;
         case C_Dark_Blue:
-            mp_set_render_draw_color(renderer, 0, 0, 139, 255);
+            mp_set_render_draw_color(0, 0, 139, 255);
             break;
         default:
             return -1;
@@ -525,11 +478,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	return renderer;
 }
 
-void mp_render_clear(MP_Renderer* renderer) {
-	if (renderer == NULL) {
-		log("Error: renderer is NULL");
-		return;
-	}
+void mp_render_clear() {
+	MP_Renderer* renderer = Globals::renderer;
 
 	Packet packet = {};
 	packet.type = PT_CLEAR;
@@ -545,11 +495,9 @@ void mp_render_clear(MP_Renderer* renderer) {
 // Copy a portion of the texture to the current renderer target
 
 // NULL for the entire texture. NULL for the entire rendering target.
-void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect) {
-	if (renderer == NULL) {
-		log("Error: renderer is NULL");
-		return;
-	}
+void mp_render_copy(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect) {
+	MP_Renderer* renderer = Globals::renderer;
+
 	// Texture Packet
 	Packet result;
 
@@ -623,14 +571,10 @@ void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* s
 	renderer->packets.push_back(result);
 }
 
-int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
+int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
 					  const float angle, const MP_Point* center, const MP_RendererFlip flip) {
-	if (renderer == NULL) {
-		log("Error: Renderer is null");
-		return -1;
-	}
+	MP_Renderer* renderer = Globals::renderer;
 
-	REF(angle);
 	// Texture Packet
 	Packet result;
 
@@ -771,11 +715,9 @@ void gl_set_blend_mode(MP_BlendMode blend_mode) {
     }
 }
 
-void mp_render_present(MP_Renderer* renderer) {
-	if (renderer == NULL) {
-		log("Error: renderer is NULL");
-		return;
-	}
+void mp_render_present() {
+	MP_Renderer* renderer = Globals::renderer;
+
 	// NOTE: Buffer the data when I create the renderer (empty buffer)
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->open_gl.vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->open_gl.ebo);
@@ -915,12 +857,8 @@ int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {
 //		   SDL_TEXTUREACCESS_STATIC	   → glTexImage2D			(for rarely changing textures)
 //		   SDL_TEXTUREACCESS_STREAMING → glTexSubImage2D		(for frequently updated textures)
 //		   SDL_TEXTUREACCESS_TARGET    → glFramebufferTexture2D (for render targets)
-MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h) {
+MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h) {
 	REF(format);
-	if (renderer == NULL) {
-		log("Error: Renderer is NULL");
-		return nullptr;
-	}
 
 	MP_Texture* result = new MP_Texture();
 	result->w = w;

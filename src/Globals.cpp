@@ -1,7 +1,7 @@
 #include "Globals.h"
 
 namespace Globals {
-	// MP_Renderer renderer;
+	MP_Renderer* renderer = {};
 
 	int resolution_x = 1600;
 	int resolution_y = 900;

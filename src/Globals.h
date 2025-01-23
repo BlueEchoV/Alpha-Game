@@ -2,9 +2,11 @@
 
 // struct MP_Renderer;
 
+struct MP_Renderer;
+
 namespace Globals {
 	// POTENTIAL RACE CONDITION IN MULTITHREADING
-	// extern MP_Renderer renderer;
+	extern MP_Renderer* renderer;
 
 	extern int resolution_x;
 	extern int resolution_y;

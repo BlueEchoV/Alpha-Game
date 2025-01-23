@@ -58,21 +58,21 @@ enum Font_Type {
 	FT_Basic
 };
 
-Image load_image(MP_Renderer* renderer, const char* file_path);
+Image load_image(const char* file_path);
 
 extern std::unordered_map<Image_Type, Image> images;
-void load_images(MP_Renderer* renderer);
+void load_images();
 Image* get_image(Image_Type image_type);
 
 extern std::unordered_map<Font_Type, Font> fonts;
-void load_fonts(MP_Renderer* renderer);
+void load_fonts();
 Font* get_font(Font_Type type);
 
-Font load_font(MP_Renderer* renderer, const char* file_path);
-void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background);
-void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background);
-void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, float y, int size, bool center_x, bool background);
-void draw_string(MP_Renderer* renderer, const char* str, int x, int y);
+Font load_font(const char* file_path);
+void draw_character(Font& font, char character, int x, int y, int size, int background);
+void draw_string(Font& font, const char* str, int x, int y, int size, bool center_x, bool background);
+void draw_string(Font& font, const char* str, float x, float y, int size, bool center_x, bool background);
+void draw_string(const char* str, int x, int y);
 
-void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2 center, Font* font);
-void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture* debug_texture, bool toggle_debug_images);
+void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font);
+void draw_mp_library_debug_images(Font& font, MP_Texture* debug_texture, bool toggle_debug_images);

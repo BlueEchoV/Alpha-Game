@@ -35,8 +35,8 @@ Player create_player(Image* image, int player_speed);
 
 Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed);
 void update_arrow(Arrow& arrow, float delta_time);
-void draw_arrow(MP_Renderer* renderer, int camera_pos_x, int camera_pos_y, Arrow& arrow);
+void draw_arrow(int camera_pos_x, int camera_pos_y, Arrow& arrow);
 
-// void spawn_entity(MP_Renderer* renderer, V2_F pos);
+// void spawn_entity(V2_F pos);
 // void update_entity();
 // void draw_entity();

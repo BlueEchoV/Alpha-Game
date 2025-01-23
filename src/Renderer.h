@@ -139,18 +139,18 @@ struct MP_Renderer {
 HDC init_open_gl(HWND window);
 void load_shaders();
 
-int mp_get_render_draw_color(MP_Renderer* renderer, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
-int mp_set_render_draw_color(MP_Renderer* renderer, Color c);
+int mp_get_render_draw_color(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
+int mp_set_render_draw_color(Color c);
 
-int mp_render_fill_rect(MP_Renderer* renderer, const MP_Rect* rect);
-int mp_render_fill_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
-int mp_render_draw_line(MP_Renderer* renderer, int x1, int y1, int x2, int y2);
-int mp_render_draw_line(MP_Renderer* renderer, float x1, float y1, float x2, float y2);
-int mp_render_draw_lines(MP_Renderer* renderer, const MP_Point* points, int count);
-int mp_render_draw_point(MP_Renderer* renderer, int x, int y);
-int mp_render_draw_points(MP_Renderer* renderer, const MP_Point* points, int count);
-int mp_render_draw_rect(MP_Renderer* renderer, const MP_Rect* rect);
-int mp_render_draw_rects(MP_Renderer* renderer, const MP_Rect* rects, int count);
+int mp_render_fill_rect(const MP_Rect* rect);
+int mp_render_fill_rects(const MP_Rect* rects, int count);
+int mp_render_draw_line(int x1, int y1, int x2, int y2);
+int mp_render_draw_line(float x1, float y1, float x2, float y2);
+int mp_render_draw_lines(const MP_Point* points, int count);
+int mp_render_draw_point(int x, int y);
+int mp_render_draw_points(const MP_Point* points, int count);
+int mp_render_draw_rect(const MP_Rect* rect);
+int mp_render_draw_rects(const MP_Rect* rects, int count);
 
 int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode);
 int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
@@ -158,25 +158,25 @@ int mp_get_texture_color_mod(MP_Texture* texture, uint8_t* r, uint8_t* g, uint8_
 int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
 int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
 
-MP_Texture* mp_create_texture(MP_Renderer* renderer, uint32_t format, int access, int w, int h);
+MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h);
 void mp_destroy_texture(MP_Texture* texture);
-void mp_render_copy(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect);
-int mp_render_copy_ex(MP_Renderer* renderer, MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
+void mp_render_copy(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect);
+int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
 				      const float angle, const MP_Point* center, const MP_RendererFlip flip);
 
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
 void mp_unlock_texture(MP_Texture* texture);
 
-int mp_set_render_draw_color(MP_Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+int mp_set_render_draw_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
-void mp_render_set_viewport(MP_Renderer* renderer, const MP_Rect* rect);
+void mp_render_set_viewport(const MP_Rect* rect);
 
 uint64_t mp_get_ticks_64();
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);
-void mp_render_clear(MP_Renderer* renderer);
-void mp_render_present(MP_Renderer* renderer);
+void mp_render_clear();
+void mp_render_present();
 
 #if 0
 int MP_SetTextureBlendMode(SDL_Texture* texture, SDL_BlendMode blend_mode);

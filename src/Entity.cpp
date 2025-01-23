@@ -48,14 +48,14 @@ void update_arrow(Arrow& arrow, float delta_time) {
 	arrow.pos_ws.y += arrow.speed * (arrow.vel.y * delta_time);
 }
 
-void draw_arrow(MP_Renderer* renderer, int camera_pos_x, int camera_pos_y, Arrow& arrow) {
+void draw_arrow(int camera_pos_x, int camera_pos_y, Arrow& arrow) {
 	// Draw everything around the camera (converting to camera space)
 	V2 entity_pos_cs = convert_to_camera_space(arrow.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - arrow.w / 2, (int)entity_pos_cs.y - arrow.h / 2, arrow.w, arrow.h };
 
 	std::string arrow_angle = std::to_string(arrow.angle);
-	draw_string(renderer, arrow_angle.c_str(), dst.x, dst.y);
+	draw_string(arrow_angle.c_str(), dst.x, dst.y);
 
-	mp_render_copy_ex(renderer, arrow.image->texture, NULL, &dst, arrow.angle, NULL, SDL_FLIP_NONE);
+	mp_render_copy_ex(arrow.image->texture, NULL, &dst, arrow.angle, NULL, SDL_FLIP_NONE);
 }

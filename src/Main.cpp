@@ -10,9 +10,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	REF(lpCmdLine);
 	REF(nShowCmd);
 
-	MP_Renderer* renderer = mp_create_renderer(hInstance);
-	load_images(renderer);
-	load_fonts(renderer);
+	Globals::renderer = mp_create_renderer(hInstance);
+	load_images();
+	load_fonts();
 
 	Game_Data game_data = {};
 	game_data.selected_font = FT_Basic;
@@ -23,8 +23,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
-	game_data.camera.w = renderer->window_width;
-	game_data.camera.h = renderer->window_height;
+	game_data.camera.w = Globals::renderer->window_width;
+	game_data.camera.h = Globals::renderer->window_height;
 	game_data.player.w = Globals::player_width;
 	game_data.player.h = Globals::player_height;
 
@@ -72,7 +72,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		if (key_pressed(VK_SPACE)) {
 			fire_player_arrow(
-				renderer,
 				game_data, 
 				IT_Arrow_1, 
 				32, 
@@ -111,9 +110,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			update_arrow(arrow, delta_time);
 		}
 		// Render
-		render(renderer, game_data);
+		render(game_data);
 	}
 
-	ReleaseDC(renderer->open_gl.window_handle, renderer->open_gl.window_dc);
+	ReleaseDC(Globals::renderer->open_gl.window_handle, Globals::renderer->open_gl.window_dc);
 	return 0;
 }
