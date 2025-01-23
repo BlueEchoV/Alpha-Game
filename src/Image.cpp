@@ -193,8 +193,9 @@ void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, fl
 	draw_string(renderer, font, str, (int)x, (int)y, size, center_x, background);
 }
 
-void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y) {
-	draw_string(renderer, font, str, x, y, 1, true, true);
+void draw_string(MP_Renderer* renderer, const char* str, int x, int y) {
+	Font* font = get_font(FT_Basic);
+	draw_string(renderer, *font, str, x, y, 1, true, true);
 }
 
 int window_w = 0;

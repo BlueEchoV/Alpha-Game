@@ -72,7 +72,7 @@ Font load_font(MP_Renderer* renderer, const char* file_path);
 void draw_character(MP_Renderer* renderer, Font& font, char character, int x, int y, int size, int background);
 void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y, int size, bool center_x, bool background);
 void draw_string(MP_Renderer* renderer, Font& font, const char* str, float x, float y, int size, bool center_x, bool background);
-void draw_string(MP_Renderer* renderer, Font& font, const char* str, int x, int y);
+void draw_string(MP_Renderer* renderer, const char* str, int x, int y);
 
 void draw_debug_2d_rotation_matrix_rect(MP_Renderer* renderer, V2 center, Font* font);
 void draw_mp_library_debug_images(MP_Renderer* renderer, Font& font, MP_Texture* debug_texture, bool toggle_debug_images);

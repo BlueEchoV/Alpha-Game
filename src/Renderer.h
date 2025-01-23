@@ -117,6 +117,8 @@ struct Vertex {
 	V2 texture_coor;
 };
 
+struct Font;
+
 struct MP_Renderer {
 	Open_GL open_gl;
 

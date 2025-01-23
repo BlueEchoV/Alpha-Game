@@ -1,6 +1,11 @@
 #pragma once
 
+// struct MP_Renderer;
+
 namespace Globals {
+	// POTENTIAL RACE CONDITION IN MULTITHREADING
+	// extern MP_Renderer renderer;
+
 	extern int resolution_x;
 	extern int resolution_y;
 	extern bool toggle_debug_images;

@@ -27,13 +27,17 @@ V2 get_mouse_position(HWND hwnd) {
 
 	POINT ptr;
 	if (GetCursorPos(&ptr)) {
-		if (ScreenToClient(hwnd, &ptr)) {
-			// Current in windows coordinate system. (Top Left)
-			result.x = (float)ptr.x;
-			result.y = (float)ptr.y;
-			// Convert to bottom right
-			result.y = Globals::resolution_y - result.y;
-		}
+        RECT clientRect;
+        GetClientRect(hwnd, &clientRect);
+
+        if (ScreenToClient(hwnd, &ptr)) {
+            // Account for potential scaling issues
+            result.x = (float)ptr.x;
+            result.y = (float)ptr.y;
+            
+            // Convert to bottom-left coordinate system
+            result.y = (float)clientRect.bottom - result.y;
+        }	
 	} else {
 		log("Error: GetCursorPos failed.");
 		assert(false);

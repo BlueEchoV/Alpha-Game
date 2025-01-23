@@ -38,6 +38,28 @@ void draw_circle(MP_Renderer* renderer, Color c, V2 center_pos_ws, V2 camera_pos
 	}
 }
 
+Font_Type debug_font = FT_Basic;
+void debug_draw_coor(MP_Renderer* renderer, V2 camera_pos, int x_ws, int y_ws) {
+	if (renderer == NULL) {
+		log("Error: Renderer is NULL");
+		return;
+	}
+
+	mp_set_render_draw_color(renderer, C_Dark_Yellow);
+
+	Font* font = get_font(debug_font); 
+	int y_offset = font->char_height;
+
+	V2 pos_cs = convert_to_camera_space({ (float)x_ws, (float)y_ws }, camera_pos);
+	std::string player_str = "x = " + std::to_string(x_ws) + ", y = " + std::to_string(y_ws);
+	draw_string(renderer, player_str.c_str(), (int)pos_cs.x, (int)pos_cs.y + y_offset);
+	draw_circle(renderer, C_Green, { (float)x_ws, (float)y_ws }, camera_pos, 5, 4);
+}
+
+void debug_draw_line() {
+
+}
+
 void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
 	if (renderer == NULL) {
 		log("Error: Renderer is NULL");
@@ -154,22 +176,20 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 		draw_arrow(renderer, (int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
 	}
 
-	Player* p = &game_data.player;
-	V2 arrow_pos = {(float)p->pos.x - (p->w / 2), (float)p->pos.y - (p->h / 2)};
+	// In camera space
 	V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
-	std::string mouse_str = "x = " + std::to_string((int)mouse.x) + ", y = " + std::to_string((int)mouse.y);
-	draw_string(renderer, *font, mouse_str.c_str(), (int)mouse.x, (int)mouse.y);
 
-	V2 p_pos_cs = convert_to_camera_space(p->pos, game_data.camera.pos_ws);
-	std::string player_str = "x = " + std::to_string((int)p_pos_cs.x) + ", y = " + std::to_string((int)p_pos_cs.y);
-	draw_string(renderer, *font, player_str.c_str(), (int)p_pos_cs.x, (int)p_pos_cs.y);
+	// Convert to world space
+	mouse += game_data.camera.pos_ws;
+	debug_draw_coor(renderer, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y);
+
+	debug_draw_coor(renderer, game_data.camera.pos_ws, (int)game_data.player.pos.x, (int)game_data.player.pos.y);
 
 	mp_set_render_draw_color(renderer, C_Green);
-	mp_render_draw_line(renderer, p_pos_cs.x, p_pos_cs.y, mouse.x, mouse.y);
+	// mp_render_draw_line(renderer, p_pos_cs.x, p_pos_cs.y, mouse.x, mouse.y);
 	// mp_set_render_draw_color(renderer, C_Red);
 	// mp_render_draw_line(renderer, arrow_pos.x, arrow_pos.y, mouse.x, mouse.y);
 
-	draw_circle(renderer, C_Orange, game_data.player.pos, game_data.camera.pos_ws, 5, 10);
 	// draw_circle(renderer, C_Green, game_data.player.pos, game_data.camera.pos_ws, 100, 20);
 
 	mp_render_present(renderer);
