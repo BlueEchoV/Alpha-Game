@@ -23,6 +23,7 @@ struct Arrow {
 	V2 vel;
 	int speed;
 	int w, h;
+	float angle;
 
 	Image* image;
 };

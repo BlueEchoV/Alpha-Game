@@ -84,3 +84,7 @@ void swap(V2& vec_1, V2& vec_2) {
 float convert_degrees_to_radians(float degrees) {
 	return degrees * ((float)M_PI / 180.0f);
 }
+
+float convert_radians_to_degrees(float degrees) {
+	return degrees * ((float)M_PI / 180.0f);
+}

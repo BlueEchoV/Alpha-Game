@@ -26,6 +26,11 @@ Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int spee
 	result.speed = speed;
 	result.w = width;
 	result.h = height;
+	result.angle = (float)atan2((double)vel.x, (double)vel.y);
+	result.angle = convert_radians_to_degrees(result.angle);
+	// Inverted coordinate system
+	result.angle *= -1;
+	result.angle += 90;
 
 	return result;
 }
@@ -40,5 +45,5 @@ void draw_arrow(MP_Renderer* renderer, int camera_pos_x, int camera_pos_y, Arrow
 	V2 entity_pos_cs = convert_to_camera_space(arrow.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - arrow.w / 2, (int)entity_pos_cs.y - arrow.h / 2, arrow.w, arrow.h };
-	mp_render_copy_ex(renderer, arrow.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
+	mp_render_copy_ex(renderer, arrow.image->texture, NULL, &dst, arrow.angle, NULL, SDL_FLIP_NONE);
 }

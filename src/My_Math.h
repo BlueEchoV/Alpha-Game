@@ -27,3 +27,4 @@ void swap(V2& vec_1, V2& vec_2);
 float hypotenuse(float a, float b);
 
 float convert_degrees_to_radians(float degrees);
+float convert_radians_to_degrees(float radians);
