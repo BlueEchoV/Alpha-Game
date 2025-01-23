@@ -71,14 +71,10 @@ void draw_tile(MP_Renderer* renderer, Game_Data& game_data, int tile_index_x, in
 	mp_render_copy(renderer, image->texture, NULL, &dst);
 }
 
-void fire_player_arrow(MP_Renderer* renderer, Game_Data& game_data, Image_Type it, int speed) {
+void fire_player_arrow(MP_Renderer* renderer, Game_Data& game_data, Image_Type it, int arrow_w, int arrow_h, int speed) {
 	Image* image = get_image(it);
 
 	V2 player_cs_pos = convert_to_camera_space(game_data.player.pos, game_data.camera.pos_ws);
-
-	// Center the image
-	player_cs_pos.x -= game_data.player.w / 2;
-	player_cs_pos.y -= game_data.player.h / 2;
 
 	V2 mouse_cs_pos = get_mouse_position(renderer->open_gl.window_handle);
 
@@ -93,7 +89,7 @@ void fire_player_arrow(MP_Renderer* renderer, Game_Data& game_data, Image_Type i
 	vel.x = vel.x / length;
 	vel.y = vel.y / length;
 
-	Arrow result = create_arrow(image, game_data.player.pos, vel, speed);
+	Arrow result = create_arrow(image, game_data.player.pos, vel, arrow_w, arrow_h, speed);
 
 	game_data.arrows.push_back(result);
 }
@@ -147,8 +143,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	// Convert the player's position to camera space
 	MP_Rect player_rect = {(int)game_data.player.pos.x, (int)game_data.player.pos.y, game_data.player.w, game_data.player.h};
 	V2 player_pos = convert_to_camera_space({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
-	player_rect.x = (int)player_pos.x;
-	player_rect.y = (int)player_pos.y;
+	player_rect.x = (int)player_pos.x - game_data.player.w / 2;
+	player_rect.y = (int)player_pos.y - game_data.player.h / 2;
 	mp_render_copy(renderer, game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);
@@ -158,16 +154,14 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 		draw_arrow(renderer, (int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
 	}
 
-	draw_circle(renderer, C_Green, game_data.player.pos, game_data.camera.pos_ws, 100, 20);
-
 	Player* p = &game_data.player;
 	V2 arrow_pos = {(float)p->pos.x - (p->w / 2), (float)p->pos.y - (p->h / 2)};
 	V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
-	std::string mouse_str = "x = " + std::to_string(mouse.x) + ", y = " + std::to_string(mouse.y);
+	std::string mouse_str = "x = " + std::to_string((int)mouse.x) + ", y = " + std::to_string((int)mouse.y);
 	draw_string(renderer, *font, mouse_str.c_str(), (int)mouse.x, (int)mouse.y);
 
 	V2 p_pos_cs = convert_to_camera_space(p->pos, game_data.camera.pos_ws);
-	std::string player_str = "x = " + std::to_string(p_pos_cs.x) + ", y = " + std::to_string(p_pos_cs.y);
+	std::string player_str = "x = " + std::to_string((int)p_pos_cs.x) + ", y = " + std::to_string((int)p_pos_cs.y);
 	draw_string(renderer, *font, player_str.c_str(), (int)p_pos_cs.x, (int)p_pos_cs.y);
 
 	mp_set_render_draw_color(renderer, C_Green);
@@ -175,7 +169,8 @@ void render(MP_Renderer* renderer, Game_Data& game_data) {
 	// mp_set_render_draw_color(renderer, C_Red);
 	// mp_render_draw_line(renderer, arrow_pos.x, arrow_pos.y, mouse.x, mouse.y);
 
-	draw_circle(renderer, C_Orange, p->pos, game_data.camera.pos_ws, 5, 10);
+	draw_circle(renderer, C_Orange, game_data.player.pos, game_data.camera.pos_ws, 5, 10);
+	// draw_circle(renderer, C_Green, game_data.player.pos, game_data.camera.pos_ws, 100, 20);
 
 	mp_render_present(renderer);
 }

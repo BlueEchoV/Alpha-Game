@@ -22,6 +22,7 @@ struct Arrow {
 	V2 pos_ws;
 	V2 vel;
 	int speed;
+	int w, h;
 
 	Image* image;
 };
@@ -31,7 +32,7 @@ V2 convert_to_camera_space(int entity_x, int entity_y, int camera_x, int camera_
 
 Player create_player(Image* image, int player_speed);
 
-Arrow create_arrow(Image* image, V2 pos, V2 vel, int speed);
+Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed);
 void update_arrow(Arrow& arrow, float delta_time);
 void draw_arrow(MP_Renderer* renderer, int camera_pos_x, int camera_pos_y, Arrow& arrow);
 

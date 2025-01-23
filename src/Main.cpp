@@ -75,6 +75,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				renderer,
 				game_data, 
 				IT_Arrow_1, 
+				32, 
+				32,
 				100
 			);
 		}
