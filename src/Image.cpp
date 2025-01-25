@@ -152,7 +152,7 @@ void draw_character(Font& font, char character, int x, int y, int size) {
 	mp_render_copy(font.image.texture, &src, &dst);
 }
 
-void draw_string(Font& font, const char* str, int x, int y, int size, bool center_x, bool background, Color_Type c) {
+void draw_string(Font& font, const char* str, Color_Type c, bool background, int x, int y, int size, bool center_x) {
 	int length = (int)strlen(str);
 
 	int final_x = x;
@@ -181,13 +181,13 @@ void draw_string(Font& font, const char* str, int x, int y, int size, bool cente
 	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
 }
 
-void draw_string(Font& font, const char* str, float x, float y, int size, bool center_x, bool background, Color_Type c) {
-	draw_string(font, str, (int)x, (int)y, size, center_x, background, c);
+void draw_string(Font& font, const char* str, Color_Type c, bool background, float x, float y, int size, bool center_x) {
+	draw_string(font, str, c, background, (int)x, (int)y, size, center_x);
 }
 
-void draw_quick_string(const char* str, int x, int y) {
+void draw_quick_string(Color_Type c, bool background, const char* str, int x, int y) {
 	Font* font = get_font(FT_Basic);
-	draw_string(*font, str, x, y, 1, true, false, CT_White);
+	draw_string(*font, str, c, background, x, y, 1, true);
 }
 
 int window_w = 0;
@@ -239,27 +239,27 @@ void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font) {
 	int string_size = 1;
 	std::string center_string = {};
 	center_string = "(" + std::to_string((int)c.x) + " " + std::to_string((int)c.y) + ")";
-	draw_string(*font, center_string.c_str(), (int)c.x, (int)c.y, string_size, true, false, CT_White);
+	draw_string(*font, center_string.c_str(), CT_White, true, c.x, c.y, string_size, true);
 
 	std::string angle_string = {};
 	center_string = std::to_string((int)angle);
-	draw_string(*font, center_string.c_str(), (int)c.x, (int)c.y + (font->char_height * 2) * string_size, string_size, true, false, CT_White);
+	draw_string(*font, center_string.c_str(), CT_White, true, (int)c.x, (int)c.y + (font->char_height * 2) * string_size, string_size, true);
 
 	std::string top_left_string = {};
 	top_left_string = "(" + std::to_string((int)new_top_left.x) + " " + std::to_string((int)new_top_left.y) + ")";
-	draw_string(*font, top_left_string.c_str(), new_top_left.x, new_top_left.y, string_size, true, false, CT_White);
+	draw_string(*font, top_left_string.c_str(), CT_White, true, new_top_left.x, new_top_left.y, string_size, true);
 
 	std::string top_right_string = {};
 	top_right_string = "(" + std::to_string((int)new_top_right.x) + " " + std::to_string((int)new_top_right.y) + ")";
-	draw_string(*font, top_right_string.c_str(), new_top_right.x, new_top_right.y, string_size, true, false, CT_White);
+	draw_string(*font, top_right_string.c_str(), CT_White, true, new_top_right.x, new_top_right.y, string_size, true);
 
 	std::string bottom_right_string = {};
 	bottom_right_string = "(" + std::to_string((int)new_bottom_right.x) + " " + std::to_string((int)new_bottom_right.y) + ")";
-	draw_string(*font, bottom_right_string.c_str(), new_bottom_right.x, new_bottom_right.y, string_size, true, false, CT_White);
+	draw_string(*font, bottom_right_string.c_str(), CT_White, true, new_bottom_right.x, new_bottom_right.y, string_size, true);
 
 	std::string bottom_left_string = {};
 	bottom_left_string = "(" + std::to_string((int)new_bottom_left.x) + " " + std::to_string((int)new_bottom_left.y) + ")";
-	draw_string(*font, bottom_left_string.c_str(), new_bottom_left.x, new_bottom_left.y, string_size, true, false, CT_White);
+	draw_string(*font, bottom_left_string.c_str(), CT_White, true, new_bottom_left.x, new_bottom_left.y, string_size, true);
 
 	mp_set_render_draw_color(CT_Orange);
 	mp_render_draw_line((int)new_top_left.x, (int)new_top_left.y, (int)new_top_right.x, (int)new_top_right.y);

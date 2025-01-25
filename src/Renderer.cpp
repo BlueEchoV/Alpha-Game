@@ -386,8 +386,10 @@ Color_RGBA get_color_type(Color_Type c) {
     switch (c) {
         case CT_White: 
 			result = { 255, 255, 255, 255 };
+			break;
         case CT_Black: 
 			result = { 0, 0, 0, 0 };
+			break;
         case CT_Red:
 			result = { 255, 0, 0, 255 };
             break;
