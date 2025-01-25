@@ -135,7 +135,7 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 			int x = (starting_x + (i % images_per_row) * offset_x);
 			int y = starting_y + (i / images_per_row) * offset_y;
 			int title_x = x + width / 2;
-			int title_y = y + (font.char_height * (string_size - 1)) + (height);
+			int title_y = y + (font.char_height * (string_size - 1)) + (height) + (font.char_height * 2) / 2;
 
 			MP_Rect rect = { x, y, width, height };
 
@@ -319,7 +319,7 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
 		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, false);
-		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.pos.x, (int)game_data.player.pos.y, true);
+		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.pos.x, (int)game_data.player.pos.y, false);
 	}
 
 	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
