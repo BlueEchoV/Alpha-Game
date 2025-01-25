@@ -3,14 +3,16 @@
 #include <unordered_map>
 #include <stdint.h>
 
-enum Color {
-	C_Red,
-	C_Green,
-	C_Blue,
-	C_Orange,
-	C_Dark_Yellow,
-	C_Dark_Blue,
-	C_Total
+enum Color_Type {
+	CT_White,
+	CT_Black,
+	CT_Red,
+	CT_Green,
+	CT_Blue,
+	CT_Orange,
+	CT_Dark_Yellow,
+	CT_Dark_Blue,
+	CT_Total
 };
 
 typedef unsigned int GLuint;
@@ -139,8 +141,9 @@ struct MP_Renderer {
 HDC init_open_gl(HWND window);
 void load_shaders();
 
-int mp_get_render_draw_color(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
-int mp_set_render_draw_color(Color c);
+void mp_set_render_draw_color(Color_Type c);
+int mp_set_render_draw_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+// int mp_get_render_draw_color(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
 
 int mp_render_fill_rect(const MP_Rect* rect);
 int mp_render_fill_rects(const MP_Rect* rects, int count);
@@ -155,6 +158,7 @@ int mp_render_draw_rects(const MP_Rect* rects, int count);
 int mp_set_texture_blend_mode(MP_Texture* texture, MP_BlendMode blend_mode);
 int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t b);
 int mp_get_texture_color_mod(MP_Texture* texture, uint8_t* r, uint8_t* g, uint8_t* b);
+void mp_set_texture_color_mod(MP_Texture* texture, Color_Type c);
 int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
 int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
 
@@ -166,8 +170,6 @@ int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rec
 
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
 void mp_unlock_texture(MP_Texture* texture);
-
-int mp_set_render_draw_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 void mp_render_set_viewport(const MP_Rect* rect);
 

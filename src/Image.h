@@ -54,8 +54,8 @@ Font* get_font(Font_Type type);
 
 Font load_font(const char* file_path);
 void draw_character(Font& font, char character, int x, int y, int size);
-void draw_string(Font& font, const char* str, int x, int y, int size, bool center_x, bool background);
-void draw_string(Font& font, const char* str, float x, float y, int size, bool center_x, bool background);
-void draw_string(const char* str, int x, int y);
+void draw_string(Font& font, const char* str, int x, int y, int size, bool center_x, bool background, Color_Type c);
+void draw_string(Font& font, const char* str, float x, float y, int size, bool center_x, bool background, Color_Type c);
+void draw_quick_string(const char* str, int x, int y);
 
 void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font);

@@ -380,30 +380,45 @@ void mp_render_set_viewport(const MP_Rect* rect) {
 	glViewport(rect->x, rect->y, rect->w, rect->h);
 }
 
-int mp_set_render_draw_color(Color c) {
+Color_RGBA get_color_type(Color_Type c) {
+	Color_RGBA result = {};
+
     switch (c) {
-        case C_Red:
-            mp_set_render_draw_color(255, 0, 0, 255);
+        case CT_White: 
+			result = { 255, 255, 255, 255 };
+        case CT_Black: 
+			result = { 0, 0, 0, 0 };
+        case CT_Red:
+			result = { 255, 0, 0, 255 };
             break;
-        case C_Green:
-            mp_set_render_draw_color(0, 255, 0, 255); 
+        case CT_Green:
+			result = { 0, 255, 0, 255 };
             break;
-        case C_Blue:
-            mp_set_render_draw_color(0, 0, 255, 255);
+        case CT_Blue:
+			result = { 0, 0, 255, 255 };
             break;
-        case C_Orange:
-            mp_set_render_draw_color(255, 165, 0, 255); 
+        case CT_Orange:
+			result = { 255, 165, 0, 255 };
             break;
-        case C_Dark_Yellow:
-            mp_set_render_draw_color(204, 204, 0, 255); 
+        case CT_Dark_Yellow:
+			result = { 204, 204, 0, 255 };
             break;
-        case C_Dark_Blue:
-            mp_set_render_draw_color(0, 0, 139, 255);
+        case CT_Dark_Blue:
+			result = { 0, 0, 139, 255 };
             break;
         default:
-            return -1;
+            return result;
     }
-    return 0; 
+
+	return result;
+}
+
+void mp_set_render_draw_color(Color_RGBA c) {
+	mp_set_render_draw_color(c.r, c.g, c.b, c.a);
+}
+
+void mp_set_render_draw_color(Color_Type c) {
+	mp_set_render_draw_color(get_color_type(c));
 }
 
 static inline int64_t GetTicks() {
@@ -837,6 +852,11 @@ int mp_set_texture_color_mod(MP_Texture* texture, uint8_t r, uint8_t g, uint8_t 
 	texture->mod.b = (float)b / 255.0f;
 
 	return 0;
+}
+
+void mp_set_texture_color_mod(MP_Texture* texture, Color_Type c) {
+	Color_RGBA result = get_color_type(c);
+	mp_set_texture_color_mod(texture, result.r, result.g, result.b);
 }
 
 int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {

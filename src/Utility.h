@@ -50,7 +50,13 @@ struct Color_4F {
 	float a;
 };
 
-struct Color_RGBA8 {
+struct Color_RGB {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+};
+
+struct Color_RGBA {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
