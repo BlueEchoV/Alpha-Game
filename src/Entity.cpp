@@ -22,6 +22,9 @@ Player create_player(Image* image, int player_speed) {
 	result.image = image;
 	result.speed = player_speed;
 
+	result.w = Globals::player_width;
+	result.h = Globals::player_height;
+
 	return result;
 }
 

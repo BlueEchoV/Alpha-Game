@@ -31,6 +31,9 @@ struct Game_Data {
 	Font_Type selected_font;
 };
 
+Camera create_camera(Player& player);
+void update_camera(Camera& camera, Player& player);
+
 void draw_circle(Color c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
 void debug_draw_coor_cs(Color c, V2 camera_pos, int x_ws, int y_ws, bool coordinates_are_in_ws);
 void debug_draw_coor_ws(Color c, V2 camera_pos, int x_cs, int y_cs, bool coordinates_are_in_cs);

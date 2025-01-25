@@ -20,13 +20,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	// Per second
 	int player_speed = 100;
 	game_data.player = create_player(get_image(IT_Player_Rugged_Male), player_speed);
+	game_data.camera = create_camera(game_data.player);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
-
-	game_data.camera.w = Globals::renderer->window_width;
-	game_data.camera.h = Globals::renderer->window_height;
-	game_data.player.w = Globals::player_width;
-	game_data.player.h = Globals::player_height;
 
 	bool running = true;
 

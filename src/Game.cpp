@@ -3,6 +3,26 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include <perlin.h>
 
+// Camera's position is relative to the player
+void update_camera(Camera& camera, Player& player) {
+	camera.pos_ws.x = (player.pos.x - (Globals::resolution_x / 2.0f));
+	camera.pos_ws.y = (player.pos.y - (Globals::resolution_y / 2.0f));
+
+	camera.pos_ws.x += player.w / 2;
+	camera.pos_ws.y += player.h / 2;
+
+	camera.w = Globals::resolution_x;
+	camera.h = Globals::resolution_y;
+}
+
+Camera create_camera(Player& player) {
+	Camera result = {};
+
+	update_camera(result, player);
+
+	return result;
+}
+
 void draw_circle(Color c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
 	V2 pos_cs = convert_ws_to_cs(center_pos_ws, camera_pos);
 
@@ -371,19 +391,13 @@ void render(Game_Data& game_data) {
 
 	renderer->window_width= window_width;
 	renderer->window_height = window_height;
-	game_data.camera.w = renderer->window_width;
-	game_data.camera.h = renderer->window_height;
+
+	update_camera(game_data.camera, game_data.player);
 
 	mp_set_render_draw_color(155, 155, 155, 255);
 
 	mp_render_clear();
 
-	// Camera relative to the game_data.player
-	game_data.camera.pos_ws.x = ((float)game_data.player.pos.x - (Globals::resolution_x / 2.0f));
-	game_data.camera.pos_ws.y = ((float)game_data.player.pos.y - (Globals::resolution_y / 2.0f));
-	// 
-	game_data.camera.pos_ws.x += game_data.player.w / 2;
-	game_data.camera.pos_ws.y += game_data.player.h / 2;
 	// Truncates by default
 	int starting_tile_x = (int)game_data.camera.pos_ws.x / Globals::tile_w;
 	int starting_tile_y = (int)game_data.camera.pos_ws.y / Globals::tile_h;
@@ -414,7 +428,9 @@ void render(Game_Data& game_data) {
 
 	for (Arrow& arrow : game_data.arrows) {
 		draw_arrow((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
-		debug_draw_coor_cs(C_Green, game_data.camera.pos_ws, (int)arrow.pos_ws.x, (int)arrow.pos_ws.y, true);
+		if (Globals::debug_show_coordinates) {
+			debug_draw_coor_cs(C_Green, game_data.camera.pos_ws, (int)arrow.pos_ws.x, (int)arrow.pos_ws.y, true);
+		}
 	}
 
 	mp_render_present();
