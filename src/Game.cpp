@@ -57,7 +57,7 @@ int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
 void debug_draw_coor_cs(Color c, V2 camera_pos, int x, int y, bool coordinates_are_in_ws) {
 	Font* font = get_font(debug_font); 
-	int y_offset = font->char_height;
+	int y_offset = font->char_height + font->char_height / 2;
 
 	V2 pos_cs = { (float)x, (float)y };
 	if (coordinates_are_in_ws) {

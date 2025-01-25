@@ -46,9 +46,9 @@ Font load_font(const char* file_path) {
 	result.image.w = width;
 	result.image.h = height;
 
+	int index = 0;
 	for (int y = 0; y < result.image.h; y++) {
 		for (int x = 0; x < result.image.w; x++) {
-			int index = 0;
 			index = (4 * ((y * width) + x));
 			// Check if the color is black
 			if (data[index] == 0 && data[index + 1] == 0 && data[index + 2] == 0) {
@@ -79,6 +79,9 @@ Font load_font(const char* file_path) {
 	my_mem_copy(data, pixels, (width * height) * 4);
 
 	mp_unlock_texture(temp);
+
+	result.image.texture->pitch = pitch;
+	result.image.texture->pixels = pixels;
 
 	result.bitmap_width = 18;
 	result.bitmap_height = 7;
@@ -138,14 +141,13 @@ Font* get_font(Font_Type type) {
 
 // NOTE: It's important to note here that we are currently drawing outside of the UV coordinates.
 // However, setting TexParam to GL_Repeat instead of GL_Mirrored, fixes the issue
-void draw_character(Font& font, char character, int x, int y, int size, int background) {
-	REF(background);
+void draw_character(Font& font, char character, int x, int y, int size) {
 	int ascii = (int)character - (int)' ';
 	int src_x = font.char_width * (ascii % font.bitmap_width);
 	int src_y = font.char_height * ((font.bitmap_height - 1) - (ascii / font.bitmap_width)) + 1;
 
-	MP_Rect src = { src_x, src_y, font.char_width, font.char_height};
-	MP_Rect dst = { x, y, (font.char_width * size), (font.char_height * size)};
+	MP_Rect src = { src_x, src_y, font.char_width, font.char_height };
+	MP_Rect dst = { x, y, (font.char_width * size), (font.char_height * size) };
 
 	mp_render_copy(font.image.texture, &src, &dst);
 }
@@ -158,20 +160,22 @@ void draw_string(Font& font, const char* str, int x, int y, int size, bool cente
 
 	if (center_x) {
 		final_x -= (int)(((float)length / 2.0f) * (float)(font.char_width * size));
-		// final_y -= (int)(((float)font.char_height * (float)size) / 2.0f);
+		final_y -= (int)(((float)font.char_height * (float)size) / 2.0f);
 	}
 
-	int padding = 3;
-	MP_Rect rect = {};
-	rect.x = final_x - padding;
-	rect.y = final_y - padding;
-	rect.w = (length * (font.char_width * size)) + (padding * 2);
-	rect.h = (font.char_height * size) + (padding * 2);
-	mp_set_render_draw_color(0, 0, 0, 255);
-	mp_render_fill_rect(&rect);
+	if (background) {
+		int padding = 3;
+		MP_Rect rect = {};
+		rect.x = final_x - padding;
+		rect.y = final_y - padding;
+		rect.w = (length * (font.char_width * size)) + (padding * 2);
+		rect.h = (font.char_height * size) + (padding * 2);
+		mp_set_render_draw_color(0, 0, 0, 255);
+		mp_render_fill_rect(&rect);
+	}
 
 	for (int i = 0; i < length; i++) {
-		draw_character(font, str[i], final_x + ((font.char_width * size) * i), final_y, size, background);
+		draw_character(font, str[i], final_x + ((font.char_width * size) * i), final_y, size);
 	}
 }
 
@@ -181,7 +185,7 @@ void draw_string(Font& font, const char* str, float x, float y, int size, bool c
 
 void draw_string(const char* str, int x, int y) {
 	Font* font = get_font(FT_Basic);
-	draw_string(*font, str, x, y, 1, true, true);
+	draw_string(*font, str, x, y, 1, true, false);
 }
 
 int window_w = 0;
