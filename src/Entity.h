@@ -5,6 +5,25 @@
 
 struct MP_Renderer;
 
+// Colliders
+struct Collider {
+	float rad;
+	// This is offset based off the position of the rigid body
+	V2 pos_ls;
+};
+
+// RIGID BODY
+// A rigid body is the process of using physics 
+// to control the movement and position of objects
+struct Rigid_Body {
+	V2 pos_ws;
+	V2 vel;
+	float speed;
+	// acceleration
+	// V2 pos_ls
+	// Colliders
+};
+
 struct Player {
 	Image* image;
 
