@@ -68,11 +68,24 @@ V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float ce
 }
 
 float hypotenuse(float a, float b) {
-	float c = {};
+	float result = {};
 
-	c = (float)sqrt((a * 2) + (b * 2));
+	result = (float)sqrt(fabs((a * a) + (b * b)));
 
-	return c;
+	return result;
+}
+
+V2 normalize(V2 vec) {
+	V2 result = {};
+
+	// Calculate length
+	float length = hypotenuse(vec.x, vec.y);
+
+	// Normalize the vector
+	result.x = vec.x / length;
+	result.y = vec.y / length;
+
+	return result;
 }
 
 void swap(V2& vec_1, V2& vec_2) {

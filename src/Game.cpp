@@ -367,15 +367,9 @@ void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arr
 	// Calculate the direction vector target <--- origin
 	V2 vel = mouse_cs_pos - player_cs_pos;
 
-	// Calculate length
-	float length = vel.x * vel.x + vel.y * vel.y;
-	length = sqrt(abs(length));
+	V2 vel_normalized = normalize(vel);
 
-	// Normalize the vel vector
-	vel.x = vel.x / length;
-	vel.y = vel.y / length;
-
-	Arrow result = create_arrow(image, game_data.player.pos, vel, arrow_w, arrow_h, speed);
+	Arrow result = create_arrow(image, game_data.player.pos, vel_normalized, arrow_w, arrow_h, speed);
 
 	game_data.arrows.push_back(result);
 }

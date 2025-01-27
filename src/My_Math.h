@@ -25,6 +25,7 @@ V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float ce
 
 void swap(V2& vec_1, V2& vec_2);
 float hypotenuse(float a, float b);
+V2 normalize(V2 vec);
 
 float convert_degrees_to_radians(float degrees);
 float convert_radians_to_degrees(float radians);
