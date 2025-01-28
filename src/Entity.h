@@ -5,6 +5,34 @@
 
 struct MP_Renderer;
 
+enum Storage_Type {
+	ST_Entity
+};
+
+const int max_storage_size = 100;
+
+// This goes on the entities
+struct Handle {
+	uint32_t index;
+	// Used to compare against generations. Does not change. 
+	uint32_t generation;
+
+};
+
+// Each array slot gets its own generation counter, 
+// which is bumped when a handle is released
+struct Generations {
+	// Used to compare against handles
+	int current_generation = 0;
+};
+
+template <typename T>
+struct Storage {
+	Storage_Type storage_type;
+	Generations generations[max_storage_size];
+	T storage[max_storage_size];
+};
+
 // Colliders
 struct Collider {
 	float rad;
@@ -42,6 +70,18 @@ struct Zombie {
 
 	int health;
 	int damage;
+	Player* target;
+};
+
+struct Entity {
+	Image* image;
+	Rigid_Body rb;
+	int w, h;
+
+	int health;
+	int damage;
+
+	// This will have the be variable in the future
 	Player* target;
 };
 
