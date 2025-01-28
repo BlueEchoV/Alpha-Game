@@ -82,8 +82,12 @@ V2 normalize(V2 vec) {
 	float length = hypotenuse(vec.x, vec.y);
 
 	// Normalize the vector
-	result.x = vec.x / length;
-	result.y = vec.y / length;
+	if (vec.x != 0) {
+		result.x = vec.x / length;
+	}
+	if (vec.y != 0) {
+		result.y = vec.y / length;
+	}
 
 	return result;
 }

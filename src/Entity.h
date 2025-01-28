@@ -35,6 +35,16 @@ struct Player {
 	// int damage;
 };
 
+struct Zombie {
+	Image* image;
+	Rigid_Body rb;
+	int w, h;
+
+	int health;
+	int damage;
+	Player* target;
+};
+
 struct Arrow {
 	V2 pos_ws;
 	V2 vel;
@@ -50,8 +60,14 @@ V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
 V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos);
 V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y);
 
+V2 calculate_origin_to_target_velocity(V2 target, V2 origin);
+
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
+Zombie spawn_zombie(Image* image, Player* target, V2 spawn_pos,
+	int width, int height, int speed, int health, int damage);
+void update_zombie(Zombie& zombie, float dt);
+void draw_zombie(Zombie& zombie, V2 camera_pos);
 
 Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed);
 void update_arrow(Arrow& arrow, float delta_time);

@@ -17,12 +17,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	Game_Data game_data = {};
 	game_data.selected_font = FT_Basic;
 
-	// Per second
 	int player_speed = 100;
 	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed);
 	game_data.camera = create_camera(game_data.player);
-
-	// GLuint my_texture = create_gl_texture("assets\\sun.png");
 
 	bool running = true;
 
@@ -75,6 +72,20 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				100
 			);
 		}
+		if (key_pressed(KEY_Q)) {
+			Zombie zombie = spawn_zombie(
+				get_image(IT_Enemy_Clothed_Zombie),
+				&game_data.player,
+				{ 0, 0 },
+				150, 
+				150, 
+				10, 
+				100, 
+				10
+			);
+			game_data.zombies.push_back(zombie);
+			log("Spawning Zombie");
+		}
 
 		player_x_delta *= game_data.player.rb.speed * delta_time;
 		player_y_delta *= game_data.player.rb.speed * delta_time;
@@ -107,6 +118,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// Update
 		for (Arrow& arrow : game_data.arrows) {
 			update_arrow(arrow, delta_time);
+		}
+		for (Zombie& zombie : game_data.zombies) {
+			update_zombie(zombie, delta_time);
 		}
 		// Render
 		render(game_data);

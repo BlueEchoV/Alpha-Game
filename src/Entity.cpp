@@ -16,6 +16,15 @@ V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
 	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
+V2 calculate_origin_to_target_velocity(V2 target, V2 origin) {
+	V2 result = {};
+
+	result = target - origin;
+	result = normalize(result);
+
+	return result;
+}
+
 Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	Rigid_Body result = {};
 
@@ -35,6 +44,44 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	result.h = Globals::player_height;
 
 	return result;
+}
+
+Zombie spawn_zombie(Image* image, Player* target, V2 spawn_pos, 
+	int width, int height, int speed, int health, int damage) {
+	Zombie result = {};
+
+	result.image = image;
+	result.rb = create_rigid_body(spawn_pos, speed);
+	result.w = width;
+	result.h = height;
+	result.health = health;
+	result.damage = damage;
+	result.target = target;
+
+	return result;
+}
+
+V2 update_zombie_position(Zombie& zombie, float dt) {
+	V2 result = {};
+
+	zombie.rb.vel = calculate_origin_to_target_velocity(zombie.target->rb.pos_ws, zombie.rb.pos_ws);
+
+	zombie.rb.pos_ws.x += (zombie.rb.vel.x * zombie.rb.speed) * dt;
+	zombie.rb.pos_ws.y += (zombie.rb.vel.y * zombie.rb.speed) * dt;
+
+	return result;
+};
+
+void update_zombie(Zombie& zombie, float dt) {
+	update_zombie_position(zombie, dt);
+}
+
+void draw_zombie(Zombie& zombie, V2 camera_pos) {
+	V2 entity_pos_cs = convert_ws_to_cs(zombie.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y});
+	// Center the image on the position of the entity
+	MP_Rect dst = { (int)entity_pos_cs.x - zombie.w / 2, (int)entity_pos_cs.y - zombie.h / 2, zombie.w, zombie.h };
+
+	mp_render_copy_ex(zombie.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
 }
 
 Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed) {

@@ -27,6 +27,7 @@ struct Game_Data {
 
 	Player player;
 	std::vector<Arrow> arrows;
+	std::vector<Zombie> zombies;
 
 	Font_Type selected_font;
 };
