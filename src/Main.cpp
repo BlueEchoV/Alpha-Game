@@ -19,7 +19,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	// Per second
 	int player_speed = 100;
-	game_data.player = create_player(get_image(IT_Player_Rugged_Male), player_speed);
+	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed);
 	game_data.camera = create_camera(game_data.player);
 
 	// GLuint my_texture = create_gl_texture("assets\\sun.png");
@@ -76,8 +76,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			);
 		}
 
-		player_x_delta *= game_data.player.speed * delta_time;
-		player_y_delta *= game_data.player.speed * delta_time;
+		player_x_delta *= game_data.player.rb.speed * delta_time;
+		player_y_delta *= game_data.player.rb.speed * delta_time;
 
 		if (player_x_delta != 0.0f && player_y_delta != 0.0f) {
 			// See HMH 042 at 24:30 for reference. 
@@ -88,13 +88,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_y_delta *= 0.707106781187f;
 		}
 
-		game_data.player.pos.x += player_x_delta;
-		game_data.player.pos.y += player_y_delta;
+		game_data.player.rb.pos_ws.x += player_x_delta;
+		game_data.player.rb.pos_ws.y += player_y_delta;
 
 		if (key_pressed_and_held(VK_SHIFT)) {
-			game_data.player.speed = player_speed * 2;
+			game_data.player.rb.speed = player_speed * 2;
 		} else {
-			game_data.player.speed = player_speed;
+			game_data.player.rb.speed = player_speed;
 		}
 
 		if (key_pressed(VK_F1)) {

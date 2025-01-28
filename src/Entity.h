@@ -18,7 +18,7 @@ struct Collider {
 struct Rigid_Body {
 	V2 pos_ws;
 	V2 vel;
-	float speed;
+	int speed;
 	// acceleration
 	// V2 pos_ls
 	// Colliders
@@ -27,14 +27,12 @@ struct Rigid_Body {
 struct Player {
 	Image* image;
 
-	// World Space
-	V2 pos;
+	Rigid_Body rb;
 
 	int w, h;
 
 	// int health;
 	// int damage;
-	int speed;
 };
 
 struct Arrow {
@@ -52,7 +50,8 @@ V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
 V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos);
 V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y);
 
-Player create_player(Image* image, int player_speed);
+Rigid_Body create_rigid_body(V2 pos_ws, int speed);
+Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
 
 Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed);
 void update_arrow(Arrow& arrow, float delta_time);

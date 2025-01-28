@@ -16,11 +16,20 @@ V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
 	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
-Player create_player(Image* image, int player_speed) {
+Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
+	Rigid_Body result = {};
+
+	result.pos_ws = pos_ws;
+	result.speed = speed;
+
+	return result;
+}
+
+Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
 
+	result.rb = create_rigid_body(spawn_pos_ws, player_speed);
 	result.image = image;
-	result.speed = player_speed;
 
 	result.w = Globals::player_width;
 	result.h = Globals::player_height;

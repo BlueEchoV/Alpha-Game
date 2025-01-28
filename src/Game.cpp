@@ -5,8 +5,8 @@
 
 // Camera's position is relative to the player
 void update_camera(Camera& camera, Player& player) {
-	camera.pos_ws.x = (player.pos.x - (Globals::resolution_x / 2.0f));
-	camera.pos_ws.y = (player.pos.y - (Globals::resolution_y / 2.0f));
+	camera.pos_ws.x = (player.rb.pos_ws.x - (Globals::resolution_x / 2.0f));
+	camera.pos_ws.y = (player.rb.pos_ws.y - (Globals::resolution_y / 2.0f));
 
 	camera.pos_ws.x += player.w / 2;
 	camera.pos_ws.y += player.h / 2;
@@ -319,7 +319,7 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
 		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, false);
-		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.pos.x, (int)game_data.player.pos.y, true);
+		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.rb.pos_ws.x, (int)game_data.player.rb.pos_ws.y, true);
 	}
 
 	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
@@ -360,7 +360,7 @@ void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float n
 void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arrow_h, int speed) {
 	Image* image = get_image(it);
 
-	V2 player_cs_pos = convert_ws_to_cs(game_data.player.pos, game_data.camera.pos_ws);
+	V2 player_cs_pos = convert_ws_to_cs(game_data.player.rb.pos_ws, game_data.camera.pos_ws);
 
 	V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 
@@ -369,7 +369,7 @@ void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arr
 
 	V2 vel_normalized = normalize(vel);
 
-	Arrow result = create_arrow(image, game_data.player.pos, vel_normalized, arrow_w, arrow_h, speed);
+	Arrow result = create_arrow(image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
 
 	game_data.arrows.push_back(result);
 }
@@ -411,7 +411,7 @@ void render(Game_Data& game_data) {
 	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
 
 	// Convert the player's position to camera space
-	MP_Rect player_rect = {(int)game_data.player.pos.x, (int)game_data.player.pos.y, game_data.player.w, game_data.player.h};
+	MP_Rect player_rect = {(int)game_data.player.rb.pos_ws.x, (int)game_data.player.rb.pos_ws.y, game_data.player.w, game_data.player.h};
 	V2 player_pos = convert_ws_to_cs({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
 	player_rect.x = (int)player_pos.x - game_data.player.w / 2;
 	player_rect.y = (int)player_pos.y - game_data.player.h / 2;
