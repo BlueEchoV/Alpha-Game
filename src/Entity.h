@@ -53,6 +53,15 @@ Handle create_handle(Storage<T> storage) {
 	return result;
 }
 
+template <typename T>
+void delete_handle(Storage<T>& storage, Handle handle) {
+	int index = handle.index;
+	if (index < ARRAYSIZE(storage) && 
+		generation == storage.generations[index].current_slot_generation){
+		storage.generations->current_slot_generation++;
+		storage.generations->slot_is_taken = false;
+	}
+}
 
 // Colliders
 struct Collider {
@@ -92,6 +101,8 @@ struct Zombie {
 	int health;
 	int damage;
 	Player* target;
+
+	Handle handle;
 };
 
 struct Entity {
