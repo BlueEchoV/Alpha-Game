@@ -26,6 +26,10 @@ struct Game_Data {
 	Camera camera;
 
 	Player player;
+
+	Storage<Arrow> arrows_storage;
+	Storage<Zombie> zombies_storage;
+
 	std::vector<Arrow> arrows;
 	std::vector<Zombie> zombies;
 

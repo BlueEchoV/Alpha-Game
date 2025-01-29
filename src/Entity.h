@@ -15,23 +15,44 @@ const int max_storage_size = 100;
 struct Handle {
 	uint32_t index;
 	// Used to compare against generations. Does not change. 
+	// This is set equal to the generation's counter on creation
 	uint32_t generation;
-
 };
 
 // Each array slot gets its own generation counter, 
 // which is bumped when a handle is released
 struct Generations {
+	bool slot_is_taken = false;
 	// Used to compare against handles
-	int current_generation = 0;
+	int current_slot_generation = 1;
 };
 
 template <typename T>
 struct Storage {
+	// Will need a variable (index_one_past_last) for serialization
 	Storage_Type storage_type;
 	Generations generations[max_storage_size];
 	T storage[max_storage_size];
 };
+
+// Creates a entity for a specific storage
+template <typename T>
+Handle create_handle(Storage<T> storage) {
+	Handle result = {};
+	int length = ARRAYSIZE(storage);
+	for(int i = 0; i < length; i++) { 
+		if (storage.generations[i].slot_is_taken == false) {
+			storage.generations[i].slot_is_taken = true;
+			result.index = i;
+			result.generation = storage.generations[i].current_slot_generation;
+		} 
+	} 
+
+	// Returning a null handle if there is not room
+
+	return result;
+}
+
 
 // Colliders
 struct Collider {
