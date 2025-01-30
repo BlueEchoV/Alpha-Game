@@ -369,7 +369,8 @@ void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arr
 
 	V2 vel_normalized = normalize(vel);
 
-	Projectile result = create_projectile(image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
+	Projectile result = create_projectile(game_data.projectile_storage, game_data.projectile_handles,
+		image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
 }
 
 void render(Game_Data& game_data) {

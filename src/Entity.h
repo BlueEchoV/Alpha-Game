@@ -141,6 +141,8 @@ struct Projectile {
 	float angle;
 
 	Image* image;
+
+	Handle handle;
 };
 
 // Zombie* get_zombie_from_handle(Handle handle);
@@ -160,7 +162,8 @@ void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle);
 
-Projectile create_projectile(Image* image, V2 pos, V2 vel, int width, int height, int speed);
+Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles,
+	Image* image, V2 pos, V2 vel, int width, int height, int speed);
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 

@@ -90,7 +90,7 @@ Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle) {
 	return get_entity_pointer_from_handle(storage, handle);
 }
 
-Projectile create_projectile(/*Storage<Projectile> storage, std::vector<Handle> projectile_handles,*/ 
+Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles, 
 	Image* image, V2 pos, V2 vel, int width, int height, int speed) {
 	Projectile result = {};
 
@@ -113,9 +113,10 @@ Projectile create_projectile(/*Storage<Projectile> storage, std::vector<Handle> 
 	log("Arrow Current Angle (Degrees): %f", result.angle);
 	// Inverted coordinate system
 	// result.angle += 180;
+	result.handle = create_handle(storage);
 
-	// projectile_handles.push_back(result.handle);
-	// storage.storage[result.handle.index] = result;
+	projectile_handles.push_back(result.handle);
+	storage.storage[result.handle.index] = result;
 
 	return result;
 }
