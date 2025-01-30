@@ -369,9 +369,7 @@ void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arr
 
 	V2 vel_normalized = normalize(vel);
 
-	Arrow result = create_arrow(image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
-
-	game_data.arrows.push_back(result);
+	Projectile result = create_projectile(image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
 }
 
 void render(Game_Data& game_data) {
@@ -420,16 +418,17 @@ void render(Game_Data& game_data) {
 	Font* font = get_font(game_data.selected_font);
 	draw_debug_info(game_data, *font, game_data.player.image->texture);
 
-	for (Arrow& arrow : game_data.arrows) {
-		draw_arrow((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, arrow);
+	for (Handle projectile: game_data.projectile_handles) {
+		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
+		draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
 		if (Globals::debug_show_coordinates) {
-			debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)arrow.pos_ws.x, (int)arrow.pos_ws.y, true);
+			debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)p->pos_ws.x, (int)p->pos_ws.y, true);
 		}
 	}
 
-	for (Handle zombie_handle: game_data.zombie_handles) {
-		Zombie* zombie = get_entity_pointer_from_handle(game_data.zombies_storage, zombie_handle);
-		draw_zombie(*zombie, game_data.camera.pos_ws);
+	for (Handle zombie_handle: game_data.enemy_unit_handles) {
+		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
+		draw_unit(*unit, game_data.camera.pos_ws);
 	}
 
 	mp_render_present();

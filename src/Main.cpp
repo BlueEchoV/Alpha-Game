@@ -73,9 +73,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			);
 		}
 		if (key_pressed(KEY_Q)) {
-			spawn_zombie(
-				game_data.zombies_storage,
-				game_data.zombie_handles,
+			spawn_unit(
+				game_data.unit_storage,
+				game_data.enemy_unit_handles,
 				get_image(IT_Enemy_Clothed_Zombie),
 				&game_data.player,
 				{ 0, 0 },
@@ -117,12 +117,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		// Update
-		for (Arrow& arrow : game_data.arrows) {
-			update_arrow(arrow, delta_time);
+		for (Handle& projectile_handle : game_data.projectile_handles) {
+			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+			update_projectile(*p, delta_time);
 		}
-		for (Handle zombie_handle : game_data.zombie_handles) {
-			Zombie* zombie = get_entity_pointer_from_handle(game_data.zombies_storage, zombie_handle);
-			update_zombie(*zombie, delta_time);
+		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
+			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+			update_unit(*unit, delta_time);
 		}
 		// Render
 		render(game_data);

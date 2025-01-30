@@ -109,7 +109,7 @@ struct Player {
 	// int damage;
 };
 
-struct Zombie {
+struct Unit {
 	Image* image;
 	Rigid_Body rb;
 	int w, h;
@@ -133,7 +133,7 @@ struct Entity {
 	Player* target;
 };
 
-struct Arrow {
+struct Projectile {
 	V2 pos_ws;
 	V2 vel;
 	int speed;
@@ -154,15 +154,15 @@ V2 calculate_origin_to_target_velocity(V2 target, V2 origin);
 
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
-void spawn_zombie(Storage<Zombie>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
+void spawn_unit(Storage<Unit>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
 	int width, int height, int speed, int health, int damage);
-void update_zombie(Zombie& zombie, float dt);
-void draw_zombie(Zombie& zombie, V2 camera_pos);
-Zombie* get_zombie_from_handle(Storage<Zombie>& storage, Handle handle);
+void update_unit(Unit& unit, float dt);
+void draw_unit(Unit& unit, V2 camera_pos);
+Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle);
 
-Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed);
-void update_arrow(Arrow& arrow, float delta_time);
-void draw_arrow(int camera_pos_x, int camera_pos_y, Arrow& arrow);
+Projectile create_projectile(Image* image, V2 pos, V2 vel, int width, int height, int speed);
+void update_projectile(Projectile& projectile, float delta_time);
+void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 
 // void spawn_entity(V2_F pos);
 // void update_entity();

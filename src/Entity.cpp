@@ -46,9 +46,9 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	return result;
 }
 
-void spawn_zombie(Storage<Zombie>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
+void spawn_unit(Storage<Unit>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
 	int width, int height, int speed, int health, int damage) {
-	Zombie result = {};
+	Unit result = {};
 
 	result.image = image;
 	result.rb = create_rigid_body(spawn_pos, speed);
@@ -63,35 +63,36 @@ void spawn_zombie(Storage<Zombie>& storage, std::vector<Handle>& handles, Image*
 	storage.storage[result.handle.index] = result;
 }
 
-V2 update_zombie_position(Zombie& zombie, float dt) {
+V2 update_unit_position(Unit& unit, float dt) {
 	V2 result = {};
 
-	zombie.rb.vel = calculate_origin_to_target_velocity(zombie.target->rb.pos_ws, zombie.rb.pos_ws);
+	unit.rb.vel = calculate_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
 
-	zombie.rb.pos_ws.x += (zombie.rb.vel.x * zombie.rb.speed) * dt;
-	zombie.rb.pos_ws.y += (zombie.rb.vel.y * zombie.rb.speed) * dt;
+	unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.speed) * dt;
+	unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.speed) * dt;
 
 	return result;
 };
 
-void update_zombie(Zombie& zombie, float dt) {
-	update_zombie_position(zombie, dt);
+void update_unit(Unit& unit, float dt) {
+	update_unit_position(unit, dt);
 }
 
-void draw_zombie(Zombie& zombie, V2 camera_pos) {
-	V2 entity_pos_cs = convert_ws_to_cs(zombie.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y});
+void draw_unit(Unit& unit, V2 camera_pos) {
+	V2 entity_pos_cs = convert_ws_to_cs(unit.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y});
 	// Center the image on the position of the entity
-	MP_Rect dst = { (int)entity_pos_cs.x - zombie.w / 2, (int)entity_pos_cs.y - zombie.h / 2, zombie.w, zombie.h };
+	MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
 
-	mp_render_copy_ex(zombie.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
+	mp_render_copy_ex(unit.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
 }
 
-Zombie* get_zombie_from_handle(Storage<Zombie>& storage, Handle handle) {
+Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle) {
 	return get_entity_pointer_from_handle(storage, handle);
 }
 
-Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed) {
-	Arrow result = {};
+Projectile create_projectile(/*Storage<Projectile> storage, std::vector<Handle> projectile_handles,*/ 
+	Image* image, V2 pos, V2 vel, int width, int height, int speed) {
+	Projectile result = {};
 
 	result.image = image;
 	result.pos_ws = pos;
@@ -113,19 +114,22 @@ Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int spee
 	// Inverted coordinate system
 	// result.angle += 180;
 
+	// projectile_handles.push_back(result.handle);
+	// storage.storage[result.handle.index] = result;
+
 	return result;
 }
 
-void update_arrow(Arrow& arrow, float delta_time) {
-	arrow.pos_ws.x += arrow.speed * (arrow.vel.x * delta_time);
-	arrow.pos_ws.y += arrow.speed * (arrow.vel.y * delta_time);
+void update_projectile(Projectile& projectile, float delta_time) {
+	projectile.pos_ws.x += projectile.speed * (projectile.vel.x * delta_time);
+	projectile.pos_ws.y += projectile.speed * (projectile.vel.y * delta_time);
 }
 
-void draw_arrow(int camera_pos_x, int camera_pos_y, Arrow& arrow) {
+void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile) {
 	// Draw everything around the camera (converting to camera space)
-	V2 entity_pos_cs = convert_ws_to_cs(arrow.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
+	V2 entity_pos_cs = convert_ws_to_cs(projectile.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
 	// Center the image on the position of the entity
-	MP_Rect dst = { (int)entity_pos_cs.x - arrow.w / 2, (int)entity_pos_cs.y - arrow.h / 2, arrow.w, arrow.h };
+	MP_Rect dst = { (int)entity_pos_cs.x - projectile.w / 2, (int)entity_pos_cs.y - projectile.h / 2, projectile.w, projectile.h };
 
-	mp_render_copy_ex(arrow.image->texture, NULL, &dst, arrow.angle, NULL, SDL_FLIP_NONE);
+	mp_render_copy_ex(projectile.image->texture, NULL, &dst, projectile.angle, NULL, SDL_FLIP_NONE);
 }

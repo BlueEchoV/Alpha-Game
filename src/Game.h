@@ -27,12 +27,11 @@ struct Game_Data {
 
 	Player player;
 
-	Storage<Arrow> arrows_storage;
-	Storage<Zombie> zombies_storage;
+	Storage<Projectile> projectile_storage;
+	Storage<Unit>		unit_storage;
 
-	std::vector<Handle> zombie_handles;
-
-	std::vector<Arrow> arrows;
+	std::vector<Handle> enemy_unit_handles;
+	std::vector<Handle> projectile_handles;
 
 	Font_Type selected_font;
 };
