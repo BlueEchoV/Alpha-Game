@@ -1,5 +1,8 @@
 #include "Entity.h"
 
+// Zombie* get_zombie_from_handle(Storage<Zombie> storage, Handle handle) {
+// }
+
 V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos) {
 	return entity_pos + camera_pos;
 }

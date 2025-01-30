@@ -9,7 +9,7 @@ enum Storage_Type {
 	ST_Entity
 };
 
-const int max_storage_size = 100;
+const int MAX_STORAGE_SIZE = 100;
 
 // This goes on the entities
 struct Handle {
@@ -31,8 +31,8 @@ template <typename T>
 struct Storage {
 	// Will need a variable (index_one_past_last) for serialization
 	Storage_Type storage_type;
-	Generations generations[max_storage_size];
-	T storage[max_storage_size];
+	Generations generations[MAX_STORAGE_SIZE];
+	T storage[MAX_STORAGE_SIZE];
 };
 
 // Creates a entity for a specific storage
@@ -56,10 +56,22 @@ Handle create_handle(Storage<T> storage) {
 template <typename T>
 void delete_handle(Storage<T>& storage, Handle handle) {
 	int index = handle.index;
+	int generation = handle.generation;
 	if (index < ARRAYSIZE(storage) && 
 		generation == storage.generations[index].current_slot_generation){
 		storage.generations->current_slot_generation++;
 		storage.generations->slot_is_taken = false;
+	}
+}
+
+template <typename T>
+T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
+	int index = handle.index;
+	int generations = handle.generation;
+	// Check if the handle is valid
+	if (storage.generations[index].current_slot_generation == generations &&
+		storage.generations[index].slot_is_taken == true) {
+		return &storage.storage[index];
 	}
 }
 
@@ -126,6 +138,8 @@ struct Arrow {
 
 	Image* image;
 };
+
+// Zombie* get_zombie_from_handle(Handle handle);
 
 V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos);
 V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
