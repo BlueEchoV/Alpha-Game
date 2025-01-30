@@ -427,8 +427,9 @@ void render(Game_Data& game_data) {
 		}
 	}
 
-	for (Zombie& zombie : game_data.zombies) {
-		draw_zombie(zombie, game_data.camera.pos_ws);
+	for (Handle zombie_handle: game_data.zombie_handles) {
+		Zombie* zombie = get_entity_pointer_from_handle(game_data.zombies_storage, zombie_handle);
+		draw_zombie(*zombie, game_data.camera.pos_ws);
 	}
 
 	mp_render_present();

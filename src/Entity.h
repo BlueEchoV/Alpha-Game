@@ -37,14 +37,15 @@ struct Storage {
 
 // Creates a entity for a specific storage
 template <typename T>
-Handle create_handle(Storage<T> storage) {
+Handle create_handle(Storage<T>& storage) {
 	Handle result = {};
-	int length = ARRAYSIZE(storage);
+	int length = ARRAYSIZE(storage.storage);
 	for(int i = 0; i < length; i++) { 
 		if (storage.generations[i].slot_is_taken == false) {
 			storage.generations[i].slot_is_taken = true;
 			result.index = i;
 			result.generation = storage.generations[i].current_slot_generation;
+			break;
 		} 
 	} 
 
@@ -73,6 +74,9 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 		storage.generations[index].slot_is_taken == true) {
 		return &storage.storage[index];
 	}
+	log("Entity does not exist from handle");
+	assert(false);
+	return nullptr;
 }
 
 // Colliders
@@ -150,10 +154,11 @@ V2 calculate_origin_to_target_velocity(V2 target, V2 origin);
 
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
-Zombie spawn_zombie(Image* image, Player* target, V2 spawn_pos,
+void spawn_zombie(Storage<Zombie>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
 	int width, int height, int speed, int health, int damage);
 void update_zombie(Zombie& zombie, float dt);
 void draw_zombie(Zombie& zombie, V2 camera_pos);
+Zombie* get_zombie_from_handle(Storage<Zombie>& storage, Handle handle);
 
 Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed);
 void update_arrow(Arrow& arrow, float delta_time);

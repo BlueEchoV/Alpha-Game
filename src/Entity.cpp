@@ -1,8 +1,5 @@
 #include "Entity.h"
 
-// Zombie* get_zombie_from_handle(Storage<Zombie> storage, Handle handle) {
-// }
-
 V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos) {
 	return entity_pos + camera_pos;
 }
@@ -49,7 +46,7 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	return result;
 }
 
-Zombie spawn_zombie(Image* image, Player* target, V2 spawn_pos, 
+void spawn_zombie(Storage<Zombie>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
 	int width, int height, int speed, int health, int damage) {
 	Zombie result = {};
 
@@ -60,8 +57,10 @@ Zombie spawn_zombie(Image* image, Player* target, V2 spawn_pos,
 	result.health = health;
 	result.damage = damage;
 	result.target = target;
-
-	return result;
+	result.handle = create_handle(storage);
+	
+	handles.push_back(result.handle);
+	storage.storage[result.handle.index] = result;
 }
 
 V2 update_zombie_position(Zombie& zombie, float dt) {
@@ -85,6 +84,10 @@ void draw_zombie(Zombie& zombie, V2 camera_pos) {
 	MP_Rect dst = { (int)entity_pos_cs.x - zombie.w / 2, (int)entity_pos_cs.y - zombie.h / 2, zombie.w, zombie.h };
 
 	mp_render_copy_ex(zombie.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
+}
+
+Zombie* get_zombie_from_handle(Storage<Zombie>& storage, Handle handle) {
+	return get_entity_pointer_from_handle(storage, handle);
 }
 
 Arrow create_arrow(Image* image, V2 pos, V2 vel, int width, int height, int speed) {

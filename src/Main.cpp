@@ -73,7 +73,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			);
 		}
 		if (key_pressed(KEY_Q)) {
-			Zombie zombie = spawn_zombie(
+			spawn_zombie(
+				game_data.zombies_storage,
+				game_data.zombie_handles,
 				get_image(IT_Enemy_Clothed_Zombie),
 				&game_data.player,
 				{ 0, 0 },
@@ -83,7 +85,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				100, 
 				10
 			);
-			game_data.zombies.push_back(zombie);
 			log("Spawning Zombie");
 		}
 
@@ -119,8 +120,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Arrow& arrow : game_data.arrows) {
 			update_arrow(arrow, delta_time);
 		}
-		for (Zombie& zombie : game_data.zombies) {
-			update_zombie(zombie, delta_time);
+		for (Handle zombie_handle : game_data.zombie_handles) {
+			Zombie* zombie = get_entity_pointer_from_handle(game_data.zombies_storage, zombie_handle);
+			update_zombie(*zombie, delta_time);
 		}
 		// Render
 		render(game_data);

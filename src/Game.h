@@ -30,8 +30,9 @@ struct Game_Data {
 	Storage<Arrow> arrows_storage;
 	Storage<Zombie> zombies_storage;
 
+	std::vector<Handle> zombie_handles;
+
 	std::vector<Arrow> arrows;
-	std::vector<Zombie> zombies;
 
 	Font_Type selected_font;
 };
