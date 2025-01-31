@@ -86,9 +86,22 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	mp_render_copy_ex(unit.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
 }
 
-Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle) {
+Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle) {
 	return get_entity_pointer_from_handle(storage, handle);
 }
+
+void delete_destroyed_entities_from_handles(Game_Data& game_data) {
+	std::erase_if(game_data.enemy_unit_handles, [&game_data](const Handle& enemy_unit_handle) {
+		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+		if (unit->is_destroyed) {
+			delete_handle(game_data.unit_storage, enemy_unit_handle);
+			*unit = {};
+			return true;
+		}
+		return false;
+	});
+};
+
 
 Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles, 
 	Image* image, V2 pos, V2 vel, int width, int height, int speed) {

@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "renderer.h"
 #include "Image.h"
+#include <vector>
 
 struct MP_Renderer;
 
@@ -52,11 +53,14 @@ Handle create_handle(Storage<T>& storage) {
 	return result;
 }
 
+#undef ARRAYSIZE
+#define ARRAYSIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 template <typename T>
 void delete_handle(Storage<T>& storage, Handle handle) {
 	int index = handle.index;
 	int generation = handle.generation;
-	if (index < ARRAYSIZE(storage) && 
+	if (index < ARRAYSIZE(storage.storage) && 
 		generation == storage.generations[index].current_slot_generation){
 		storage.generations->current_slot_generation++;
 		storage.generations->slot_is_taken = false;
@@ -116,6 +120,8 @@ struct Unit {
 	int damage;
 	Player* target;
 
+	bool is_destroyed = false;
+
 	Handle handle;
 };
 
@@ -162,7 +168,6 @@ struct Game_Data {
 	Font_Type selected_font;
 };
 
-
 // Zombie* get_zombie_from_handle(Handle handle);
 
 V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos);
@@ -178,9 +183,8 @@ void spawn_unit(Storage<Unit>& storage, std::vector<Handle>& handles, Image* ima
 	int width, int height, int speed, int health, int damage);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
-Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle);
-
-void delete_destroyed_entities_from_handles(Game_Data);
+Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
+void delete_destroyed_entities_from_handles(Game_Data& game_data);
 
 Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles,
 	Image* image, V2 pos, V2 vel, int width, int height, int speed);
