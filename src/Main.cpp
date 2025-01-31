@@ -87,6 +87,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			);
 			log("Spawning Zombie");
 		}
+		if (key_pressed(KEY_E)) {
+			for (Handle handle : game_data.enemy_unit_handles) {
+				Unit* enemy_unit = get_entity_pointer_from_handle(game_data.unit_storage, handle);
+				enemy_unit->is_destroyed = true;
+			}
+		}
 
 		player_x_delta *= game_data.player.rb.speed * delta_time;
 		player_y_delta *= game_data.player.rb.speed * delta_time;
