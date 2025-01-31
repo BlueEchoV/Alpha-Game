@@ -49,8 +49,6 @@ Handle create_handle(Storage<T>& storage) {
 		} 
 	} 
 
-	// Returning a null handle if there is not room
-
 	return result;
 }
 
@@ -145,6 +143,26 @@ struct Projectile {
 	Handle handle;
 };
 
+struct Camera {
+	V2 pos_ws;
+	int w, h;
+};
+
+struct Game_Data {
+	Camera camera;
+
+	Player player;
+
+	Storage<Projectile> projectile_storage;
+	Storage<Unit>		unit_storage;
+
+	std::vector<Handle> enemy_unit_handles;
+	std::vector<Handle> projectile_handles;
+
+	Font_Type selected_font;
+};
+
+
 // Zombie* get_zombie_from_handle(Handle handle);
 
 V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos);
@@ -161,6 +179,8 @@ void spawn_unit(Storage<Unit>& storage, std::vector<Handle>& handles, Image* ima
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_zombie_from_handle(Storage<Unit>& storage, Handle handle);
+
+void delete_destroyed_entities_from_handles(Game_Data);
 
 Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles,
 	Image* image, V2 pos, V2 vel, int width, int height, int speed);

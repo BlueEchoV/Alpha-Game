@@ -17,25 +17,6 @@ enum Debug_Image {
     DI_Count
 };
 
-struct Camera {
-	V2 pos_ws;
-	int w, h;
-};
-
-struct Game_Data {
-	Camera camera;
-
-	Player player;
-
-	Storage<Projectile> projectile_storage;
-	Storage<Unit>		unit_storage;
-
-	std::vector<Handle> enemy_unit_handles;
-	std::vector<Handle> projectile_handles;
-
-	Font_Type selected_font;
-};
-
 Camera create_camera(Player& player);
 void update_camera(Camera& camera, Player& player);
 
