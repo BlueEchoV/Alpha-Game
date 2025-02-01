@@ -6,6 +6,11 @@
 
 struct MP_Renderer;
 
+enum Unit_Type {
+	UT_Zombie,
+	UT_Total_Unit_Types
+};
+
 enum Storage_Type : uint8_t {
 	// Init it to 1 so that null inits aren't value
 	ST_Unit = 1,
@@ -118,6 +123,16 @@ struct Player {
 	// int damage;
 };
 
+struct Unit_Data {
+	// Image_Type			  w, h, health, damage, target, is_destroyed, handle
+	Image_Type image_type;
+	int w;
+	int h;
+	int health;
+	int damage;
+	int speed;
+};
+
 struct Unit {
 	Image* image;
 	Rigid_Body rb;
@@ -130,18 +145,6 @@ struct Unit {
 	bool is_destroyed = false;
 
 	Handle handle;
-};
-
-struct Entity {
-	Image* image;
-	Rigid_Body rb;
-	int w, h;
-
-	int health;
-	int damage;
-
-	// This will have the be variable in the future
-	Player* target;
 };
 
 struct Projectile {
@@ -186,8 +189,8 @@ V2 calculate_origin_to_target_velocity(V2 target, V2 origin);
 
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
-void spawn_unit(Storage<Unit>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
-	int width, int height, int speed, int health, int damage);
+void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles,
+	Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);

@@ -46,16 +46,26 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	return result;
 }
 
-void spawn_unit(Storage<Unit>& storage, std::vector<Handle>& handles, Image* image, Player* target, V2 spawn_pos,
-	int width, int height, int speed, int health, int damage) {
+Unit_Data unit_data[UT_Total_Unit_Types] = {
+	// Image_Type			  w,   h,   health, damage, speed
+	{IT_Enemy_Clothed_Zombie, 150, 150, 100,    10,     10}
+};
+
+Unit_Data* get_unit_data(Unit_Type unit_type) {
+	return &unit_data[(int)unit_type];
+}
+
+void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles, 
+	Player* target, V2 spawn_pos) {
 	Unit result = {};
 
-	result.image = image;
-	result.rb = create_rigid_body(spawn_pos, speed);
-	result.w = width;
-	result.h = height;
-	result.health = health;
-	result.damage = damage;
+	Unit_Data* data = get_unit_data(unit_type);
+	result.image = get_image(data->image_type);
+	result.rb = create_rigid_body(spawn_pos, data->speed);
+	result.w = data->w;
+	result.h = data->h;
+	result.health = data->health;
+	result.damage = data->damage;
 	result.target = target;
 	result.handle = create_handle(storage);
 	
