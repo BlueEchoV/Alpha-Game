@@ -6,14 +6,18 @@
 
 struct MP_Renderer;
 
-enum Storage_Type {
-	ST_Entity
+enum Storage_Type : uint8_t {
+	// Init it to 1 so that null inits aren't value
+	ST_Unit = 1,
+	ST_Projectile,
+	ST_Building
 };
 
 const int MAX_STORAGE_SIZE = 100;
 
 // This goes on the entities
 struct Handle {
+	Storage_Type storage_type;
 	uint32_t index;
 	// Used to compare against generations. Does not change. 
 	// This is set equal to the generation's counter on creation
@@ -25,7 +29,7 @@ struct Handle {
 struct Generations {
 	bool slot_is_taken = false;
 	// Used to compare against handles
-	int current_slot_generation = 1;
+	uint32_t current_slot_generation = 1;
 };
 
 template <typename T>
@@ -50,6 +54,7 @@ Handle create_handle(Storage<T>& storage) {
 		} 
 	} 
 
+	result.storage_type = storage.storage_type;
 	return result;
 }
 
@@ -58,10 +63,11 @@ Handle create_handle(Storage<T>& storage) {
 
 template <typename T>
 void delete_handle(Storage<T>& storage, Handle handle) {
-	int index = handle.index;
-	int generation = handle.generation;
+	uint32_t index = handle.index;
+	uint32_t generation = handle.generation;
 	if (index < ARRAYSIZE(storage.storage) && 
-		generation == storage.generations[index].current_slot_generation){
+		generation == storage.generations[index].current_slot_generation &&
+		storage.storage_type == handle.storage_type){
 		storage.generations->current_slot_generation++;
 		storage.generations->slot_is_taken = false;
 	}
@@ -69,11 +75,12 @@ void delete_handle(Storage<T>& storage, Handle handle) {
 
 template <typename T>
 T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
-	int index = handle.index;
-	int generations = handle.generation;
+	uint32_t index = handle.index;
+	uint32_t generations = handle.generation;
 	// Check if the handle is valid
 	if (storage.generations[index].current_slot_generation == generations &&
-		storage.generations[index].slot_is_taken == true) {
+		storage.generations[index].slot_is_taken == true &&
+		storage.storage_type == handle.storage_type) {
 		return &storage.storage[index];
 	}
 	log("Entity does not exist from handle");
@@ -159,8 +166,8 @@ struct Game_Data {
 
 	Player player;
 
-	Storage<Projectile> projectile_storage;
-	Storage<Unit>		unit_storage;
+	Storage<Projectile> projectile_storage = { .storage_type = ST_Projectile };
+	Storage<Unit>		unit_storage = { .storage_type = ST_Unit };
 
 	std::vector<Handle> enemy_unit_handles;
 	std::vector<Handle> projectile_handles;
