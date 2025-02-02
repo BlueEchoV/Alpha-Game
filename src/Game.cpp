@@ -95,6 +95,24 @@ void debug_draw_coor_ws(Color_Type c, bool background, V2 camera_pos, int x, int
 	mp_render_fill_rect(&rect);
 }
 
+// Mouse space is another coordinate system. CS and WS are the others.
+void debug_draw_coor_mouse_in_cs(Color_Type c, bool background, V2 camera_pos, int mouse_x, int mouse_y) {
+	Font* font = get_font(debug_font); 
+	int y_offset = font->char_height + font->char_height / 2;
+
+	V2 pos_cs = { (float)mouse_x, (float)mouse_y };
+	pos_cs += camera_pos;
+	std::string coordinates = "CS: x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);
+	draw_quick_string(c, background, coordinates.c_str(), (int)mouse_x, (int)mouse_y + y_offset);
+	MP_Rect rect = {}; 
+	rect.w = debug_point_size;
+	rect.h = debug_point_size;
+	rect.x = (int)mouse_x - rect.w / 2;;
+	rect.y = (int)mouse_y - rect.h / 2;;
+	mp_set_render_draw_color(c);
+	mp_render_fill_rect(&rect);
+}
+
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture) {
 	if (!Globals::toggle_debug_images && !Globals::debug_show_coordinates) { 
 		return;
@@ -318,7 +336,8 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
-		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, false);
+		// Think about mouse space
+		debug_draw_coor_mouse_in_cs(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y);
 		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.rb.pos_ws.x, (int)game_data.player.rb.pos_ws.y, true);
 	}
 
@@ -431,6 +450,9 @@ void render(Game_Data& game_data) {
 		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
 		draw_unit(*unit, game_data.camera.pos_ws);
 	}
+
+	std::string temp_str = std::to_string(Globals::total_arrows);
+	draw_quick_string(CT_Red, true, temp_str.c_str(), 0, 0);
 
 	mp_render_present();
 }

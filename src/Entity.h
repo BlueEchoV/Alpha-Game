@@ -18,7 +18,7 @@ enum Storage_Type : uint8_t {
 	ST_Building
 };
 
-const int MAX_STORAGE_SIZE = 100;
+const int MAX_STORAGE_SIZE = 1000;
 
 // This goes on the entities
 struct Handle {

@@ -20,4 +20,6 @@ namespace Globals {
 
 	extern int player_width;
 	extern int player_height;
+
+	extern int total_arrows;
 }

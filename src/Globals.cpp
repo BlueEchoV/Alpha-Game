@@ -16,4 +16,6 @@ namespace Globals {
 
 	int player_width = 96;
 	int player_height = 96;
+
+	extern int total_arrows = 0;
 }

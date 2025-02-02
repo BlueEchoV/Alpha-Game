@@ -69,8 +69,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				IT_Arrow_1, 
 				32, 
 				32,
-				100
+				500
 			);
+			Globals::total_arrows++;
 		}
 		if (key_pressed(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
