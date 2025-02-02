@@ -152,6 +152,7 @@ void draw_character(Font& font, char character, int x, int y, int size) {
 	mp_render_copy(font.image.texture, &src, &dst);
 }
 
+// Draws in camera space 
 void draw_string(Font& font, const char* str, Color_Type c, bool background, int x, int y, int size, bool center_x) {
 	int length = (int)strlen(str);
 
@@ -185,6 +186,7 @@ void draw_string(Font& font, const char* str, Color_Type c, bool background, flo
 	draw_string(font, str, c, background, (int)x, (int)y, size, center_x);
 }
 
+// Draws in camera space 
 void draw_quick_string(Color_Type c, bool background, const char* str, int x, int y) {
 	Font* font = get_font(FT_Basic);
 	draw_string(*font, str, c, background, x, y, 1, true);

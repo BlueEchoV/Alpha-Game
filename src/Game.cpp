@@ -63,7 +63,7 @@ void debug_draw_coor_cs(Color_Type c, bool background, V2 camera_pos, int x, int
 	if (coordinates_are_in_ws) {
 		pos_cs = convert_ws_to_cs({ (float)x, (float)y }, camera_pos);
 	}
-	std::string coordinates = "CS: x = " + std::to_string(x) + ", y = " + std::to_string(y);
+	std::string coordinates = "CS: x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);
 	draw_quick_string(c, background, coordinates.c_str(), (int)pos_cs.x, (int)pos_cs.y + y_offset);
 	MP_Rect rect = {}; 
 	rect.w = debug_point_size;
@@ -95,29 +95,7 @@ void debug_draw_coor_ws(Color_Type c, bool background, V2 camera_pos, int x, int
 	mp_render_fill_rect(&rect);
 }
 
-// Mouse space is another coordinate system. CS and WS are the others.
-void debug_draw_coor_mouse_in_cs(Color_Type c, bool background, V2 camera_pos, int mouse_x, int mouse_y) {
-	Font* font = get_font(debug_font); 
-	int y_offset = font->char_height + font->char_height / 2;
-
-	V2 pos_cs = { (float)mouse_x, (float)mouse_y };
-	pos_cs += camera_pos;
-	std::string coordinates = "CS: x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);
-	draw_quick_string(c, background, coordinates.c_str(), (int)mouse_x, (int)mouse_y + y_offset);
-	MP_Rect rect = {}; 
-	rect.w = debug_point_size;
-	rect.h = debug_point_size;
-	rect.x = (int)mouse_x - rect.w / 2;;
-	rect.y = (int)mouse_y - rect.h / 2;;
-	mp_set_render_draw_color(c);
-	mp_render_fill_rect(&rect);
-}
-
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture) {
-	if (!Globals::toggle_debug_images && !Globals::debug_show_coordinates) { 
-		return;
-	}
-
 	MP_Renderer* renderer = Globals::renderer;
 
 	if (Globals::toggle_debug_images) {
@@ -336,9 +314,35 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
-		// Think about mouse space
-		debug_draw_coor_mouse_in_cs(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y);
+		// The mouse position is already in camera space
+		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, false);
 		debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.rb.pos_ws.x, (int)game_data.player.rb.pos_ws.y, true);
+	}
+
+	if (Globals::debug_show_stats) {
+		int stats_string_size = 2;
+		int stats_border_padding = 50;
+		int stats_w = 300;
+		int stats_h = 600;
+		int stats_rect_x = Globals::resolution_x - (stats_w + stats_border_padding);
+		int stats_rect_y = Globals::resolution_y - (stats_h + stats_border_padding);
+		MP_Rect stats_rect = {stats_rect_x, stats_rect_y, stats_w, stats_h};
+		mp_set_render_draw_color(CT_Black);
+		mp_render_fill_rect(&stats_rect);
+
+		int stats_string_x = stats_rect_x + stats_w / 2;
+		int stats_string_y = (stats_rect_y + stats_h) - (font.char_height * stats_string_size);
+		int stats_string_y_offset = font.char_height * stats_string_size * 2;
+
+		std::string stats_title = "Debug Stats";
+		draw_string(font, stats_title.c_str(), CT_Red, true, stats_string_x, stats_string_y, 
+			stats_string_size, true);
+
+		stats_string_y -= stats_string_y_offset;
+
+		std::string total_arrows_fired = "Arrows Fired: " + std::to_string(Globals::debug_total_arrows);
+		draw_string(font, total_arrows_fired.c_str(), CT_Red, true, (int)stats_string_x, (int)stats_string_y, 
+			stats_string_size, true);
 	}
 
 	mp_set_texture_color_mod(font.image.texture, 255, 255, 255);
@@ -430,9 +434,10 @@ void render(Game_Data& game_data) {
 
 	// Convert the player's position to camera space
 	MP_Rect player_rect = {(int)game_data.player.rb.pos_ws.x, (int)game_data.player.rb.pos_ws.y, game_data.player.w, game_data.player.h};
-	V2 player_pos = convert_ws_to_cs({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
-	player_rect.x = (int)player_pos.x - game_data.player.w / 2;
-	player_rect.y = (int)player_pos.y - game_data.player.h / 2;
+	// This is the camera space position of the player. Not the world space position.
+	V2 player_pos_cs = convert_ws_to_cs({ (float)player_rect.x, (float)player_rect.y }, game_data.camera.pos_ws);
+	player_rect.x = (int)player_pos_cs.x - game_data.player.w / 2;
+	player_rect.y = (int)player_pos_cs.y - game_data.player.h / 2;
 	mp_render_copy(game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);
@@ -450,9 +455,6 @@ void render(Game_Data& game_data) {
 		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
 		draw_unit(*unit, game_data.camera.pos_ws);
 	}
-
-	std::string temp_str = std::to_string(Globals::total_arrows);
-	draw_quick_string(CT_Red, true, temp_str.c_str(), 0, 0);
 
 	mp_render_present();
 }

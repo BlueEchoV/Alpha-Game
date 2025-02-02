@@ -8,6 +8,7 @@ namespace Globals {
 
 	bool toggle_debug_images = true;
 	bool debug_show_coordinates = true;
+	bool debug_show_stats = true;
 
 	float noise_frequency = 0.05f;
 	// Pixels
@@ -17,5 +18,5 @@ namespace Globals {
 	int player_width = 96;
 	int player_height = 96;
 
-	extern int total_arrows = 0;
+	extern int debug_total_arrows = 0;
 }

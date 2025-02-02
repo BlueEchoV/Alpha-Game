@@ -12,6 +12,7 @@ namespace Globals {
 	extern int resolution_y;
 	extern bool toggle_debug_images;
 	extern bool debug_show_coordinates;
+	extern bool debug_show_stats;
 
 	extern float noise_frequency;
 
@@ -21,5 +22,5 @@ namespace Globals {
 	extern int player_width;
 	extern int player_height;
 
-	extern int total_arrows;
+	extern int debug_total_arrows;
 }

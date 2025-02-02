@@ -71,7 +71,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				32,
 				500
 			);
-			Globals::total_arrows++;
+			Globals::debug_total_arrows++;
 		}
 		if (key_pressed(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
@@ -118,6 +118,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		if (key_pressed(VK_F2)) {
 			Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
+		}
+		if (key_pressed(VK_F3)) {
+			Globals::debug_show_stats= !Globals::debug_show_stats;
 		}
 
 		// Update
