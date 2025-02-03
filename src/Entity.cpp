@@ -112,21 +112,17 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 	});
 };
 
-
 Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles, 
 	Image* image, V2 pos, V2 vel, int width, int height, int speed) {
 	Projectile result = {};
 
+	result.rb = create_rigid_body(pos, speed);
+	result.rb.vel = vel;
 	result.image = image;
-	result.pos_ws = pos;
-	result.vel = vel;
-	result.speed = speed;
 	result.w = width;
 	result.h = height;
 	// NOTE: atan2 returns a range from -180 to 180
 	result.angle = (float)atan2((double)vel.x, (double)vel.y);
-	log("Arrow Current Angle (Radians): %f", result.angle);
-	log("Vel: %f, %f", result.vel.x, result.vel.y);
 	// Range from -180 to 180
 	result.angle = convert_radians_to_degrees(result.angle);
 	result.angle -= 90;
@@ -145,13 +141,13 @@ Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& 
 }
 
 void update_projectile(Projectile& projectile, float delta_time) {
-	projectile.pos_ws.x += projectile.speed * (projectile.vel.x * delta_time);
-	projectile.pos_ws.y += projectile.speed * (projectile.vel.y * delta_time);
+	projectile.rb.pos_ws.x += projectile.rb.speed * (projectile.rb.vel.x * delta_time);
+	projectile.rb.pos_ws.y += projectile.rb.speed * (projectile.rb.vel.y * delta_time);
 }
 
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile) {
 	// Draw everything around the camera (converting to camera space)
-	V2 entity_pos_cs = convert_ws_to_cs(projectile.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
+	V2 entity_pos_cs = convert_ws_to_cs(projectile.rb.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - projectile.w / 2, (int)entity_pos_cs.y - projectile.h / 2, projectile.w, projectile.h };
 

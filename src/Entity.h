@@ -148,9 +148,8 @@ struct Unit {
 };
 
 struct Projectile {
-	V2 pos_ws;
-	V2 vel;
-	int speed;
+	Rigid_Body rb;
+
 	int w, h;
 	float angle;
 

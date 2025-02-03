@@ -296,7 +296,7 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 				MP_Rect temp_rect = { x, y, width, height };
 				static float temp_angle = 0;
 				static float rotation_speed = 8.0f;
-				temp_angle += delta_time * rotation_speed;
+				temp_angle += delta_time * 
 				mp_render_copy_ex(images[IT_Sun].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
 				break;
 			}
@@ -441,7 +441,7 @@ void render(Game_Data& game_data, float delta_time) {
 		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
 		draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
 		if (Globals::debug_show_coordinates) {
-			debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)p->pos_ws.x, (int)p->pos_ws.y, true);
+			debug_draw_coor_cs(CT_Green, true, game_data.camera.pos_ws, (int)p->rb.pos_ws.x, (int)p->rb.pos_ws.y, true);
 		}
 	}
 
