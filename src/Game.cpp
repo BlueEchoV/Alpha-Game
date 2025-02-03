@@ -95,7 +95,7 @@ void debug_draw_coor_ws(Color_Type c, bool background, V2 camera_pos, int x, int
 	mp_render_fill_rect(&rect);
 }
 
-void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture) {
+void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
 	MP_Renderer* renderer = Globals::renderer;
 
 	if (Globals::toggle_debug_images) {
@@ -287,7 +287,7 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 			}
 			case DI_2d_matrix_transformation_rect: {
 				draw_string(font, "2d_rotation", CT_White, true, title_x, title_y, string_size, true);
-				draw_debug_2d_rotation_matrix_rect({ (float)x + width / 2, (float)y + height / 2 }, &font);
+				draw_debug_2d_rotation_matrix_rect({ (float)x + width / 2, (float)y + height / 2 }, &font, delta_time);
 				break;
 			}
 			case DI_copy_ex: {
@@ -295,12 +295,8 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 
 				MP_Rect temp_rect = { x, y, width, height };
 				static float temp_angle = 0;
-				if (key_pressed_and_held(KEY_A)) {
-					temp_angle += 1;
-				}
-				if (key_pressed_and_held(KEY_D)) {
-					temp_angle -= 1;
-				}
+				static float rotation_speed = 8.0f;
+				temp_angle += delta_time * rotation_speed;
 				mp_render_copy_ex(images[IT_Sun].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
 				break;
 			}
@@ -349,8 +345,6 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 	mp_set_texture_alpha_mod(debug_texture, 255);
 }
 
-
-
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
 	Image_Type type = IT_Rock_32x32;
 
@@ -396,7 +390,7 @@ void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arr
 		image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
 }
 
-void render(Game_Data& game_data) {
+void render(Game_Data& game_data, float delta_time) {
 	MP_Renderer* renderer = Globals::renderer;
 
 	int window_width = 0;
@@ -441,7 +435,7 @@ void render(Game_Data& game_data) {
 	mp_render_copy(game_data.player.image->texture, NULL, &player_rect);
 
 	Font* font = get_font(game_data.selected_font);
-	draw_debug_info(game_data, *font, game_data.player.image->texture);
+	draw_debug_info(game_data, *font, game_data.player.image->texture, delta_time);
 
 	for (Handle projectile: game_data.projectile_handles) {
 		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);

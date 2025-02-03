@@ -194,7 +194,7 @@ void draw_quick_string(Color_Type c, bool background, const char* str, int x, in
 
 int window_w = 0;
 int window_h = 0;
-void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font) {
+void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font, float delta_time) {
 	MP_Renderer* renderer = Globals::renderer;
 	
 	V2 c = {};
@@ -224,13 +224,9 @@ void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font) {
 
 	static float angle = 0.0f;
 	static float last_angle = 0.0f;
-	float rotation_speed = 1.0f;
-	if (key_pressed_and_held(KEY_A)) {
-		angle += rotation_speed;
-	}
-	if (key_pressed_and_held(KEY_D)) {
-		angle -= rotation_speed;
-	}
+	float rotation_speed = 8.0f;
+	angle += delta_time * rotation_speed;
+
 	if (angle != last_angle || recalculate_points) {
 		new_top_left = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_left.x, (float)original_top_left.y);
 		new_top_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_right.x, (float)original_top_right.y);

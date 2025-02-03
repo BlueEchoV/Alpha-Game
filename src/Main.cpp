@@ -133,7 +133,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			update_unit(*unit, delta_time);
 		}
 		// Render
-		render(game_data);
+		render(game_data, delta_time);
 
 		delete_destroyed_entities_from_handles(game_data);
 	}

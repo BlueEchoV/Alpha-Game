@@ -58,4 +58,4 @@ void draw_string(Font& font, const char* str, Color_Type c, bool background, int
 void draw_string(Font& font, const char* str, Color_Type c, bool background, float x, float y, int size, bool center_x);
 void draw_quick_string(Color_Type c, bool background, const char* str, int x, int y);
 
-void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font);
+void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font, float delta_time);
