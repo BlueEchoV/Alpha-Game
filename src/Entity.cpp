@@ -16,7 +16,7 @@ V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
 	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
-V2 calculate_origin_to_target_velocity(V2 target, V2 origin) {
+V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin) {
 	V2 result = {};
 
 	result = target - origin;
@@ -76,7 +76,7 @@ void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>
 V2 update_unit_position(Unit& unit, float dt) {
 	V2 result = {};
 
-	unit.rb.vel = calculate_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
+	unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
 
 	unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.speed) * dt;
 	unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.speed) * dt;
@@ -96,48 +96,42 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	mp_render_copy_ex(unit.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
 }
 
-Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle) {
-	return get_entity_pointer_from_handle(storage, handle);
-}
-
-void delete_destroyed_entities_from_handles(Game_Data& game_data) {
-	std::erase_if(game_data.enemy_unit_handles, [&game_data](const Handle& enemy_unit_handle) {
-		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-		if (unit->is_destroyed) {
-			delete_handle(game_data.unit_storage, enemy_unit_handle);
-			*unit = {};
-			return true;
-		}
-		return false;
-	});
+Projectile_Data projectile_data = {
+	"Arrow", IT_Arrow_1, 32, 32, 500
 };
 
-Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles, 
-	Image* image, V2 pos, V2 vel, int width, int height, int speed) {
-	Projectile result = {};
-
-	result.rb = create_rigid_body(pos, speed);
-	result.rb.vel = vel;
-	result.image = image;
-	result.w = width;
-	result.h = height;
+float calculate_facing_direction(V2 vec) {
+	float angle = {};
 	// NOTE: atan2 returns a range from -180 to 180
-	result.angle = (float)atan2((double)vel.x, (double)vel.y);
+	angle = (float)atan2((double)vec.x, (double)vec.y);
 	// Range from -180 to 180
-	result.angle = convert_radians_to_degrees(result.angle);
-	result.angle -= 90;
+	angle = convert_radians_to_degrees(angle);
+	angle -= 90;
 	// NOTE: Convert from range -180 to 180 to 0 to 360
 	// -result.angle for counter clockwise
-	result.angle = (float)fmod(-result.angle + 360.0, 360.0);
-	log("Arrow Current Angle (Degrees): %f", result.angle);
+	angle = (float)fmod(-angle + 360.0, 360.0);
 	// Inverted coordinate system
 	// result.angle += 180;
-	result.handle = create_handle(storage);
+	return angle;
+}
 
-	projectile_handles.push_back(result.handle);
-	storage.storage[result.handle.index] = result;
+void spawn_projectile(Game_Data& game_data, V2 origin_ws, V2 target_ws) {
+	Projectile result = {};
 
-	return result;
+	Projectile_Data data = projectile_data;
+
+	result.rb = create_rigid_body(origin_ws, data.speed);
+	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);
+	result.rb.vel = vel_normalized;
+
+	result.image = get_image(data.it);
+	result.w = data.w;
+	result.h = data.h;
+	result.angle = calculate_facing_direction(result.rb.vel);
+	result.handle = create_handle(game_data.projectile_storage);
+
+	game_data.projectile_handles.push_back(result.handle);
+	game_data.projectile_storage.storage[result.handle.index] = result;
 }
 
 void update_projectile(Projectile& projectile, float delta_time) {
@@ -153,3 +147,19 @@ void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile)
 
 	mp_render_copy_ex(projectile.image->texture, NULL, &dst, projectile.angle, NULL, SDL_FLIP_NONE);
 }
+
+Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle) {
+	return get_entity_pointer_from_handle(storage, handle);
+}
+
+void delete_destroyed_entities_from_handles(Game_Data& game_data) {
+	std::erase_if(game_data.enemy_unit_handles, [&game_data](const Handle& enemy_unit_handle) {
+		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+		if (unit->is_destroyed) {
+			delete_handle(game_data.unit_storage, enemy_unit_handle);
+			*unit = {};
+			return true;
+		}
+		return false;
+	});
+};

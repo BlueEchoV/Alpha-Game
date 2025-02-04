@@ -26,5 +26,4 @@ void debug_draw_coor_ws(Color_Type c, bool background, V2 camera_pos, int x, int
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);
-void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arrow_h, int speed);
 void render(Game_Data& game_data, float delta_time);

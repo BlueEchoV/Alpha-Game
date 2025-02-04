@@ -374,22 +374,6 @@ void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float n
 	mp_render_copy(image->texture, NULL, &dst);
 }
 
-void fire_player_arrow(Game_Data& game_data, Image_Type it, int arrow_w, int arrow_h, int speed) {
-	Image* image = get_image(it);
-
-	V2 player_cs_pos = convert_ws_to_cs(game_data.player.rb.pos_ws, game_data.camera.pos_ws);
-
-	V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
-
-	// Calculate the direction vector target <--- origin
-	V2 vel = mouse_cs_pos - player_cs_pos;
-
-	V2 vel_normalized = normalize(vel);
-
-	Projectile result = create_projectile(game_data.projectile_storage, game_data.projectile_handles,
-		image, game_data.player.rb.pos_ws, vel_normalized, arrow_w, arrow_h, speed);
-}
-
 void render(Game_Data& game_data, float delta_time) {
 	MP_Renderer* renderer = Globals::renderer;
 

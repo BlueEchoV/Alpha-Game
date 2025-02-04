@@ -147,6 +147,14 @@ struct Unit {
 	Handle handle;
 };
 
+struct Projectile_Data {
+	std::string projectile_type;
+	Image_Type it;
+
+	int w, h;
+	int speed;
+};
+
 struct Projectile {
 	Rigid_Body rb;
 
@@ -184,7 +192,7 @@ V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
 V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos);
 V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y);
 
-V2 calculate_origin_to_target_velocity(V2 target, V2 origin);
+V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin);
 
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
@@ -195,8 +203,7 @@ void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 void delete_destroyed_entities_from_handles(Game_Data& game_data);
 
-Projectile create_projectile(Storage<Projectile>& storage, std::vector<Handle>& projectile_handles,
-	Image* image, V2 pos, V2 vel, int width, int height, int speed);
+void spawn_projectile(Game_Data& game_data, V2 origin, V2 target);
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 

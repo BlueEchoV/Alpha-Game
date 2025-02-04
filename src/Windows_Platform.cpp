@@ -22,6 +22,7 @@ void reset_is_pressed() {
 	}
 }
 
+// In camera space
 V2 get_mouse_position(HWND hwnd) {
 	V2 result = {};
 
