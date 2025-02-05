@@ -17,12 +17,17 @@ enum Debug_Image {
     DI_Count
 };
 
+enum Coordinates_Conversion {
+	CC_cs_to_ws,
+	CC_ws_to_cs,
+	CC_no_conversion
+};
+
 Camera create_camera(Player& player);
 void update_camera(Camera& camera, Player& player);
 
 void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
-void debug_draw_coor_cs(Color_Type c, bool background, V2 camera_pos, int x, int y, bool coordinates_are_in_ws);
-void debug_draw_coor_ws(Color_Type c, bool background, V2 camera_pos, int x, int y, bool coordinates_are_in_cs);
+void debug_draw_coor(Color_Type c, bool background, V2 camera_pos, int x, int y, Coordinates_Conversion cc);
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);

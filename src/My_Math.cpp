@@ -105,3 +105,28 @@ float convert_degrees_to_radians(float degrees) {
 float convert_radians_to_degrees(float radians) {
 	return radians * (180.0f / (float)M_PI);
 }
+
+V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin) {
+	V2 result = {};
+
+	result = target - origin;
+	result = normalize(result);
+
+	return result;
+}
+
+float calculate_facing_direction(V2 vec) {
+	float angle = {};
+	// NOTE: atan2 returns a range from -180 to 180
+	angle = (float)atan2((double)vec.x, (double)vec.y);
+	// Range from -180 to 180
+	angle = convert_radians_to_degrees(angle);
+	angle -= 90;
+	// NOTE: Convert from range -180 to 180 to 0 to 360
+	// -result.angle for counter clockwise
+	angle = (float)fmod(-angle + 360.0, 360.0);
+	// Inverted coordinate system
+	// result.angle += 180;
+	return angle;
+}
+

@@ -16,15 +16,6 @@ V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
 	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
-V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin) {
-	V2 result = {};
-
-	result = target - origin;
-	result = normalize(result);
-
-	return result;
-}
-
 Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	Rigid_Body result = {};
 
@@ -99,21 +90,6 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 Projectile_Data projectile_data = {
 	"Arrow", IT_Arrow_1, 32, 32, 500
 };
-
-float calculate_facing_direction(V2 vec) {
-	float angle = {};
-	// NOTE: atan2 returns a range from -180 to 180
-	angle = (float)atan2((double)vec.x, (double)vec.y);
-	// Range from -180 to 180
-	angle = convert_radians_to_degrees(angle);
-	angle -= 90;
-	// NOTE: Convert from range -180 to 180 to 0 to 360
-	// -result.angle for counter clockwise
-	angle = (float)fmod(-angle + 360.0, 360.0);
-	// Inverted coordinate system
-	// result.angle += 180;
-	return angle;
-}
 
 void spawn_projectile(Game_Data& game_data, V2 origin_ws, V2 target_ws) {
 	Projectile result = {};
