@@ -55,23 +55,26 @@ void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, floa
 
 int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
-void debug_draw_coor(Color_Type c, bool background, V2 camera_pos, int x, int y, 
-	Coordinates_Conversion cc) {
+void debug_draw_coor(Color_Type c, bool background, V2 camera_pos, int x, int y, Coordinates_Conversion cc) {
 	Font* font = get_font(debug_font); 
 	int y_offset = font->char_height + font->char_height / 2;
 
 	V2 pos_cs = {};
+	std::string coordinates = {};
 	switch(cc) {
 	case CC_cs_to_ws: {
 		pos_cs = convert_ws_to_cs({ (float)x, (float)y }, camera_pos);
+		coordinates = "WS: x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);;
 		break;
 	}
 	case CC_ws_to_cs: {
 		pos_cs = convert_cs_to_ws({ (float)x, (float)y }, camera_pos);
+		coordinates = "CS: x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);;
 		break;
 	}
 	case CC_no_conversion: {
 		pos_cs = { (float)x, (float)y };
+		coordinates = "x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);;
 		break;
 	}
 	default: {
@@ -79,7 +82,6 @@ void debug_draw_coor(Color_Type c, bool background, V2 camera_pos, int x, int y,
 	}
 	}
 
-	std::string coordinates = "CS: x = " + std::to_string((int)pos_cs.x) + ", y = " + std::to_string((int)pos_cs.y);
 	draw_quick_string(c, background, coordinates.c_str(), (int)pos_cs.x, (int)pos_cs.y + y_offset);
 	MP_Rect rect = {}; 
 	rect.w = debug_point_size;
@@ -306,7 +308,7 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
 		// The mouse position is already in camera space
-		debug_draw_coor(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, CC_cs_to_ws);
+		debug_draw_coor(CT_Green, true, game_data.camera.pos_ws, (int)mouse.x, (int)mouse.y, CC_no_conversion);
 		debug_draw_coor(CT_Green, true, game_data.camera.pos_ws, (int)game_data.player.rb.pos_ws.x, 
 			(int)game_data.player.rb.pos_ws.y, CC_no_conversion);
 	}
