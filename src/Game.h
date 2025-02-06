@@ -21,7 +21,8 @@ Camera create_camera(Player& player);
 void update_camera(Camera& camera, Player& player);
 
 void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
-void debug_draw_coor(V2 coor_to_draw, V2 draw_at, Color_Type c, bool background, std::string custom_text);
+void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, V2 draw_at,
+	Color_Type c, bool background, std::string custom_text, bool call_convert_ws_to_cs);
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);

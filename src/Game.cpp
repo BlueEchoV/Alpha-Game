@@ -56,13 +56,13 @@ void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, floa
 int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
 // Conversion done before entering the function
-void debug_draw_coor(V2 coor_to_draw, V2 draw_at, 
-	Color_Type c, bool background, std::string custom_text/*, bool call_convert_ws_to_cs*/) {
+void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, V2 draw_at, 
+	Color_Type c, bool background, std::string custom_text, bool call_convert_ws_to_cs) {
 
 	V2 coor_to_draw_final = coor_to_draw;
-	// if(call_convert_ws_to_cs) {
-	// 	coor_to_draw_final = convert_ws_to_cs(coor_to_draw);
-	// }
+	if(call_convert_ws_to_cs) {
+		coor_to_draw_final = convert_ws_to_cs(coor_to_draw_final, game_data.camera.pos_ws);
+	}
 
 	Font* font = get_font(debug_font); 
 	int y_offset = font->char_height + font->char_height / 2;
@@ -296,10 +296,10 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
 		// The mouse position is already in camera space
-		debug_draw_coor(mouse, mouse, CT_Green, true, "Mouse: ");
-		debug_draw_coor(game_data.player.rb.pos_ws, 
+		debug_draw_coor(game_data, mouse, mouse, CT_Green, true, "Mouse: ", false);
+		debug_draw_coor(game_data, game_data.player.rb.pos_ws, 
 			{(float)Globals::resolution_x / 2, (float)Globals::resolution_y / 2},
-			CT_Green, true, "Player: ");
+			CT_Green, true, "Player: ", false);
 
 	}
 
@@ -413,8 +413,7 @@ void render(Game_Data& game_data, float delta_time) {
 		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
 		draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
 		if (Globals::debug_show_coordinates) {
-			V2 p_cs = convert_cs_to_ws(p->rb.pos_ws, game_data.camera.pos_ws);
-			debug_draw_coor(p_cs, p_cs, CT_Green, true, "CS: ");
+			debug_draw_coor(game_data, p->rb.pos_ws, p->rb.pos_ws, CT_Green, true, "CS: ", true);
 		}
 	}
 
