@@ -55,13 +55,17 @@ void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, floa
 
 int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
-// Conversion done before entering the function
-void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, V2 draw_at, 
-	Color_Type c, bool background, std::string custom_text, bool call_convert_ws_to_cs) {
+// The draw_at variable should be in world space. World space is technically UI space.
+void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
+	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string custom_text) {
 
 	V2 coor_to_draw_final = coor_to_draw;
-	if(call_convert_ws_to_cs) {
+	if (convert_coor_to_draw_to_cs) {
 		coor_to_draw_final = convert_ws_to_cs(coor_to_draw_final, game_data.camera.pos_ws);
+	}
+	V2 draw_at_final = draw_at;
+	if (convert_draw_at_to_cs) {
+		draw_at_final = convert_ws_to_cs(draw_at, game_data.camera.pos_ws);
 	}
 
 	Font* font = get_font(debug_font); 
@@ -70,12 +74,12 @@ void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, V2 draw_at,
 	std::string str = custom_text + "x = " + std::to_string((int)coor_to_draw_final.x) + ", y = " 
 		+ std::to_string((int)coor_to_draw_final.y);
 
-	draw_quick_string(c, background, str.c_str(), (int)draw_at.x, (int)draw_at.y + y_offset);
+	draw_quick_string(c, background, str.c_str(), (int)draw_at_final.x, (int)draw_at_final.y + y_offset);
 	MP_Rect rect = {}; 
 	rect.w = debug_point_size;
 	rect.h = debug_point_size;
-	rect.x = (int)draw_at.x - rect.w / 2;;
-	rect.y = (int)draw_at.y - rect.h / 2;;
+	rect.x = (int)draw_at_final.x - rect.w / 2;;
+	rect.y = (int)draw_at_final.y - rect.h / 2;;
 	mp_set_render_draw_color(c);
 	mp_render_fill_rect(&rect);
 }
@@ -296,10 +300,10 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 	if (Globals::debug_show_coordinates) {
 		V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
 		// The mouse position is already in camera space
-		debug_draw_coor(game_data, mouse, mouse, CT_Green, true, "Mouse: ", false);
-		debug_draw_coor(game_data, game_data.player.rb.pos_ws, 
-			{(float)Globals::resolution_x / 2, (float)Globals::resolution_y / 2},
-			CT_Green, true, "Player: ", false);
+		debug_draw_coor(game_data, mouse, false, mouse, false, CT_Green, true, "Mouse: ");
+		debug_draw_coor(game_data, game_data.player.rb.pos_ws, false, 
+			{(float)Globals::resolution_x / 2, (float)Globals::resolution_y / 2}, false,
+			CT_Green, true, "Player WS Pos: ");
 
 	}
 
@@ -413,7 +417,8 @@ void render(Game_Data& game_data, float delta_time) {
 		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
 		draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
 		if (Globals::debug_show_coordinates) {
-			debug_draw_coor(game_data, p->rb.pos_ws, p->rb.pos_ws, CT_Green, true, "CS: ", true);
+			debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true, 
+				CT_Green, true, "WS Pos: ");
 		}
 	}
 
