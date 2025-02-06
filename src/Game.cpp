@@ -55,16 +55,20 @@ void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, floa
 
 int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
+// Conversion done before entering the function
 void debug_draw_coor(V2 coor_to_draw, V2 draw_at, 
-	Color_Type c, bool background, std::string custom_text) {
+	Color_Type c, bool background, std::string custom_text/*, bool call_convert_ws_to_cs*/) {
+
+	V2 coor_to_draw_final = coor_to_draw;
+	// if(call_convert_ws_to_cs) {
+	// 	coor_to_draw_final = convert_ws_to_cs(coor_to_draw);
+	// }
 
 	Font* font = get_font(debug_font); 
 	int y_offset = font->char_height + font->char_height / 2;
 
-	std::string str = custom_text + "x = " + std::to_string((int)coor_to_draw.x) + ", y = " 
-		+ std::to_string((int)coor_to_draw.y);
-
-	// pos_to_draw = convert_cs_to_ws({ (float)x, (float)y }, camera_pos);
+	std::string str = custom_text + "x = " + std::to_string((int)coor_to_draw_final.x) + ", y = " 
+		+ std::to_string((int)coor_to_draw_final.y);
 
 	draw_quick_string(c, background, str.c_str(), (int)draw_at.x, (int)draw_at.y + y_offset);
 	MP_Rect rect = {}; 
