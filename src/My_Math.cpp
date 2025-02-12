@@ -130,3 +130,11 @@ float calculate_facing_direction(V2 vec) {
 	return angle;
 }
 
+float calculate_distance_between(V2 vec_1, V2 vec_2) {
+	float result = {};
+
+	V2 direction_vector = vec_1 - vec_2;
+	result = hypotenuse(direction_vector.x, direction_vector.y);
+
+	return result;
+}

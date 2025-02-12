@@ -130,14 +130,16 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		// Collision
-		/*
 		for (Handle& projectile_handle : game_data.projectile_handles) {
 			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
-				Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+				Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
 				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+				float distance_between = {};
+
+				float radius_sum = {};
+				// Calculate the length from the arrow and the target
 			}
 		}
-		*/
 
 		// Render
 		render(game_data, delta_time);
