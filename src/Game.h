@@ -20,7 +20,6 @@ enum Debug_Image {
 Camera create_camera(Player& player);
 void update_camera(Camera& camera, Player& player);
 
-void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
 void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
 	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string custom_text);
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);

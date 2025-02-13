@@ -23,4 +23,6 @@ namespace Globals {
 	extern int player_height;
 
 	extern int debug_total_arrows;
+
+	const int MAX_COLLIDERS = 100;
 }

@@ -5,6 +5,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+Game_Data game_data = {};
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
 	REF(lpCmdLine);
@@ -14,7 +16,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	load_images();
 	load_fonts();
 
-	Game_Data game_data = {};
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 100;

@@ -97,7 +97,7 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 
 // Colliders
 struct Collider {
-	float rad;
+	float radius;
 	// This is offset based off the position of the rigid body
 	V2 pos_ls;
 };
@@ -109,9 +109,11 @@ struct Rigid_Body {
 	V2 pos_ws;
 	V2 vel;
 	int speed;
+
+	int num_colliders;
+	Collider colliders[Globals::MAX_COLLIDERS];
 	// acceleration
 	// V2 pos_ls
-	// Colliders
 };
 
 struct Player {
@@ -196,8 +198,13 @@ V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
 V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos);
 V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y);
 
+void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
+
+void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
+void draw_colliders(Rigid_Body* rb, V2 camera_pos);
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
+
 void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles,
 	Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);

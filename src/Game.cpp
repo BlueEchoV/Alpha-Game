@@ -23,36 +23,6 @@ Camera create_camera(Player& player) {
 	return result;
 }
 
-void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
-	V2 pos_cs = convert_ws_to_cs(center_pos_ws, camera_pos);
-
-	mp_set_render_draw_color(c);
-
-	float increment_angle = 360.0f / total_lines;
-	float current_degrees = 0;
-	for (int i = 0; i < total_lines; i++) {
-		float current_radians = convert_degrees_to_radians(current_degrees);
-		float force_x = cos(current_radians);
-		float force_y = sin(current_radians);
-		float x1 = force_x * radius;
-		float y1 = force_y * radius;
-		current_degrees += increment_angle;
-
-		current_radians = convert_degrees_to_radians(current_degrees);
-		force_x = cos(current_radians);
-		force_y = sin(current_radians);
-		float x2 = force_x * radius;
-		float y2 = force_y * radius;
-
-		x1 += pos_cs.x + radius / 2;
-		y1 += pos_cs.y + radius / 2;
-		x2 += pos_cs.x + radius / 2;
-		y2 += pos_cs.y + radius / 2;
-
-		mp_render_draw_line((int)x1, (int)y1, (int)x2, (int)y2);
-	}
-}
-
 int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
 // The draw_at variable should be in world space. World space is technically UI space.
@@ -412,6 +382,7 @@ void render(Game_Data& game_data, float delta_time) {
 	player_rect.x = (int)player_pos_cs.x; 
 	player_rect.y = (int)player_pos_cs.y; 
 	mp_render_copy(game_data.player.image->texture, NULL, &player_rect);
+	draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 
 	Font* font = get_font(game_data.selected_font);
 	draw_debug_info(game_data, *font, game_data.player.image->texture, delta_time);
@@ -428,6 +399,7 @@ void render(Game_Data& game_data, float delta_time) {
 	for (Handle zombie_handle: game_data.enemy_unit_handles) {
 		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
 		draw_unit(*unit, game_data.camera.pos_ws);
+		draw_colliders(&unit->rb, game_data.camera.pos_ws);
 	}
 
 	mp_render_present();
