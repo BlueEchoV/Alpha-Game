@@ -84,7 +84,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed(KEY_E)) {
 			for (Handle handle : game_data.enemy_unit_handles) {
 				Unit* enemy_unit = get_entity_pointer_from_handle(game_data.unit_storage, handle);
-				enemy_unit->destroyed = true;
+				if (enemy_unit != NULL) {
+					enemy_unit->destroyed = true;
+				}
 			}
 		}
 
@@ -135,14 +137,19 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Handle& projectile_handle : game_data.projectile_handles) {
 			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 				Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+				if (proj == NULL) {
+					continue;
+				}
 				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+				if (unit == NULL) {
+					continue;
+				}
 				float distance_between = calculate_distance_between(proj->rb.pos_ws, unit->rb.pos_ws);
 				float radius_sum = (float)proj->w + (float)unit->w;
 				if (distance_between <= radius_sum) {
 					proj->destroyed = true;
 					unit->destroyed = true;
 				}
-				// Calculate the length from the arrow and the target
 			}
 		}
 
