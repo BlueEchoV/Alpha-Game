@@ -84,7 +84,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed(KEY_E)) {
 			for (Handle handle : game_data.enemy_unit_handles) {
 				Unit* enemy_unit = get_entity_pointer_from_handle(game_data.unit_storage, handle);
-				enemy_unit->is_destroyed = true;
+				enemy_unit->destroyed = true;
 			}
 		}
 
@@ -126,7 +126,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-			update_unit(*unit, delta_time);
+			if (unit != NULL) {
+				update_unit(*unit, delta_time);
+			}
 		}
 
 		// Collision
@@ -134,9 +136,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 				Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
 				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-				float distance_between = {};
-
-				float radius_sum = {};
+				float distance_between = calculate_distance_between(proj->rb.pos_ws, unit->rb.pos_ws);
+				float radius_sum = (float)proj->w + (float)unit->w;
+				if (distance_between <= radius_sum) {
+					proj->destroyed = true;
+					unit->destroyed = true;
+				}
 				// Calculate the length from the arrow and the target
 			}
 		}

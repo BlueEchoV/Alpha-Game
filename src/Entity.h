@@ -78,6 +78,8 @@ void delete_handle(Storage<T>& storage, Handle handle) {
 	}
 }
 
+// NOTE: I need to make sure and check if it returns null. If it does,
+// DON'T USE IT.
 template <typename T>
 T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 	uint32_t index = handle.index;
@@ -89,7 +91,7 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 		return &storage.storage[index];
 	}
 	log("Entity does not exist from handle");
-	assert(false);
+	// assert(false);
 	return nullptr;
 }
 
@@ -142,7 +144,7 @@ struct Unit {
 	int damage;
 	Player* target;
 
-	bool is_destroyed = false;
+	bool destroyed = false;
 
 	Handle handle;
 };
@@ -162,6 +164,8 @@ struct Projectile {
 	float angle;
 
 	Image* image;
+
+	bool destroyed = false;
 
 	Handle handle;
 };
