@@ -51,6 +51,17 @@ void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to
 	mp_render_fill_rect(&rect);
 }
 
+void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb) {
+	for (int i = 0; i < rb.num_colliders; i++) {
+		Collider* c = &rb.colliders[i];
+		V2 collider_ws_pos = rb.pos_ws + c->pos_ls;
+		collider_ws_pos = convert_ws_to_cs(collider_ws_pos, game_data.camera.pos_ws);
+		debug_draw_coor(
+			game_data, rb.pos_ws, false, collider_ws_pos, false, CT_Dark_Yellow, true, "CS: "
+		);
+	}
+}
+
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
 	MP_Renderer* renderer = Globals::renderer;
 
@@ -271,7 +282,6 @@ void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture
 		debug_draw_coor(game_data, game_data.player.rb.pos_ws, false, 
 			{(float)Globals::resolution_x / 2, (float)Globals::resolution_y / 2}, false,
 			CT_Green, true, "Player WS Pos: ");
-
 	}
 
 	if (Globals::debug_show_stats) {
@@ -380,6 +390,7 @@ void render(Game_Data& game_data, float delta_time) {
 	player_draw_rect.y = (int)player_pos_cs.y; 
 	mp_render_copy(game_data.player.image->texture, NULL, &player_draw_rect);
 	draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
+	debug_draw_collider_coodinates(game_data, game_data.player.rb);
 
 	Font* font = get_font(game_data.selected_font);
 	draw_debug_info(game_data, *font, game_data.player.image->texture, delta_time);

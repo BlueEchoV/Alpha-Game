@@ -22,6 +22,7 @@ void update_camera(Camera& camera, Player& player);
 
 void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
 	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string custom_text);
+void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb);
 void draw_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);

@@ -16,7 +16,7 @@ V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
 	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
-void draw_circle(Color_Type c, V2 center_pos_ws, int radius, float total_lines) {
+void draw_circle_ws(Color_Type c, V2 center_pos_ws, int radius, float total_lines) {
 	V2 pos_cs = center_pos_ws;
 
 	mp_set_render_draw_color(c);
@@ -37,10 +37,10 @@ void draw_circle(Color_Type c, V2 center_pos_ws, int radius, float total_lines) 
 		float x2 = force_x * radius;
 		float y2 = force_y * radius;
 
-		x1 += pos_cs.x + radius / 2;
-		y1 += pos_cs.y + radius / 2;
-		x2 += pos_cs.x + radius / 2;
-		y2 += pos_cs.y + radius / 2;
+		x1 += pos_cs.x;
+		y1 += pos_cs.y;
+		x2 += pos_cs.x;
+		y2 += pos_cs.y;
 
 		mp_render_draw_line((int)x1, (int)y1, (int)x2, (int)y2);
 	}
@@ -49,7 +49,7 @@ void draw_circle(Color_Type c, V2 center_pos_ws, int radius, float total_lines) 
 void draw_circle_cs(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
 	V2 pos_cs = convert_ws_to_cs(center_pos_ws, camera_pos);
 
-	draw_circle(c, pos_cs, radius, total_lines);
+	draw_circle_ws(c, pos_cs, radius, total_lines);
 }
 
 void add_collider(Rigid_Body* rb, V2 pos_ls, float radius) {
