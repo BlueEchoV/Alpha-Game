@@ -64,13 +64,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_x_delta = -1.0f;
 		}
 
-		if (key_pressed(VK_SPACE)) {
+		if (key_pressed_and_held(VK_SPACE)) {
 			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
 			spawn_projectile(game_data, game_data.player.rb.pos_ws, mouse_ws_pos);
 			Globals::debug_total_arrows++;
 		}
-		if (key_pressed(KEY_Q)) {
+		if (key_pressed_and_held(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
 			mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
 			spawn_unit(

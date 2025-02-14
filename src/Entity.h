@@ -198,7 +198,8 @@ V2 convert_cs_to_ws(int entity_x, int entity_y, int camera_x, int camera_y);
 V2 convert_ws_to_cs(V2 entity_pos, V2 camera_pos);
 V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y);
 
-void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
+void draw_circle(Color_Type c, V2 center_pos_ws, int radius, float total_lines);
+void draw_circle_cs(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
 
 void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
 void draw_colliders(Rigid_Body* rb, V2 camera_pos);

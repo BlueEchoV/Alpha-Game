@@ -16,8 +16,8 @@ V2 convert_ws_to_cs(int entity_x, int entity_y, int camera_x, int camera_y) {
 	return convert_ws_to_cs({(float)entity_x, (float)entity_y }, {(float)camera_x, (float)camera_y });
 }
 
-void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
-	V2 pos_cs = convert_ws_to_cs(center_pos_ws, camera_pos);
+void draw_circle(Color_Type c, V2 center_pos_ws, int radius, float total_lines) {
+	V2 pos_cs = center_pos_ws;
 
 	mp_set_render_draw_color(c);
 
@@ -46,6 +46,12 @@ void draw_circle(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, floa
 	}
 }
 
+void draw_circle_cs(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines) {
+	V2 pos_cs = convert_ws_to_cs(center_pos_ws, camera_pos);
+
+	draw_circle(c, pos_cs, radius, total_lines);
+}
+
 void add_collider(Rigid_Body* rb, V2 pos_ls, float radius) {
 	if (rb->num_colliders < Globals::MAX_COLLIDERS) {
 		Collider collider = {};
@@ -66,7 +72,7 @@ void draw_colliders(Rigid_Body* rb, V2 camera_pos) {
 		}
 
 		V2 collider_ws_pos = rb->pos_ws + c->pos_ls;
-		draw_circle(CT_Green, collider_ws_pos, camera_pos, (int)c->radius, 20);
+		draw_circle_cs(CT_Green, collider_ws_pos, camera_pos, (int)c->radius, 20);
 	}
 }
 
@@ -84,11 +90,15 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 
 	result.image = image;
 
-	result.rb = create_rigid_body(spawn_pos_ws, player_speed);
-	add_collider(&result.rb, { 0, 0 }, (float)Globals::player_width);
-
 	result.w = Globals::player_width;
 	result.h = Globals::player_height;
+
+	result.rb = create_rigid_body(
+		{ spawn_pos_ws.x, spawn_pos_ws.y}, 
+		player_speed
+	);
+
+	add_collider(&result.rb, { 0, 0 }, (float)result.w);
 
 	return result;
 }
@@ -175,9 +185,11 @@ void update_projectile(Projectile& projectile, float delta_time) {
 
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile) {
 	// Draw everything around the camera (converting to camera space)
-	V2 entity_pos_cs = convert_ws_to_cs(projectile.rb.pos_ws, { (float)camera_pos_x, (float)camera_pos_y });
+	V2 entity_pos_cs = convert_ws_to_cs(projectile.rb.pos_ws, { (float)camera_pos_x, 
+		(float)camera_pos_y });
 	// Center the image on the position of the entity
-	MP_Rect dst = { (int)entity_pos_cs.x - projectile.w / 2, (int)entity_pos_cs.y - projectile.h / 2, projectile.w, projectile.h };
+	MP_Rect dst = { (int)entity_pos_cs.x - projectile.w / 2, 
+		(int)entity_pos_cs.y - projectile.h / 2, projectile.w, projectile.h };
 
 	mp_render_copy_ex(projectile.image->texture, NULL, &dst, projectile.angle, NULL, SDL_FLIP_NONE);
 }
