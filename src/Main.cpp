@@ -125,7 +125,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// Update
 		for (Handle& projectile_handle : game_data.projectile_handles) {
 			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
-			update_projectile(*p, delta_time);
+			if (p != NULL) {
+				update_projectile(*p, delta_time);
+			}
 		}
 		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
