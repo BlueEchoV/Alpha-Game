@@ -397,6 +397,10 @@ void render(Game_Data& game_data, float delta_time) {
 
 	for (Handle projectile: game_data.projectile_handles) {
 		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
+		if (p == NULL) {
+			log("Error: handle returned null");
+			continue;
+		}
 		draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
 		if (Globals::debug_show_coordinates) {
 			debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true, 
@@ -405,9 +409,13 @@ void render(Game_Data& game_data, float delta_time) {
 	}
 
 	for (Handle zombie_handle: game_data.enemy_unit_handles) {
-		Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
-		draw_unit(*unit, game_data.camera.pos_ws);
-		draw_colliders(&unit->rb, game_data.camera.pos_ws);
+		Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
+		if (u == NULL) {
+			log("Error: handle returned null");
+			continue;
+		}
+		draw_unit(*u, game_data.camera.pos_ws);
+		draw_colliders(&u->rb, game_data.camera.pos_ws);
 	}
 
 	mp_render_present();
