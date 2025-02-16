@@ -204,7 +204,9 @@ void draw_circle_cs(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, f
 void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
 void draw_colliders(Rigid_Body* rb, V2 camera_pos);
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
+
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
+void draw_player(Player& p, V2 camera_ws_pos);
 
 void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles,
 	Player* target, V2 spawn_pos);

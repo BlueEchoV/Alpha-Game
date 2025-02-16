@@ -3,3 +3,10 @@ Alpha_Game.vcxproj.user
 x64
 /Debug/
 .vscode/
+# Ignore build artifacts
+*.obj
+*.pdb
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake

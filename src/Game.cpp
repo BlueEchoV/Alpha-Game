@@ -379,16 +379,7 @@ void render(Game_Data& game_data, float delta_time) {
 
 	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
 
-	// Convert the player's position to camera space
-	MP_Rect player_draw_rect = {
-		(int)game_data.player.rb.pos_ws.x - game_data.player.w / 2,
-		(int)game_data.player.rb.pos_ws.y - game_data.player.h / 2,
-		game_data.player.w, game_data.player.h};
-	// This is the camera space position of the player. Not the world space position.
-	V2 player_pos_cs = convert_ws_to_cs({ (float)player_draw_rect.x, (float)player_draw_rect.y }, game_data.camera.pos_ws);
-	player_draw_rect.x = (int)player_pos_cs.x; 
-	player_draw_rect.y = (int)player_pos_cs.y; 
-	mp_render_copy(game_data.player.image->texture, NULL, &player_draw_rect);
+	draw_player(game_data.player, game_data.camera.pos_ws);
 	draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 	debug_draw_collider_coodinates(game_data, game_data.player.rb);
 

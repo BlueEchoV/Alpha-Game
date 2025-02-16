@@ -103,6 +103,19 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	return result;
 }
 
+void draw_player(Player& p, V2 camera_ws_pos) {
+	// Convert the player's position to camera space
+	MP_Rect p_draw_rect = {
+		(int)p.rb.pos_ws.x - p.w / 2,
+		(int)p.rb.pos_ws.y - p.h / 2,
+		p.w, p.h};
+	// This is the camera space position of the player. Not the world space position.
+	V2 p_pos_cs = convert_ws_to_cs({ (float)p_draw_rect.x, (float)p_draw_rect.y }, camera_ws_pos);
+	p_draw_rect.x = (int)p_pos_cs.x; 
+	p_draw_rect.y = (int)p_pos_cs.y; 
+	mp_render_copy(p.image->texture, NULL, &p_draw_rect);
+}
+
 Unit_Data unit_data[UT_Total_Unit_Types] = {
 	// Image_Type			  w,   h,   health, damage, speed
 	{IT_Enemy_Clothed_Zombie, 150, 150, 100,    10,     10}

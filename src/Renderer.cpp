@@ -14,13 +14,13 @@ GLuint create_shader(const char* file_path, GLenum gl_shader_type) {
 	if (file == NULL) {
 		log("Error: Failed to open shader file");
 		return 0;
-	}
-	
+	} 	
+
 	fseek(file, 0, SEEK_END);
 	UINT32 length = ftell(file);
 	rewind(file);
 
-	// NOTE: Allocate a empty buffer
+	// TODO: Allocate a empty buffer
 	std::string shader_source_buffer(length, ' ');
 
 	// NOTE: Buffer to the pointer to the first character
