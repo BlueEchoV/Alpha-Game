@@ -99,9 +99,9 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	);
 
 	float collider_radius = 32;
-	add_collider(&result.rb, { 0, collider_radius }, collider_radius);
-	add_collider(&result.rb, { 0, 0 }, collider_radius);
-	add_collider(&result.rb, { 0, -collider_radius }, collider_radius);
+	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
+	add_collider(&result.rb, { 0,   	  						 0 }, collider_radius);
+	add_collider(&result.rb, { 0, -result.image->sprite_radius / 2 }, collider_radius);
 
 	return result;
 }
@@ -128,14 +128,17 @@ Unit_Data* get_unit_data(Unit_Type unit_type) {
 	return &unit_data[(int)unit_type];
 }
 
-void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles, 
-	Player* target, V2 spawn_pos) {
+void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
 	Unit result = {};
 
 	Unit_Data* data = get_unit_data(unit_type);
 	result.image = get_image(data->image_type);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
-	add_collider(&result.rb, { 0, 0 }, 100);
+
+	float collider_radius = result.image->sprite_radius;
+	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
+	add_collider(&result.rb, { 0,   	  						 0 }, collider_radius);
+	add_collider(&result.rb, { 0, -result.image->sprite_radius / 2 }, collider_radius);
 
 	result.w = data->w;
 	result.h = data->h;

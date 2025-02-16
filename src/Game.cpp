@@ -5,6 +5,7 @@
 
 // Camera's position is relative to the player
 void update_camera(Camera& camera, Player& player) {
+	// The camera is offset from the player
 	camera.pos_ws.x = (player.rb.pos_ws.x - (Globals::resolution_x / 2.0f));
 	camera.pos_ws.y = (player.rb.pos_ws.y - (Globals::resolution_y / 2.0f));
 
@@ -55,10 +56,8 @@ void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb) {
 	for (int i = 0; i < rb.num_colliders; i++) {
 		Collider* c = &rb.colliders[i];
 		V2 collider_ws_pos = rb.pos_ws + c->pos_ls;
-		collider_ws_pos = convert_ws_to_cs(collider_ws_pos, game_data.camera.pos_ws);
-		debug_draw_coor(
-			game_data, rb.pos_ws, false, collider_ws_pos, false, CT_Dark_Yellow, true, "CS: "
-		);
+		V2 collider_cs_pos = convert_ws_to_cs(collider_ws_pos, game_data.camera.pos_ws);
+		debug_draw_coor( game_data, c->pos_ls, false, collider_cs_pos, false, CT_Dark_Yellow, true, "LS: " );
 	}
 }
 
@@ -382,7 +381,6 @@ void render(Game_Data& game_data, float delta_time) {
 	draw_player(game_data.player, game_data.camera.pos_ws);
 	draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 	debug_draw_collider_coodinates(game_data, game_data.player.rb);
-	draw_circle_cs(CT_Red, game_data.player.rb.pos_ws, game_data.camera.pos_ws, (int)game_data.player.image->sprite_radius, 20.0);
 
 	Font* font = get_font(game_data.selected_font);
 	draw_debug_info(game_data, *font, game_data.player.image->texture, delta_time);
