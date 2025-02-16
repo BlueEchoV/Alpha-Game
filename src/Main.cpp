@@ -119,7 +119,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
 		}
 		if (key_pressed(VK_F3)) {
-			Globals::debug_show_stats= !Globals::debug_show_stats;
+			Globals::debug_show_stats = !Globals::debug_show_stats;
 		}
 
 		// Update

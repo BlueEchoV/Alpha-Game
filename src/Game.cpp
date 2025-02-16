@@ -382,6 +382,7 @@ void render(Game_Data& game_data, float delta_time) {
 	draw_player(game_data.player, game_data.camera.pos_ws);
 	draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 	debug_draw_collider_coodinates(game_data, game_data.player.rb);
+	draw_circle_cs(CT_Red, game_data.player.rb.pos_ws, game_data.camera.pos_ws, (int)game_data.player.image->sprite_radius, 20.0);
 
 	Font* font = get_font(game_data.selected_font);
 	draw_debug_info(game_data, *font, game_data.player.image->texture, delta_time);

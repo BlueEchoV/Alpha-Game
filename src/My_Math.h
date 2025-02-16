@@ -1,7 +1,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <math.h>
-
+#include <cmath>
 
 struct V2 {
 	float x, y;

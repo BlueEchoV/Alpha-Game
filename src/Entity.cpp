@@ -98,7 +98,10 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 		player_speed
 	);
 
-	add_collider(&result.rb, { 0, 0 }, (float)result.w);
+	float collider_radius = 32;
+	add_collider(&result.rb, { 0, collider_radius }, collider_radius);
+	add_collider(&result.rb, { 0, 0 }, collider_radius);
+	add_collider(&result.rb, { 0, -collider_radius }, collider_radius);
 
 	return result;
 }

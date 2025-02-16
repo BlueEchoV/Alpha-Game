@@ -5,6 +5,11 @@
 struct Image {
 	int w;
 	int h;
+
+	// This is the distance from the center of the image to 
+	// the farthest non transparent pixel in the sprite.
+	float sprite_radius;
+
 	MP_Texture* texture;
 };
 

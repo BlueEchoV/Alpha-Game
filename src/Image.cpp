@@ -3,13 +3,28 @@
 Image load_image(const char* file_path) {
 	Image result = {};
 
-	// Might be necessary for opengl, testing soon
+	// Might be necessary for open gl, testing soon
 	stbi_set_flip_vertically_on_load(true); 
 
 	int width, height, channels;
 	unsigned char* data = stbi_load(file_path, &width, &height, &channels, 4);
 	if (data == NULL) {
 		log("Error: stbi_load is null: %s", file_path);
+	}
+
+	// Get the radius from the center of the image 
+	// to the farthest non transparent pixel in the image
+	V2 center = { (float)(width / 2), (float)(height / 2)};
+	for (int x = 0; x < width; x++) {
+		for (int y = 0; y < height; y++) {
+			int index = (x + (y * width)) * channels;
+			if (data[index + 3] > 0) {
+				V2 point = { (float)x, (float)y };
+				V2 direction_vector = center - point;
+				result.sprite_radius = hypotenuse(direction_vector.x, direction_vector.y);
+				result.sprite_radius = ceil(result.sprite_radius);
+			}
+		}
 	}
 
 	DEFER{
