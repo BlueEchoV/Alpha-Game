@@ -588,6 +588,7 @@ void mp_render_copy(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect*
 	renderer->packets.push_back(result);
 }
 
+// Takes angle in degrees
 int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
 					  const float angle, const MP_Point* center, const MP_RendererFlip flip) {
 	MP_Renderer* renderer = Globals::renderer;
@@ -629,9 +630,9 @@ int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rec
 	V2 bottom_right = { (float)dst.x + (float)dst.w, (float)dst.y		         };
 
 	if (angle != 0) {
-		bottom_left = rotate_point_based_off_angle(angle,  (float)c.x, (float)c.y, bottom_left.x, bottom_left.y);
-		top_left = rotate_point_based_off_angle(angle,     (float)c.x, (float)c.y, top_left.x, top_left.y);
-		top_right = rotate_point_based_off_angle(angle,    (float)c.x, (float)c.y, top_right.x, top_right.y);
+		bottom_left =  rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, bottom_left.x, bottom_left.y  );
+		top_left =	   rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, top_left.x, top_left.y	     );
+		top_right =	   rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, top_right.x, top_right.y      );
 		bottom_right = rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, bottom_right.x, bottom_right.y);
 	}
 

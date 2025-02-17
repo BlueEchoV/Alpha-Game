@@ -108,6 +108,9 @@ struct Collider {
 struct Rigid_Body {
 	V2 pos_ws;
 	V2 vel;
+
+	float angle;
+
 	int speed;
 
 	int num_colliders;

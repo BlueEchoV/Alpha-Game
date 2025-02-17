@@ -81,6 +81,7 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 
 	result.pos_ws = pos_ws;
 	result.speed = speed;
+	result.angle = 0.0f;
 
 	return result;
 }
@@ -116,7 +117,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	V2 p_pos_cs = convert_ws_to_cs({ (float)p_draw_rect.x, (float)p_draw_rect.y }, camera_ws_pos);
 	p_draw_rect.x = (int)p_pos_cs.x; 
 	p_draw_rect.y = (int)p_pos_cs.y; 
-	mp_render_copy(p.image->texture, NULL, &p_draw_rect);
+	mp_render_copy_ex(p.image->texture, NULL, &p_draw_rect, p.rb.angle, NULL, SDL_FLIP_NONE);
 }
 
 Unit_Data unit_data[UT_Total_Unit_Types] = {
@@ -171,7 +172,7 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
 
-	mp_render_copy_ex(unit.image->texture, NULL, &dst, NULL, NULL, SDL_FLIP_NONE);
+	mp_render_copy_ex(unit.image->texture, NULL, &dst, unit.rb.angle, NULL, SDL_FLIP_NONE);
 }
 
 Projectile_Data projectile_data = {
