@@ -19,7 +19,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 100;
-	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed);
+	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed, 1);
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
@@ -65,11 +65,22 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (key_pressed_and_held(VK_SPACE)) {
-			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
-			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-			spawn_projectile(game_data, game_data.player.rb.pos_ws, mouse_ws_pos);
-			Globals::debug_total_arrows++;
+			if (game_data.player.can_fire) {
+				V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+				V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
+				spawn_projectile(game_data, game_data.player.rb.pos_ws, mouse_ws_pos);
+				Globals::debug_total_arrows++;
+			}
 		}
+
+		if (game_data.player.fire_cooldown <= 0) {
+			game_data.player.can_fire = true;
+			game_data.player.fire_cooldown = (float)game_data.player.fire_rate;
+		} else {
+			game_data.player.can_fire = false;
+			game_data.player.fire_cooldown -= delta_time;
+		}
+
 		if (key_pressed_and_held(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
 			mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);

@@ -86,7 +86,7 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	return result;
 }
 
-Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
+Player create_player(Image* image, V2 spawn_pos_ws, int player_speed, int fire_rate_per_sec) {
 	Player result = {};
 
 	result.image = image;
@@ -98,6 +98,8 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 		{ spawn_pos_ws.x, spawn_pos_ws.y}, 
 		player_speed
 	);
+
+	result.fire_rate = fire_rate_per_sec;
 
 	float collider_radius = 32;
 	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
