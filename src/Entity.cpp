@@ -178,7 +178,7 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 }
 
 Projectile_Data projectile_data = {
-	"Arrow", IT_Arrow_1, 32, 32, 500
+	"Arrow", IT_Arrow_1, 32, 32, 100 
 };
 
 void spawn_projectile(Game_Data& game_data, V2 origin_ws, V2 target_ws) {
@@ -195,6 +195,8 @@ void spawn_projectile(Game_Data& game_data, V2 origin_ws, V2 target_ws) {
 	result.h = data.h;
 	result.angle = calculate_facing_direction(result.rb.vel);
 	result.handle = create_handle(game_data.projectile_storage);
+
+	add_collider(&result.rb, { result.image->sprite_radius * 0.8f }, result.image->sprite_radius / 4);
 
 	game_data.projectile_handles.push_back(result.handle);
 	game_data.projectile_storage.storage[result.handle.index] = result;

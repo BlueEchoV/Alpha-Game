@@ -406,6 +406,7 @@ void render(Game_Data& game_data, float delta_time) {
 			debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true, 
 				CT_Green, true, "WS Pos: ");
 		}
+		draw_colliders(&p->rb, game_data.camera.pos_ws);
 	}
 
 	for (Handle zombie_handle: game_data.enemy_unit_handles) {
