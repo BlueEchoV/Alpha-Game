@@ -7,3 +7,4 @@
 // https://learn.microsoft.com/en-us/windows/win32/coreaudio/rendering-a-stream
 
 
+int init_x_audio_2();

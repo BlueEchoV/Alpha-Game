@@ -1,6 +1,7 @@
 #include "GL_Functions.h"
 #include "Game.h"
 #include "Image.h"
+#include "Audio.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -23,6 +24,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
+
+	init_x_audio_2();
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;

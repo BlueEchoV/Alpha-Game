@@ -26,6 +26,7 @@ constexpr uint16_t AUDIO_BUFFER_SIZE_IN_SAMPLES = SAMPLES_PER_CYCLE * AUDIO_BUFF
 // 4,000 bytes per buffer.
 constexpr uint32_t AUDIO_BUFFER_SIZE_IN_BYTES = uint32_t(AUDIO_BUFFER_SIZE_IN_SAMPLES * (BITS_PER_SAMPLE / 8));
 
+// The actual audio buffer
 std::array<byte, AUDIO_BUFFER_SIZE_IN_BYTES> audio_buffer = {};
 
 int init_x_audio_2() {
@@ -35,13 +36,15 @@ int init_x_audio_2() {
 
     IXAudio2* m_xAudio2 = nullptr; 
     IXAudio2MasteringVoice* m_masteringVoice = nullptr;
+    IXAudio2SourceVoice* m_pXAudio2SourceVoice = nullptr;
 	if (SUCCEEDED(hr)) {
         // #2 - Create the XAudio2 engine object
         hr = ::XAudio2Create(&m_xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
         if (FAILED(hr)) {
             // Clean up COM
             ::CoUninitialize(); 
-            return -1;        }
+            return -1;        
+        }
 
         // #3 - Create a mastering voice (connect to the default audio device)
         hr = m_xAudio2->CreateMasteringVoice(
@@ -53,9 +56,7 @@ int init_x_audio_2() {
             nullptr                         // No effect chain
         );
         if (FAILED(hr)) {
-            // Clean up XAudio2
             if (m_xAudio2) m_xAudio2->Release(); 
-            // Clean up COM
             ::CoUninitialize(); 
             return -1; 
         }
@@ -65,9 +66,57 @@ int init_x_audio_2() {
         wave_format_ex.wFormatTag = WAVE_FORMAT_PCM;
         wave_format_ex.nChannels = 1; // 1 channel
         wave_format_ex.nSamplesPerSec = SAMPLES_PER_SEC;
+        wave_format_ex.nBlockAlign = wave_format_ex.nChannels * BITS_PER_SAMPLE / 8;
+        wave_format_ex.nAvgBytesPerSec = wave_format_ex.nSamplesPerSec * wave_format_ex.nBlockAlign;
+        wave_format_ex.wBitsPerSample = BITS_PER_SAMPLE;
+        wave_format_ex.cbSize = 0;
 
+        // CreateSourceVoice allows you to play multiple independent sounds simultaneously 
+        // (e.g., background music, sound effects, or tones) by creating multiple source voices, 
+        // each with its own configuration.
+        hr = m_xAudio2->CreateSourceVoice(&m_pXAudio2SourceVoice, &wave_format_ex);
+        if (FAILED(hr)) {
+            if (m_xAudio2) m_xAudio2->Release(); 
+            ::CoUninitialize(); 
+            return -1; 
+        }
 
-        return 0; // Success!
+		double phase = {};
+        uint32_t buffer_index = {};
+        while (buffer_index < AUDIO_BUFFER_SIZE_IN_BYTES)
+        {
+            phase += (2 * PI) / SAMPLES_PER_CYCLE;
+            int16_t sample = (int16_t)(sin(phase) * INT16_MAX * VOLUME);
+            // Values are little-endian.
+            audio_buffer[buffer_index++] = (byte)sample; 
+            audio_buffer[buffer_index++] = (byte)(sample >> 8);
+        }
+
+		XAUDIO2_BUFFER x_audio_2_buffer = {};
+        x_audio_2_buffer.Flags = XAUDIO2_END_OF_STREAM;
+        x_audio_2_buffer.AudioBytes = AUDIO_BUFFER_SIZE_IN_BYTES;
+        x_audio_2_buffer.pAudioData = audio_buffer.data();
+        x_audio_2_buffer.PlayBegin = 0;
+        x_audio_2_buffer.PlayLength = 0;
+        x_audio_2_buffer.LoopBegin = 0;
+        x_audio_2_buffer.LoopLength = 0;
+        x_audio_2_buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+
+        hr = m_pXAudio2SourceVoice->SubmitSourceBuffer(&x_audio_2_buffer);
+        if (FAILED(hr)) {
+            if (m_xAudio2) m_xAudio2->Release(); 
+            ::CoUninitialize(); 
+            return -1; 
+        }
+
+        hr = m_pXAudio2SourceVoice->Start(0);
+        if (FAILED(hr)) {
+            if (m_xAudio2) m_xAudio2->Release(); 
+            ::CoUninitialize(); 
+            return -1; 
+        }
+
+        return 0; 
     }
     return -1;
 }
