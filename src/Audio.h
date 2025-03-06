@@ -17,13 +17,11 @@ struct Sound {
     uint32_t data_offset; // Offset of "data" chunk data in fileData
     uint32_t data_size;   // Size of "data" chunk data
     WAVEFORMATEX wave_format; // Parsed format for XAudio2
-    bool valid; // Whether the sound was loaded and parsed successfully
 };
 
 enum Chunk_Type {
     CT_Format,
     CT_Data
 };
-
 
 int init_xAudio2();

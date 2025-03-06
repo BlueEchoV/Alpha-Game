@@ -30,26 +30,26 @@ constexpr uint32_t AUDIO_BUFFER_SIZE_IN_BYTES = uint32_t(AUDIO_BUFFER_SIZE_IN_SA
 // The actual audio buffer
 std::array<byte, AUDIO_BUFFER_SIZE_IN_BYTES> audio_buffer = {};
 
+// Pointer to the main XAudio2 engine instance. This represents the core audio system 
+// object responsible for managing audio processing, creating voices, and handling audio 
+// playback on the system. It’s initialized to nullptr to indicate it hasn’t been created yet.
+IXAudio2* m_xAudio2 = nullptr; 
+// Pointer to the mastering voice, which is the final output voice in the XAudio2 system. 
+// It handles the audio output to the system’s audio device (e.g., speakers or headphones) 
+// and applies global audio effects or volume control before the sound is played. It’s 
+// initialized to nullptr until created.
+IXAudio2MasteringVoice* m_masteringVoice = nullptr; 
+// Pointer to a source voice, which is used to play a specific audio buffer or stream 
+// (e.g., a sound effect or music track). It manages the playback, pitch, volume, and 
+// other properties of an individual audio source, feeding data into the mastering 
+// voice for output. It’s initialized to nullptr until set up for a specific sound.
+// This handles the threading in the XAudio2 api
+IXAudio2SourceVoice* m_pXAudio2SourceVoice = nullptr; 
+
 int init_xAudio2() {
     // #1 - Initialize COM
     // HRRESULT is for error checking
 	HRESULT hr = ::CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-
-    // Pointer to the main XAudio2 engine instance. This represents the core audio system 
-    // object responsible for managing audio processing, creating voices, and handling audio 
-    // playback on the system. It’s initialized to nullptr to indicate it hasn’t been created yet.
-    IXAudio2* m_xAudio2 = nullptr; 
-    // Pointer to the mastering voice, which is the final output voice in the XAudio2 system. 
-    // It handles the audio output to the system’s audio device (e.g., speakers or headphones) 
-    // and applies global audio effects or volume control before the sound is played. It’s 
-    // initialized to nullptr until created.
-    IXAudio2MasteringVoice* m_masteringVoice = nullptr; 
-    // Pointer to a source voice, which is used to play a specific audio buffer or stream 
-    // (e.g., a sound effect or music track). It manages the playback, pitch, volume, and 
-    // other properties of an individual audio source, feeding data into the mastering 
-    // voice for output. It’s initialized to nullptr until set up for a specific sound.
-    // This handles the threading in the XAudio2 api
-    IXAudio2SourceVoice* m_pXAudio2SourceVoice = nullptr; 
 
 	if (SUCCEEDED(hr)) {
         // #2 - Create the XAudio2 engine object
@@ -141,16 +141,49 @@ void clean_up_audio() {
     ::CoUninitialize(); 
 }
 
+/*
 void read_chunck(Chunk_Type chunk_type, ) {
-    if (chunk_type == )
+    if (chunk_type == );
 
 }
+*/
 
-void load_wav_file(const char* file_name) {
-    // Read as raw bytes (8-bit value (0 - 255))
+bool load_wav_file(const char* file_name, Sound& sound) {
+    // Step 1: Open the file with fopen in binary mode
+    // NOTE: Read as raw bytes (8-bit value (0 - 255))
     FILE* file = fopen(file_name, "rb");
+    if (!file) {
+        return false;
+    }
 
+    // Step 2: Get the file size
+    fseek(file, 0, SEEK_END); // Move to the end of the file
+    uint32_t file_size_in_bytes = ftell(file); // Get position in bytes (size of file)
+    fseek(file, 0, SEEK_SET); // Move back to the start
+
+    // Step 3: Allocate buffer and read entire file into memory
+    sound.file_data.resize(file_size_in_bytes);
+    size_t bytes_read = fread(sound.file_data.data(), 1, file_size_in_bytes, file);
     fclose(file);
+
+    if (bytes_read != (size_t)file_size_in_bytes) {
+        return false;
+    }
+
+    // Step 4: Verify it's a WAVE file (check RIFF and WAVE identifiers)
+    // NOTE: These three checks are enough to verify if it's a WAV file
+    if (file_size_in_bytes < 12 || // At least 12 bytes (4 bytes for RIFF, 4 bytes for the file size, 4 bytes for the 'WAVE')
+        memcmp(sound.file_data.data(), "RIFF", 4) != 0 ||
+        memcmp(sound.file_data.data() + 8, "WAVE", 4) != 0) {
+        return false;
+    }
+
+    // Step 5: Scan the buffer to find "fmt" and "data" chunks
+    uint32_t offset = 12; // Start after the RIFF header
+    bool found_format = false;
+    bool found_data = false;
+
+    return true;
 }
 // play_sound
 // pause_sound
