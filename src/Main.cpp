@@ -25,7 +25,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	bool running = true;
 
-	init_x_audio_2();
+	init_xAudio2();
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;

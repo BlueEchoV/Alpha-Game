@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <xaudio2.h>
 #include <array>
+#include <stdio.h>
 
 // *****Constant Literals*****
 // 16 bits per sample.
@@ -29,14 +30,27 @@ constexpr uint32_t AUDIO_BUFFER_SIZE_IN_BYTES = uint32_t(AUDIO_BUFFER_SIZE_IN_SA
 // The actual audio buffer
 std::array<byte, AUDIO_BUFFER_SIZE_IN_BYTES> audio_buffer = {};
 
-int init_x_audio_2() {
+int init_xAudio2() {
     // #1 - Initialize COM
     // HRRESULT is for error checking
 	HRESULT hr = ::CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
+    // Pointer to the main XAudio2 engine instance. This represents the core audio system 
+    // object responsible for managing audio processing, creating voices, and handling audio 
+    // playback on the system. It’s initialized to nullptr to indicate it hasn’t been created yet.
     IXAudio2* m_xAudio2 = nullptr; 
-    IXAudio2MasteringVoice* m_masteringVoice = nullptr;
-    IXAudio2SourceVoice* m_pXAudio2SourceVoice = nullptr;
+    // Pointer to the mastering voice, which is the final output voice in the XAudio2 system. 
+    // It handles the audio output to the system’s audio device (e.g., speakers or headphones) 
+    // and applies global audio effects or volume control before the sound is played. It’s 
+    // initialized to nullptr until created.
+    IXAudio2MasteringVoice* m_masteringVoice = nullptr; 
+    // Pointer to a source voice, which is used to play a specific audio buffer or stream 
+    // (e.g., a sound effect or music track). It manages the playback, pitch, volume, and 
+    // other properties of an individual audio source, feeding data into the mastering 
+    // voice for output. It’s initialized to nullptr until set up for a specific sound.
+    // This handles the threading in the XAudio2 api
+    IXAudio2SourceVoice* m_pXAudio2SourceVoice = nullptr; 
+
 	if (SUCCEEDED(hr)) {
         // #2 - Create the XAudio2 engine object
         hr = ::XAudio2Create(&m_xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
@@ -66,7 +80,7 @@ int init_x_audio_2() {
         wave_format_ex.wFormatTag = WAVE_FORMAT_PCM;
         wave_format_ex.nChannels = 1; // 1 channel
         wave_format_ex.nSamplesPerSec = SAMPLES_PER_SEC;
-        wave_format_ex.nBlockAlign = wave_format_ex.nChannels * BITS_PER_SAMPLE / 8;
+        wave_format_ex.nBlockAlign = (wave_format_ex.nChannels * BITS_PER_SAMPLE) / 8;
         wave_format_ex.nAvgBytesPerSec = wave_format_ex.nSamplesPerSec * wave_format_ex.nBlockAlign;
         wave_format_ex.wBitsPerSample = BITS_PER_SAMPLE;
         wave_format_ex.cbSize = 0;
@@ -74,6 +88,7 @@ int init_x_audio_2() {
         // CreateSourceVoice allows you to play multiple independent sounds simultaneously 
         // (e.g., background music, sound effects, or tones) by creating multiple source voices, 
         // each with its own configuration.
+        // XAudio2 makes an internal copy of the buffer when you submit it.
         hr = m_xAudio2->CreateSourceVoice(&m_pXAudio2SourceVoice, &wave_format_ex);
         if (FAILED(hr)) {
             if (m_xAudio2) m_xAudio2->Release(); 
@@ -109,6 +124,7 @@ int init_x_audio_2() {
             return -1; 
         }
 
+        // This function returns immediately, but the audio continues playing independently.
         hr = m_pXAudio2SourceVoice->Start(0);
         if (FAILED(hr)) {
             if (m_xAudio2) m_xAudio2->Release(); 
@@ -125,27 +141,17 @@ void clean_up_audio() {
     ::CoUninitialize(); 
 }
 
-/* 
-void play_audio_stream() {
-	HRESULT error_codes;
-
-	// This creates an instance of the device enumerator, 
-	// which allows the program to find audio devices.
-	error_codes = CoCreateInstance(
-		CLSID_MMDeviceEnumerator, 
-		NULL,
-		CLSCTX_ALL, 
-		IID_IMMDeviceEnumerator,
-		(void**)&pEnumerator
-	);
-	// TODO: Error check here
+void read_chunck(Chunk_Type chunk_type, ) {
+    if (chunk_type == )
 
 }
 
-// void mp_play_audio() 
-// void mp_stop_audio() 
+void load_wav_file(const char* file_name) {
+    // Read as raw bytes (8-bit value (0 - 255))
+    FILE* file = fopen(file_name, "rb");
 
-void test() {
-	// HRESULT temp = CoCreateInstance();
+    fclose(file);
 }
-*/
+// play_sound
+// pause_sound
+
