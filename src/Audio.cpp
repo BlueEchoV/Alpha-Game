@@ -146,6 +146,7 @@ void read_chunck(Chunk_Type chunk_type, ) {
 }
 */
 
+// Load the wav file and grab all the data inside of it
 bool load_wav_file(const char* file_name, Sound& sound) {
     // Step 1: Open the file with fopen in binary mode
     // NOTE: Read as raw bytes (8-bit value (0 - 255))
@@ -172,25 +173,85 @@ bool load_wav_file(const char* file_name, Sound& sound) {
 
     // Step 4: Verify it's a WAVE file (check RIFF and WAVE identifiers)
     // NOTE: These three checks are enough to verify if it's a WAV file
-    if (file_size_in_bytes < 12) { // At least 12 bytes (4 bytes for RIFF, 4 bytes for the file size, 4 bytes for the 'WAVE')
+    if (file_size_in_bytes < 12 || // At least 12 bytes (4 bytes for RIFF, 4 bytes for the file size, 4 bytes for the 'WAVE')
+        memcmp(sound.file_data.data(), "RIFF", 4) != 0 ||
+        memcmp(sound.file_data.data() + 8, "WAVE", 4) != 0) {
+
 	    unsigned char* buffer = sound.file_data.data();
 	    REF(buffer);
 
-        // memcmp(sound.file_data.data(), "RIFF", 4) != 0 ||
-        // memcmp(sound.file_data.data() + 8, "WAVE", 4) != 0) {
         return false;
     }
 
     // Step 5: Scan the buffer to find "fmt" and "data" chunks
-    // uint32_t offset = 12; // Start after the RIFF header
-    // bool found_format = false;
-    // bool found_data = false;
+    uint32_t offset = 12; // Start after the RIFF header
+    bool found_format = false;
+    bool found_data = false;
 
-    /*
-    while (offset + 8 <= file_size_in_bytes) { // 8 is for the chunk ID and size
+	while (offset + 8 <= file_size_in_bytes) { // Ensure space for chunk ID (4) + size (4)
+        // Read chunk ID and size
+        char chunk_id[4];
+        memcpy(chunk_id, sound.file_data.data() + offset, 4);
+        uint32_t chunk_size;
+        memcpy(&chunk_size, sound.file_data.data() + offset + 4, 4);
 
+        if (memcmp(chunk_id, "fmt ", 4) == 0) {
+            // Handle format chunk
+            if (found_format) {
+                log("Error: Multiple fmt chunks found");
+                return false; // Only one "fmt " chunk allowed
+            }
+            found_format = true;
+            if (chunk_size != 16) { // PCM format chunk size is 16 bytes
+                log("Error: Invalid fmt chunk size");
+                return false;
+            }
+
+            // Parse and verify format (little-endian)
+            uint16_t format_tag;
+            memcpy(&format_tag, sound.file_data.data() + offset + 8, 2); // Offset 8: wFormatTag
+            uint16_t channels;
+            memcpy(&channels, sound.file_data.data() + offset + 10, 2);  // Offset 10: nChannels
+            uint32_t samples_per_sec;
+            memcpy(&samples_per_sec, sound.file_data.data() + offset + 12, 4); // Offset 12: nSamplesPerSec
+            uint32_t avg_bytes_per_sec;
+            memcpy(&avg_bytes_per_sec, sound.file_data.data() + offset + 16, 4); // Offset 16: nAvgBytesPerSec
+            uint16_t block_align;
+            memcpy(&block_align, sound.file_data.data() + offset + 20, 2); // Offset 20: nBlockAlign
+            uint16_t bits_per_sample;
+            memcpy(&bits_per_sample, sound.file_data.data() + offset + 22, 2); // Offset 22: wBitsPerSample
+
+            // Verify format matches init_xAudio2 expectations
+            if (format_tag != WAVE_FORMAT_PCM || // PCM = 1
+                channels != 1 ||                 // Mono
+                samples_per_sec != 44100 ||      // 44.1kHz
+                bits_per_sample != 16 ||         // 16-bit
+                block_align != 2 ||              // 1 channel * 16 bits / 8 = 2 bytes
+                avg_bytes_per_sec != 88200) {    // 44100 * 2 = 88200
+                log("Error: WAV format does not match expected PCM, mono, 16-bit, 44.1kHz");
+                return false;
+            }
+        }
+        else if (memcmp(chunk_id, "data", 4) == 0) {
+            // Handle data chunk
+            if (found_data) {
+                log("Error: Multiple data chunks found");
+                return false; // Only one "data" chunk allowed
+            }
+            found_data = true;
+            sound.data_offset = offset + 8; // Audio data starts after ID (4) + size (4)
+            sound.data_size = chunk_size;   // Size of audio data
+        }
+
+        // Move to the next chunk
+        offset += 8 + chunk_size;
     }
-    */
+
+    // Step 6: Ensure both chunks were found
+    if (!found_format || !found_data) {
+        log("Error: Missing fmt or data chunk");
+        return false;
+    }
 
     return true;
 }
