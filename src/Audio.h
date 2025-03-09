@@ -1,14 +1,9 @@
 #pragma once
+#include "Utility.h"
+
 #include <Audioclient.h>
 #include <vector>
 #include <unordered_map>
-
-extern std::unordered_map<std::string, Sound> sounds;
-
-// ***My own custom audio library***
-
-// Rendering a stream example:
-// https://learn.microsoft.com/en-us/windows/win32/coreaudio/rendering-a-stream
 
 struct Sound {
     std::vector<unsigned char> file_data; // Entire WAV file loaded into memory
@@ -18,6 +13,13 @@ struct Sound {
     uint32_t data_size;   // Size of "data" chunk data
     WAVEFORMATEX wave_format; // Parsed format for XAudio2
 };
+
+extern std::unordered_map<std::string, Sound> sounds;
+
+// ***My own custom audio library***
+
+// Rendering a stream example:
+// https://learn.microsoft.com/en-us/windows/win32/coreaudio/rendering-a-stream
 
 enum Chunk_Type {
     CT_Format,
