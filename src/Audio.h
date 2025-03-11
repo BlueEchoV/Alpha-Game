@@ -27,3 +27,4 @@ enum Chunk_Type {
 };
 
 int init_xAudio2();
+bool load_wav_file(const char* file_name, Sound& sound);

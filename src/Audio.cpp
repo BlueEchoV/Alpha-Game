@@ -174,8 +174,8 @@ bool load_wav_file(const char* file_name, Sound& sound) {
     // Step 4: Verify it's a WAVE file (check RIFF and WAVE identifiers)
     // NOTE: These three checks are enough to verify if it's a WAV file
     if (file_size_in_bytes < 12 || // At least 12 bytes (4 bytes for RIFF, 4 bytes for the file size, 4 bytes for the 'WAVE')
-        memcmp(sound.file_data.data(), "RIFF", 4) != 0 ||
-        memcmp(sound.file_data.data() + 8, "WAVE", 4) != 0) {
+        my_mem_compare(sound.file_data.data(), "RIFF", 4) != false ||
+        my_mem_compare(sound.file_data.data() + 8, "WAVE", 4) != false) {
 
 	    unsigned char* buffer = sound.file_data.data();
 	    REF(buffer);

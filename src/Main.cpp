@@ -27,6 +27,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	init_xAudio2();
 
+	Sound sound = {};
+	// load_wav_file();
+
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;
 	float delta_time = 0;
