@@ -25,7 +25,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	bool running = true;
 
-	init_xAudio2();
+	// init_xAudio2();
 
 	Sound sound = {};
 	// load_wav_file();

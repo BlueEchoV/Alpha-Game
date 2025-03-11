@@ -47,14 +47,14 @@ V2 operator-(const V2 vec1, const V2 vec2) {
 }
 
 // Rotates a point based off an angle
-V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float ws_x, float ws_y) {
+V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float center_y, float x, float y) {
 	V2 result = {};
 
 	float angle_in_radians = angle_in_degrees * ((float)M_PI / 180.0f);
 
 	// Translate the world space x and y so that the center is 0,0
-	double translated_old_x = ws_x - center_x;
-	double translated_old_y = ws_y - center_y;
+	double translated_old_x = x - center_x;
+	double translated_old_y = y - center_y;
 
 	// Rotation matrix
 	float translated_new_x = (float)(translated_old_x * cos(angle_in_radians) - translated_old_y * sin(angle_in_radians));

@@ -124,7 +124,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 
 Unit_Data unit_data[UT_Total_Unit_Types] = {
 	// Image_Type			  w,   h,   health, damage, speed
-	{IT_Enemy_Clothed_Zombie, 150, 150, 100,    10,     10}
+	{IT_Enemy_Clothed_Zombie, 75, 75, 100,    10,     10}
 };
 
 Unit_Data* get_unit_data(Unit_Type unit_type) {
@@ -196,7 +196,9 @@ void spawn_projectile(Game_Data& game_data, V2 origin_ws, V2 target_ws) {
 	result.angle = calculate_facing_direction(result.rb.vel);
 	result.handle = create_handle(game_data.projectile_storage);
 
-	add_collider(&result.rb, { result.image->sprite_radius * 0.8f }, result.image->sprite_radius / 4);
+	V2 pos_ls = rotate_point_based_off_angle(result.angle, 0, 0, result.image->sprite_radius * 0.8f, 0);
+
+	add_collider(&result.rb, pos_ls, result.image->sprite_radius / 4);
 
 	game_data.projectile_handles.push_back(result.handle);
 	game_data.projectile_storage.storage[result.handle.index] = result;
