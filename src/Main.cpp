@@ -28,7 +28,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	// init_xAudio2();
 
 	Sound sound = {};
-	// load_wav_file();
+	if (!load_wav_file("C:\\Projects\\Alpha_Game\\assets\\audio\\arrow_woosh.wav", sound)) {
+		log("Error: Wav file didn't load properly.");
+	}
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;

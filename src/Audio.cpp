@@ -174,8 +174,8 @@ bool load_wav_file(const char* file_name, Sound& sound) {
     // Step 4: Verify it's a WAVE file (check RIFF and WAVE identifiers)
     // NOTE: These three checks are enough to verify if it's a WAV file
     if (file_size_in_bytes < 12 || // At least 12 bytes (4 bytes for RIFF, 4 bytes for the file size, 4 bytes for the 'WAVE')
-        my_mem_compare(sound.file_data.data(), "RIFF", 4) != false ||
-        my_mem_compare(sound.file_data.data() + 8, "WAVE", 4) != false) {
+        my_mem_compare(sound.file_data.data(), "RIFF", 4) == false ||
+        my_mem_compare(sound.file_data.data() + 8, "WAVE", 4) == false) {
 
 	    unsigned char* buffer = sound.file_data.data();
 	    REF(buffer);
@@ -221,6 +221,7 @@ bool load_wav_file(const char* file_name, Sound& sound) {
             uint16_t bits_per_sample;
             memcpy(&bits_per_sample, sound.file_data.data() + offset + 22, 2); // Offset 22: wBitsPerSample
 
+            /*
             // Verify format matches init_xAudio2 expectations
             if (format_tag != WAVE_FORMAT_PCM || // PCM = 1
                 channels != 1 ||                 // Mono
@@ -231,6 +232,7 @@ bool load_wav_file(const char* file_name, Sound& sound) {
                 log("Error: WAV format does not match expected PCM, mono, 16-bit, 44.1kHz");
                 return false;
             }
+            */
         }
         else if (memcmp(chunk_id, "data", 4) == 0) {
             // Handle data chunk
