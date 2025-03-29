@@ -138,10 +138,10 @@ void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>
 	result.image = get_image(data->image_type);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
-	float collider_radius = result.image->sprite_radius;
-	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
-	add_collider(&result.rb, { 0,   	  						 0 }, collider_radius);
-	add_collider(&result.rb, { 0, -result.image->sprite_radius / 2 }, collider_radius);
+	float collider_radius = (float)data->w / 4;
+	add_collider(&result.rb, { 0,  collider_radius / 2 }, collider_radius);
+	add_collider(&result.rb, { 0,					 0 }, collider_radius);
+	add_collider(&result.rb, { 0, -collider_radius / 2 }, collider_radius);
 
 	result.w = data->w;
 	result.h = data->h;

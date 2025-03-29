@@ -69,6 +69,16 @@ V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float ce
 
 float hypotenuse(float a, float b) {
 	float result = {};
+	// 1-2 cpu cycles
+	int x = 4;
+	int y = 2;
+	// add and sub take 1-2 cycles
+	x = y + x;
+	x = y - x;
+	x = y * x;
+	// sqrt requires 20-50 more cycles or more
+	double z = sqrt(y);
+	z++;
 
 	result = (float)sqrt(fabs((a * a) + (b * b)));
 
