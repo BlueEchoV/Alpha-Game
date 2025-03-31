@@ -19,7 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Audio.cpp" />
+    <ClCompile Include="src\Audio_DirectSound.cpp" />
+    <ClCompile Include="src\Audio_xAudio2.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Globals.cpp" />
@@ -32,7 +33,8 @@
     <ClCompile Include="src\Windows_Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Audio.h" />
+    <ClInclude Include="src\Audio_DirectSound.h" />
+    <ClInclude Include="src\Audio_xAudio2.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Game.h" />

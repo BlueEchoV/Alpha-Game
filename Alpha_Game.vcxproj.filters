@@ -37,7 +37,10 @@
     <ClCompile Include="src\My_Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio.cpp">
+    <ClCompile Include="src\Audio_xAudio2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio_DirectSound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,7 +75,10 @@
     <ClInclude Include="src\My_Math.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio.h">
+    <ClInclude Include="src\Audio_xAudio2.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Audio_DirectSound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
