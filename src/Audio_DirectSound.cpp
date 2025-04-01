@@ -67,11 +67,28 @@ void init_direct_sound(HWND* window, DWORD samples_per_second, DWORD buffer_size
                     // SetFormat tells it how the sound should come out (e.g., stereo, mono, or how clear it should be).
 					if (SUCCEEDED(primary_buffer->SetFormat(&wave_format)))
                     {
-                        // NOTE(casey): We have finally set the format of the primary buffer!
+                        // NOTE: We have finally set the format of the primary buffer!
+                         OutputDebugStringA("Primary buffer format was set.\n");
                     }
                 }
-                // NOTE: "Create" a secondary buffer     
             }
+
+            // The second buffer is added because the first buffer (primary) controls 
+            //      the main audio output, while the secondary buffer holds specific sounds you want to play, 
+            //      like music or sound effects. It’s like having a main speaker system (primary) and a separate 
+            //      playlist (secondary) you can control.
+            // NOTE: "Create" a secondary buffer
+			DSBUFFERDESC buffer_description = {};
+			buffer_description.dwSize = sizeof(buffer_description);      
+			buffer_description.dwBufferBytes = buffer_size;
+			buffer_description.lpwfxFormat = &wave_format;
+
+			IDirectSoundBuffer* secondary_buffer;
+			if(SUCCEEDED(direct_sound->CreateSoundBuffer(&buffer_description, &secondary_buffer, 0)))
+			{
+				// NOTE: All good, secondary buffer works as intended
+                OutputDebugStringA("Secondary buffer created Successfully.\n");
+			}
         }
     }
 }

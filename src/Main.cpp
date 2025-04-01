@@ -26,7 +26,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	bool running = true;
 
-	init_direct_sound(&Globals::renderer->open_gl.window_handle);
+    int samples_per_second = 48000;
+    int bytes_per_sample = sizeof(uint16_t) * 2;
+    int secondary_buffer_size = 2 * samples_per_second * bytes_per_sample;
+    
+	init_direct_sound(&Globals::renderer->open_gl.window_handle, samples_per_second, secondary_buffer_size);
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;
