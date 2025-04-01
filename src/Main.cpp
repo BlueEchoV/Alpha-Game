@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Image.h"
 #include "Audio_xAudio2.h"
+#include "Audio_DirectSound.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -25,12 +26,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	bool running = true;
 
-	// init_xAudio2();
-
-	Sound sound = {};
-	if (!load_wav_file("C:\\Projects\\Alpha_Game\\assets\\audio\\arrow_woosh.wav", sound)) {
-		log("Error: Wav file didn't load properly.");
-	}
+	init_direct_sound();
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;
