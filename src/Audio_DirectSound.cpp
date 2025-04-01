@@ -18,7 +18,7 @@
 //      Direct_Sound_Create, I mean this exact function setup.” It makes it easier to use later.
 typedef DIRECT_SOUND_CREATE(Direct_Sound_Create);
 
-void init_direct_sound() {
+void init_direct_sound(HWND* window, DWORD samples_per_second, DWORD buffer_size) {
     // "dsound.dll" is a library file (part of Windows) that helps programs work with sound, like playing audio or managing speakers.
     // LoadLibraryA is a function that grabs this file from the system and makes it available for the program to use.
     // HMODULE is just a way to store a reference to this loaded library, so the program can keep track of it.
@@ -38,11 +38,40 @@ void init_direct_sound() {
 
         IDirectSound* direct_sound;
         if(DirectSoundCreate && SUCCEEDED(DirectSoundCreate(0, &direct_sound, 0))) {
-            int i = 0;
-            i++;
+			WAVEFORMATEX wave_format= {};
+            wave_format.wFormatTag = WAVE_FORMAT_PCM;
+            wave_format.nChannels = 2;
+            wave_format.nSamplesPerSec = samples_per_second;
+            wave_format.wBitsPerSample = 16;
+            wave_format.nBlockAlign = (wave_format.nChannels * wave_format.wBitsPerSample) / 8; // 4 under current settings
+            wave_format.nAvgBytesPerSec = wave_format.nSamplesPerSec * wave_format.nBlockAlign;
+
 			// NOTE: Set cooperative level
-			// NOTE: "Create" a primary buffer
-			// NOTE: "Create" a secondary buffer     
+            if (SUCCEEDED(direct_sound->SetCooperativeLevel(*window, DSSCL_PRIORITY)))
+            {
+                // NOTE: "Create" a primary buffer
+
+                // This is like filling out a form that describes what kind of audio setup you want
+                DSBUFFERDESC buffer_description= {};
+                buffer_description.dwSize = sizeof(buffer_description);
+                buffer_description.dwFlags = DSBCAPS_PRIMARYBUFFER;
+
+                // Think of primary_buffer as the actual "speaker" that will play the sound
+                IDirectSoundBuffer* primary_buffer;
+
+                // This line asks the DirectSound system to set up the audio based on your "form" (BufferDescription)
+                // DirectSound is the audio manager, and CreateSoundBuffer is like saying "please make me a speaker"
+                if (SUCCEEDED(direct_sound->CreateSoundBuffer(&buffer_description, &primary_buffer, 0)))
+                {
+
+                    // SetFormat tells it how the sound should come out (e.g., stereo, mono, or how clear it should be).
+					if (SUCCEEDED(primary_buffer->SetFormat(&wave_format)))
+                    {
+                        // NOTE(casey): We have finally set the format of the primary buffer!
+                    }
+                }
+                // NOTE: "Create" a secondary buffer     
+            }
         }
     }
 }

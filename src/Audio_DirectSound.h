@@ -1,3 +1,3 @@
 #pragma once
 
-void init_direct_sound();
+void init_direct_sound(HWND* window);
