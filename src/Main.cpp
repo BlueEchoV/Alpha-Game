@@ -26,16 +26,81 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	bool running = true;
 
+	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
+	//		It’s how many "pixels" (samples) you capture per second to draw the sound.
     int samples_per_second = 48000;
-    int bytes_per_sample = sizeof(uint16_t) * 2;
+	// This is like the "color depth" of each pixel—how much data each sound pixel holds. Here, 
+	//		it’s 4 bytes total (2 bytes per uint16_t × 2 channels).
+    int bytes_per_sample = sizeof(int16_t) * 2;
+	// This is the "canvas size" or total number of pixels in your sound image. It’s like saying 
+	//		your video frame buffer holds 2 seconds of pixels at 48,000 pixels per second.
     int secondary_buffer_size = 2 * samples_per_second * bytes_per_sample;
+	// This is like the "pattern frequency" in your image—how often a repeating design (like a stripe) 
+	//		appears. In sound, it’s the pitch of the note.
+	int tone_hz = 256;
+	// This is the "width" of one repeating pattern (one cycle) in your sound image, measured in pixels (samples).
+	int square_wave_period = samples_per_second / tone_hz;
+	// This is like splitting each pattern into two halves—like the "on" and "off" parts of a blinking light in your image.
+	int half_square_wave_period = square_wave_period / 2;
+	// This is like the "brightness" or "intensity" of your pixel color—how vivid the sound pixel is.
+	int16_t tone_volume = 3000;
+	uint32_t running_sample_index = 0;
     
 	init_direct_sound(&Globals::renderer->open_gl.window_handle, samples_per_second, secondary_buffer_size);
+	global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;
 	float delta_time = 0;
 	while (running) {
+
+		// NOTE: Direct Sound output test
+		DWORD play_cursor;
+		DWORD write_cursor;
+		if (SUCCEEDED(global_secondary_buffer->GetCurrentPosition(&play_cursor, &write_cursor))) {
+			DWORD byte_to_lock = (running_sample_index * bytes_per_sample) % secondary_buffer_size;
+			DWORD bytes_to_write;
+			if(byte_to_lock > play_cursor)
+			{
+				// Play cursor is behind
+				bytes_to_write = secondary_buffer_size - byte_to_lock; // region 1
+				bytes_to_write += play_cursor; // region 2
+			}
+			else
+			{
+				// Play cursor is in front
+				bytes_to_write = play_cursor - byte_to_lock; // region 1
+			}
+
+			VOID* region_1;
+			DWORD region_1_size;
+			VOID* region_2;
+			DWORD region_2_size;
+			if (SUCCEEDED(global_secondary_buffer->Lock(byte_to_lock, bytes_to_write,
+				&region_1, &region_1_size, &region_2, &region_2_size, 0))) {
+				// All good, we can write to the buffer
+				// TODO: assert that region_1_size/region_2_size are valid 
+				int16_t* sample_out = (int16_t*)region_1;
+				DWORD region_1_sample_count = region_1_size / bytes_per_sample;
+				for (DWORD sample_index = 0; sample_index < region_1_sample_count; ++sample_index) {
+					int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
+					// Left
+					*sample_out++ = sample_value;
+					// Right
+					*sample_out++ = sample_value;
+				}
+				DWORD region_2_sample_count = region_2_size / bytes_per_sample;
+				for (DWORD sample_index = 0; sample_index < region_2_sample_count; ++sample_index) {
+					int16_t sample_value = ((running_sample_index++ / (uint32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
+					// Left
+					*sample_out++ = sample_value;
+					// Right
+					*sample_out++ = sample_value;
+				}
+				global_secondary_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
+			}
+		}
+
 		reset_is_pressed();
 
 		MSG message;

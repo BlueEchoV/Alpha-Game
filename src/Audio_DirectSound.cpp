@@ -2,14 +2,50 @@
 
 #include <dsound.h>
 
-// Review:
+IDirectSoundBuffer* global_secondary_buffer = {};
 
+// Review
 // ************************************************************************
 // SAMPLE: In audio programming, a sample is a tiny snapshot of sound taken 
 //		   at a specific moment in time. Think of it like a single frame in a 
 //		   movie—it’s just one small piece of the audio that, when combined with 
 //		   many other samples, creates the full sound you hear, like a song or a voice.
+// COM: Think of COM as a vending machine system, and DirectSound as a specific vending machine for audio:
+//      Without COM: You’d have to manually find the vending machine’s instruction manual (using GetProcAddress) 
+//          every time you want to buy a snack. For example, you’d look up “How to get a soda,” then “How to get chips,” 
+//          and so on. This is slow and tedious.
+//      With COM: When you get the vending machine (DirectSoundCreate gives you the DirectSound object), it comes with 
+//          a built-in menu (the vtable). The menu already lists all the snacks (functions like CreateSoundBuffer) 
+//          and their buttons (addresses). You just press the button for “soda” (call the function), and the machine 
+//          knows what to do.
 // ************************************************************************
+
+/* 
+    The below function does the follow:
+        1. Load dsound.dll library.
+        2. Get the address of the function DirectSoundCreate.
+           - This is the only function that we need to pull directly from dsound.dll.
+        3. Create DirectSound object.
+        4. Set up the sound format. Variable frequency aside, we know that our sound will have the following properties:
+           - Stereo (2 channels)
+           - 16 bits per sample (Audio CD quality)
+           - We also calculate other things required by the API
+           - We requested the sound to be of 48kHz because this seems to be the most common native format for sound output. 
+             You can also set it to be 44.1kHz, another common format and the one used in Audio CDs.
+        5. Set the “cooperative level” of our window to be priority.
+           - This will allow us to later set up the format of the primary buffer.
+        6. Create Primary Buffer.
+           - In order to do that, we need to describe our buffer in the DSBUFFERDESC structure.
+        7. Set the format of the buffer based on the WAVEFORMATEX structure we defined in step 4.
+           - We really only needed to create primary buffer for this.
+           - In theory, you could skip steps 5-7, but then you don't have guarantee that your sound wouldn't be up/downsampled 
+              by Windows.
+        8. Create Secondary Buffer.
+           - We need a buffer description here as well. Among other things we pass a buffer size. We want our buffer to 
+             be 2 seconds long to avoid bad jumps on skipped frames.
+           - We don't need to set the format separately here, as it can be passed directly inside BufferDescription.
+    NOTE: The secondary buffer is the only thing we will be using at this point.
+*/
 
 // This is like creating a reusable blueprint (a macro) in C/C++ programming. It defines a function signature 
 //      called DIRECT_SOUND_CREATE. You can give it any name you want (like MyFunction), and it will turn into a function that:
@@ -28,12 +64,11 @@ void init_direct_sound(HWND* window, DWORD samples_per_second, DWORD buffer_size
     // Don't crash the game if the dll doesn't load. It is not a necessary part of the game.
     if (DSoundLibrary) {
 		// NOTE: Create a DirectSound object 
-        // This is like reaching into the toolbox (DSoundLibrary) you just opened and pulling out a specific tool 
-        //      called "DirectSoundCreate".
-		// GetProcAddress finds the exact function you want from the library by its name and gives you a pointer to it.
-		// You’re assigning this tool to a variable called DIRECT_SOUND_CREATE, and you’re telling the program it
-        //      matches the Direct_Sound_Create blueprint from earlier. Now you can use it to start working with sound in 
-        //      your program.
+
+        // GetProcAddress is like finding the vending machine’s address in a directory. You only need to do this once 
+        //      to get the machine (DirectSoundCreate).
+        // After that, the machine’s menu (vtable) is already set up in memory (loaded with the dsound.dll). 
+        //      The DirectSound object points to this menu, so you can press buttons (call functions) directly. 
         Direct_Sound_Create* DirectSoundCreate = (Direct_Sound_Create*)GetProcAddress(DSoundLibrary, "DirectSoundCreate");
 
         IDirectSound* direct_sound;
@@ -83,8 +118,7 @@ void init_direct_sound(HWND* window, DWORD samples_per_second, DWORD buffer_size
 			buffer_description.dwBufferBytes = buffer_size;
 			buffer_description.lpwfxFormat = &wave_format;
 
-			IDirectSoundBuffer* secondary_buffer;
-			if(SUCCEEDED(direct_sound->CreateSoundBuffer(&buffer_description, &secondary_buffer, 0)))
+			if(SUCCEEDED(direct_sound->CreateSoundBuffer(&buffer_description, &global_secondary_buffer, 0)))
 			{
 				// NOTE: All good, secondary buffer works as intended
                 OutputDebugStringA("Secondary buffer created Successfully.\n");
