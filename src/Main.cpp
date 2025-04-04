@@ -46,12 +46,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	int16_t tone_volume = 3000;
 	uint32_t running_sample_index = 0;
     
+	bool sound_is_playing = false;
 	init_direct_sound(&Globals::renderer->open_gl.window_handle, samples_per_second, secondary_buffer_size);
 	global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;
 	float delta_time = 0;
+
 	while (running) {
 
 		// NOTE: Direct Sound output test
@@ -99,6 +101,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 				global_secondary_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
 			}
+
+		}
+
+		// Think of the buffer as a bucket you're filling with water (audio data) to pour out (play sound). 
+		// If you start pouring before the bucket has enough water, you’ll get nothing at first, and you’ll 
+		// have to wait until the bucket fills up a bit. That waiting is the delay.
+		if (!sound_is_playing) {
+			global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
+			sound_is_playing;
 		}
 
 		reset_is_pressed();
