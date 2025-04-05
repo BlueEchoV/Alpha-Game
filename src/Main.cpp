@@ -62,7 +62,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (SUCCEEDED(global_secondary_buffer->GetCurrentPosition(&play_cursor, &write_cursor))) {
 			DWORD byte_to_lock = (running_sample_index * bytes_per_sample) % secondary_buffer_size;
 			DWORD bytes_to_write;
-			if(byte_to_lock > play_cursor)
+			// TODO: We need a more accurate check than ByteToLock == PlayCursor
+			if (byte_to_lock == play_cursor)
+			{
+				// Play cursor is at the same spot
+				bytes_to_write = secondary_buffer_size;
+			}
+			else if(byte_to_lock > play_cursor)
 			{
 				// Play cursor is behind
 				bytes_to_write = secondary_buffer_size - byte_to_lock; // region 1
@@ -106,7 +112,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		// Think of the buffer as a bucket you're filling with water (audio data) to pour out (play sound). 
 		// If you start pouring before the bucket has enough water, you’ll get nothing at first, and you’ll 
-		// have to wait until the bucket fills up a bit. That waiting is the delay.
+		// have to wait until the bucket fills up a bit. That waiting is the delay. 
+		// NOTE: There still is a delay here, just a shorter one.
 		if (!sound_is_playing) {
 			global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
 			sound_is_playing;
