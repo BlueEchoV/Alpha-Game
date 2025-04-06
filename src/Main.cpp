@@ -105,7 +105,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				int16_t* sample_out = (int16_t*)region_1;
 				DWORD region_1_sample_count = region_1_size / bytes_per_sample;
 				for (DWORD sample_index = 0; sample_index < region_1_sample_count; ++sample_index) {
-					int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
+					f32 t = ; // TODO!
+					f32 SineValue = sinf(t);
+					s16 SampleValue = SineValue * ToneVolume;
+					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
 					// Left
 					*sample_out++ = sample_value;
 					// Right
@@ -113,7 +116,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 				DWORD region_2_sample_count = region_2_size / bytes_per_sample;
 				for (DWORD sample_index = 0; sample_index < region_2_sample_count; ++sample_index) {
-					int16_t sample_value = ((running_sample_index++ / (uint32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
+					f32 t = ; // TODO!
+					f32 SineValue = sinf(t);
+					s16 SampleValue = SineValue * ToneVolume;
+					// int16_t sample_value = ((running_sample_index++ / (uint32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
 					// Left
 					*sample_out++ = sample_value;
 					// Right
