@@ -20,6 +20,7 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
+#define Pi32 3.14159265359f
 
 Game_Data game_data = {};
 
@@ -59,6 +60,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	// This is like the "brightness" or "intensity" of your pixel color—how vivid the sound pixel is.
 	int16_t tone_volume = 3000;
 	uint32_t running_sample_index = 0;
+	u32 running_sample_index = 0;
+	int tone_hz = 256;
+	int tone_volume = 3000;
+	int wave_period = samples_per_second / tone_hz;
     
 	bool sound_is_playing = false;
 	init_direct_sound(&Globals::renderer->open_gl.window_handle, samples_per_second, secondary_buffer_size);
@@ -105,25 +110,27 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				int16_t* sample_out = (int16_t*)region_1;
 				DWORD region_1_sample_count = region_1_size / bytes_per_sample;
 				for (DWORD sample_index = 0; sample_index < region_1_sample_count; ++sample_index) {
-					f32 t = ; // TODO!
-					f32 SineValue = sinf(t);
-					s16 SampleValue = SineValue * ToneVolume;
+					f32 t = 2.0f * Pi32 * (f32)running_sample_index / (f32)wave_period;
+					f32 sine_value = sinf(t);
+					s16 sample_value = sine_value * tone_volume;
 					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
 					// Left
 					*sample_out++ = sample_value;
 					// Right
 					*sample_out++ = sample_value;
+					++running_sample_index;
 				}
 				DWORD region_2_sample_count = region_2_size / bytes_per_sample;
 				for (DWORD sample_index = 0; sample_index < region_2_sample_count; ++sample_index) {
-					f32 t = ; // TODO!
-					f32 SineValue = sinf(t);
-					s16 SampleValue = SineValue * ToneVolume;
-					// int16_t sample_value = ((running_sample_index++ / (uint32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
+					f32 t = 2.0f * Pi32 * (f32)running_sample_index / (f32)wave_period;
+					f32 sine_value = sinf(t);
+					s16 sample_value = sine_value * tone_volume;
+					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
 					// Left
 					*sample_out++ = sample_value;
 					// Right
 					*sample_out++ = sample_value;
+					++running_sample_index;
 				}
 				global_secondary_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
 			}
