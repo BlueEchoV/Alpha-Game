@@ -54,15 +54,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//		appears. In sound, it’s the pitch of the note.
 	int tone_hz = 256;
 	// This is the "width" of one repeating pattern (one cycle) in your sound image, measured in pixels (samples).
-	int square_wave_period = samples_per_second / tone_hz;
-	// This is like splitting each pattern into two halves—like the "on" and "off" parts of a blinking light in your image.
-	int half_square_wave_period = square_wave_period / 2;
+	// int square_wave_period = samples_per_second / tone_hz;
 	// This is like the "brightness" or "intensity" of your pixel color—how vivid the sound pixel is.
 	int16_t tone_volume = 3000;
 	uint32_t running_sample_index = 0;
-	u32 running_sample_index = 0;
-	int tone_hz = 256;
-	int tone_volume = 3000;
 	int wave_period = samples_per_second / tone_hz;
     
 	bool sound_is_playing = false;
@@ -112,7 +107,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				for (DWORD sample_index = 0; sample_index < region_1_sample_count; ++sample_index) {
 					f32 t = 2.0f * Pi32 * (f32)running_sample_index / (f32)wave_period;
 					f32 sine_value = sinf(t);
-					s16 sample_value = sine_value * tone_volume;
+					s16 sample_value = (s16)(sine_value * tone_volume);
 					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
 					// Left
 					*sample_out++ = sample_value;
@@ -120,11 +115,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					*sample_out++ = sample_value;
 					++running_sample_index;
 				}
+				sample_out = (int16_t*)region_2;
 				DWORD region_2_sample_count = region_2_size / bytes_per_sample;
 				for (DWORD sample_index = 0; sample_index < region_2_sample_count; ++sample_index) {
 					f32 t = 2.0f * Pi32 * (f32)running_sample_index / (f32)wave_period;
 					f32 sine_value = sinf(t);
-					s16 sample_value = sine_value * tone_volume;
+					s16 sample_value = (s16)(sine_value * tone_volume);
 					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
 					// Left
 					*sample_out++ = sample_value;
