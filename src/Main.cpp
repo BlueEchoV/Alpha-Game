@@ -69,11 +69,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float delta_time = 0;
 
 	while (running) {
-
 		// NOTE: Direct Sound output test
 		DWORD play_cursor;
 		DWORD write_cursor;
-		if (SUCCEEDED(global_secondary_buffer->GetCurrentPosition(&play_cursor, &write_cursor))) {
+		if (sound_is_playing &&
+			SUCCEEDED(global_secondary_buffer->GetCurrentPosition(&play_cursor, &write_cursor))) {
 			DWORD byte_to_lock = (running_sample_index * bytes_per_sample) % secondary_buffer_size;
 			DWORD bytes_to_write;
 			// TODO: We need a more accurate check than ByteToLock == PlayCursor
