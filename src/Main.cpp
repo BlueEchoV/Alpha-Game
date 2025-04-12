@@ -36,7 +36,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 100;
-	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed, 1);
+	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed);
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
@@ -127,87 +127,17 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	}
 
+	if (!sound_is_playing) {
+		global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
+		sound_is_playing;
+	}
+	global_secondary_buffer->Stop();
 
 	uint64_t current_frame_time = 0;
 	uint64_t last_frame_time = 0;
 	float delta_time = 0;
 
 	while (running) {
-		/*
-		// NOTE: Direct Sound output test
-		DWORD play_cursor;
-		DWORD write_cursor;
-		if (sound_is_playing &&
-			SUCCEEDED(global_secondary_buffer->GetCurrentPosition(&play_cursor, &write_cursor))) {
-			DWORD byte_to_lock = (running_sample_index * bytes_per_sample) % secondary_buffer_size;
-			DWORD bytes_to_write;
-			// TODO: We need a more accurate check than ByteToLock == PlayCursor
-			if (byte_to_lock == play_cursor)
-			{
-				// Play cursor is at the same spot
-				bytes_to_write = secondary_buffer_size;
-			}
-			else if(byte_to_lock > play_cursor)
-			{
-				// Play cursor is behind
-				bytes_to_write = secondary_buffer_size - byte_to_lock; // region 1
-				bytes_to_write += play_cursor; // region 2
-			}
-			else
-			{
-				// Play cursor is in front
-				bytes_to_write = play_cursor - byte_to_lock; // region 1
-			}
-
-			VOID* region_1;
-			DWORD region_1_size;
-			VOID* region_2;
-			DWORD region_2_size;
-			if (SUCCEEDED(global_secondary_buffer->Lock(byte_to_lock, bytes_to_write,
-				&region_1, &region_1_size, &region_2, &region_2_size, 0))) {
-				// All good, we can write to the buffer
-				// TODO: assert that region_1_size/region_2_size are valid 
-				int16_t* sample_out = (int16_t*)region_1;
-				DWORD region_1_sample_count = region_1_size / bytes_per_sample;
-				for (DWORD sample_index = 0; sample_index < region_1_sample_count; ++sample_index) {
-					f32 t = 2.0f * Pi32 * (f32)running_sample_index / (f32)wave_period;
-					f32 sine_value = sinf(t);
-					s16 sample_value = (s16)(sine_value * tone_volume);
-					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
-					// Left
-					*sample_out++ = sample_value;
-					// Right
-					*sample_out++ = sample_value;
-					++running_sample_index;
-				}
-				sample_out = (int16_t*)region_2;
-				DWORD region_2_sample_count = region_2_size / bytes_per_sample;
-				for (DWORD sample_index = 0; sample_index < region_2_sample_count; ++sample_index) {
-					f32 t = 2.0f * Pi32 * (f32)running_sample_index / (f32)wave_period;
-					f32 sine_value = sinf(t);
-					s16 sample_value = (s16)(sine_value * tone_volume);
-					// int16_t sample_value = ((running_sample_index++ / (int32_t)half_square_wave_period) % 2) ? tone_volume: -tone_volume; 
-					// Left
-					*sample_out++ = sample_value;
-					// Right
-					*sample_out++ = sample_value;
-					++running_sample_index;
-				}
-				global_secondary_buffer->Unlock(region_1, region_1_size, region_2, region_2_size);
-			}
-
-		}
-		*/
-
-		// Think of the buffer as a bucket you're filling with water (audio data) to pour out (play sound). 
-		// If you start pouring before the bucket has enough water, you’ll get nothing at first, and you’ll 
-		// have to wait until the bucket fills up a bit. That waiting is the delay. 
-		// NOTE: There still is a delay here, just a shorter one.
-		if (!sound_is_playing) {
-			global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
-			sound_is_playing;
-		}
-
 		reset_is_pressed();
 
 		MSG message;

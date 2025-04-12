@@ -86,7 +86,7 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	return result;
 }
 
-Player create_player(Image* image, V2 spawn_pos_ws, int player_speed, int fire_rate_per_sec) {
+Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
 
 	result.image = image;
@@ -98,8 +98,6 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed, int fire_r
 		{ spawn_pos_ws.x, spawn_pos_ws.y}, 
 		player_speed
 	);
-
-	result.fire_rate = fire_rate_per_sec;
 
 	float collider_radius = 32;
 	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
@@ -120,6 +118,19 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	p_draw_rect.x = (int)p_pos_cs.x; 
 	p_draw_rect.y = (int)p_pos_cs.y; 
 	mp_render_copy_ex(p.image->texture, NULL, &p_draw_rect, p.rb.angle, NULL, SDL_FLIP_NONE);
+}
+
+void Player::equip_weapon(Weapon_Type wt) {
+	Weapon weapon = {};
+
+	Weapon_Data weapon_data = get_weapon_data(wt);
+	weapon.image = get_image(weapon_data.it);
+	weapon.damage = weapon_data.damage;
+	weapon.fire_rate = weapon_data.fire_rate;
+
+
+	// Add colliders
+	this->weapon = weapon;
 }
 
 Unit_Data unit_data[UT_Total_Unit_Types] = {

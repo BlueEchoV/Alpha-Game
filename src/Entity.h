@@ -119,24 +119,7 @@ struct Rigid_Body {
 	// V2 pos_ls
 };
 
-struct Player {
-	Image* image;
-
-	Rigid_Body rb;
-
-	int w, h;
-
-	// This will be merged with the new gun system
-	bool can_fire = true;
-	int fire_rate;
-	float fire_cooldown;
-
-	// int health;
-	// int damage;
-};
-
 struct Unit_Data {
-	// Image_Type			  w, h, health, damage, target, is_destroyed, handle
 	Image_Type image_type;
 	int w;
 	int h;
@@ -144,6 +127,8 @@ struct Unit_Data {
 	int damage;
 	int speed;
 };
+
+struct Player;
 
 struct Unit {
 	Image* image;
@@ -180,6 +165,63 @@ struct Projectile {
 	Handle handle;
 };
 
+struct Weapon_Data {
+	Image_Type it;
+	// The actual width and height of the weapon on screen
+	int w, h;
+	int damage;
+	int fire_rate;
+};
+
+enum Weapon_Type {
+	WT_Bow,
+	WT_Total
+};
+
+Weapon_Data weapon_data[WT_Total] = {
+	// Image_Type	w		h		damage  fire rate
+	{IT_Arrow_1,	100,	50,		10,		5}
+};
+
+Weapon_Data get_weapon_data(Weapon_Type wt) {
+	return weapon_data[(int)wt];
+};
+
+struct Weapon {
+	// Sprite sheet
+	Image* image;
+	int w, h;
+	int fire_rate;
+	int damage;
+	// bool can_stick
+
+	bool can_fire = true;
+	float fire_cooldown;
+
+	virtual void fire();
+	// virtual void reload(); // Reloading animation? // This could be tedious
+};
+
+void Weapon::fire() {
+	// Fire the weapon
+	// spawn_projectile
+};
+
+struct Player {
+	Image* image;
+
+	Rigid_Body rb;
+
+	int w, h;
+
+	Weapon weapon;
+
+	void equip_weapon(Weapon_Type wt);
+
+	// int health;
+	// int damage;
+};
+
 struct Camera {
 	V2 pos_ws;
 	int w, h;
@@ -213,7 +255,7 @@ void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
 void draw_colliders(Rigid_Body* rb, V2 camera_pos);
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 
-Player create_player(Image* image, V2 spawn_pos_ws, int player_speed, int fire_rate_per_sec);
+Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
 void draw_player(Player& p, V2 camera_ws_pos);
 
 void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles,
