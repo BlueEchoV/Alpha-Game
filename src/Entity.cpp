@@ -120,17 +120,29 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	mp_render_copy_ex(p.image->texture, NULL, &p_draw_rect, p.rb.angle, NULL, SDL_FLIP_NONE);
 }
 
+Weapon_Data weapon_data[WT_Total] = {
+	// Image_Type	w		h		damage  fire rate
+	{IT_Arrow_1,	100,	50,		10,		5}
+};
+
+Weapon_Data get_weapon_data(Weapon_Type wt) {
+	return weapon_data[(int)wt];
+};
+
 void Player::equip_weapon(Weapon_Type wt) {
-	Weapon weapon = {};
+	Weapon* new_weapon = new Weapon();
 
-	Weapon_Data weapon_data = get_weapon_data(wt);
-	weapon.image = get_image(weapon_data.it);
-	weapon.damage = weapon_data.damage;
-	weapon.fire_rate = weapon_data.fire_rate;
-
+	Weapon_Data current_weapon_data = get_weapon_data(wt);
+	new_weapon->image = get_image(current_weapon_data.it);
+	new_weapon->damage = current_weapon_data.damage;
+	new_weapon->fire_rate = current_weapon_data.fire_rate;
 
 	// Add colliders
-	this->weapon = weapon;
+	this->weapon = new_weapon;
+}
+
+void Weapon::fire() {
+	log("Fire");
 }
 
 Unit_Data unit_data[UT_Total_Unit_Types] = {

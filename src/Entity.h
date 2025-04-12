@@ -178,15 +178,6 @@ enum Weapon_Type {
 	WT_Total
 };
 
-Weapon_Data weapon_data[WT_Total] = {
-	// Image_Type	w		h		damage  fire rate
-	{IT_Arrow_1,	100,	50,		10,		5}
-};
-
-Weapon_Data get_weapon_data(Weapon_Type wt) {
-	return weapon_data[(int)wt];
-};
-
 struct Weapon {
 	// Sprite sheet
 	Image* image;
@@ -202,11 +193,6 @@ struct Weapon {
 	// virtual void reload(); // Reloading animation? // This could be tedious
 };
 
-void Weapon::fire() {
-	// Fire the weapon
-	// spawn_projectile
-};
-
 struct Player {
 	Image* image;
 
@@ -214,13 +200,16 @@ struct Player {
 
 	int w, h;
 
-	Weapon weapon;
+	Weapon* weapon;
 
 	void equip_weapon(Weapon_Type wt);
 
 	// int health;
 	// int damage;
 };
+
+// Make sure and release weapon memory
+void delete_player();
 
 struct Camera {
 	V2 pos_ws;

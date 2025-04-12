@@ -174,22 +174,25 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_x_delta = -1.0f;
 		}
 
+		Player* player = &game_data.player;
+
 		if (key_pressed_and_held(VK_SPACE)) {
-			if (game_data.player.can_fire) {
+			// Change this to fire weapon
+			if (game_data.player.weapon->can_fire) {
 				V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 				V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-				spawn_projectile(game_data, game_data.player.rb.pos_ws, mouse_ws_pos);
+				spawn_projectile(game_data, player->rb.pos_ws, mouse_ws_pos);
 				Globals::debug_total_arrows++;
-				game_data.player.can_fire = false;
+				player->weapon->can_fire = false;
 			}
 		}
 
-		if (game_data.player.fire_cooldown <= 0) {
-			game_data.player.can_fire = true;
-			game_data.player.fire_cooldown = (float)game_data.player.fire_rate;
+		if (player->weapon->fire_cooldown <= 0) {
+			player->weapon->can_fire = true;
+			player->weapon->fire_cooldown = (float)player->weapon->fire_rate;
 		} 
-		if (game_data.player.can_fire == false) {
-			game_data.player.fire_cooldown -= delta_time;
+		if (player->weapon->can_fire == false) {
+			player->weapon->fire_cooldown -= delta_time;
 		}
 
 		if (key_pressed_and_held(KEY_Q)) {
