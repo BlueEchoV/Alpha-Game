@@ -176,6 +176,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Player* player = &game_data.player;
 
+		player->equip_weapon(WT_Bow);
+
 		if (key_pressed_and_held(VK_SPACE)) {
 			// Change this to fire weapon
 			if (game_data.player.weapon->can_fire) {

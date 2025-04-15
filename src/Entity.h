@@ -188,9 +188,6 @@ struct Weapon {
 
 	bool can_fire = true;
 	float fire_cooldown;
-
-	virtual void fire();
-	// virtual void reload(); // Reloading animation? // This could be tedious
 };
 
 struct Player {
@@ -200,9 +197,11 @@ struct Player {
 
 	int w, h;
 
+	// Could this all be put into a 'kit' of some sort?
 	Weapon* weapon;
-
 	void equip_weapon(Weapon_Type wt);
+	void fire_weapon(V2 target);
+	// virtual void reload(); // Reloading animation? // This could be tedious
 
 	// int health;
 	// int damage;

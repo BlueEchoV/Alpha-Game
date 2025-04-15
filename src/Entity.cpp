@@ -141,8 +141,14 @@ void Player::equip_weapon(Weapon_Type wt) {
 	this->weapon = new_weapon;
 }
 
-void Weapon::fire() {
-	log("Fire");
+void Player::fire_weapon(V2 target) {
+	if (this->can_fire) {
+		V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
+		spawn_projectile(game_data, player->rb.pos_ws, mouse_ws_pos);
+		Globals::debug_total_arrows++;
+		player->weapon->can_fire = false;
+	}
 }
 
 Unit_Data unit_data[UT_Total_Unit_Types] = {
