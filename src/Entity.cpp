@@ -122,7 +122,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 
 Weapon_Data weapon_data[WT_Total] = {
 	// Image_Type	w		h		damage  fire rate
-	{IT_Arrow_1,	100,	50,		10,		5}
+	{IT_Arrow_1,	100,	50,		10,		1}
 };
 
 Weapon_Data get_weapon_data(Weapon_Type wt) {
@@ -137,17 +137,18 @@ void Player::equip_weapon(Weapon_Type wt) {
 	new_weapon->damage = current_weapon_data.damage;
 	new_weapon->fire_rate = current_weapon_data.fire_rate;
 
-	// Add colliders
+	// No colliders on weapons
 	this->weapon = new_weapon;
 }
 
-void Player::fire_weapon(V2 target) {
-	if (this->can_fire) {
+// Fires at the mouse
+void Player::fire_weapon(Game_Data& game_data) {
+	if (this->weapon->can_fire) {
 		V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-		spawn_projectile(game_data, player->rb.pos_ws, mouse_ws_pos);
+		spawn_projectile(game_data, this->rb.pos_ws, mouse_ws_pos);
 		Globals::debug_total_arrows++;
-		player->weapon->can_fire = false;
+		this->weapon->can_fire = false;
 	}
 }
 

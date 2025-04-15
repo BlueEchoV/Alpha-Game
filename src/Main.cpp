@@ -176,17 +176,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Player* player = &game_data.player;
 
-		player->equip_weapon(WT_Bow);
+		if (player->weapon == nullptr) {
+			player->equip_weapon(WT_Bow);
+		}
 
 		if (key_pressed_and_held(VK_SPACE)) {
 			// Change this to fire weapon
-			if (game_data.player.weapon->can_fire) {
-				V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
-				V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-				spawn_projectile(game_data, player->rb.pos_ws, mouse_ws_pos);
-				Globals::debug_total_arrows++;
-				player->weapon->can_fire = false;
-			}
+			player->fire_weapon(game_data);
+
 		}
 
 		if (player->weapon->fire_cooldown <= 0) {

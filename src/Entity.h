@@ -190,6 +190,8 @@ struct Weapon {
 	float fire_cooldown;
 };
 
+struct Game_Data;
+
 struct Player {
 	Image* image;
 
@@ -197,10 +199,10 @@ struct Player {
 
 	int w, h;
 
-	// Could this all be put into a 'kit' of some sort?
+	// Could this all be put into a 'weapon_kit' of some sort?
 	Weapon* weapon;
 	void equip_weapon(Weapon_Type wt);
-	void fire_weapon(V2 target);
+	void fire_weapon(Game_Data& game_data);
 	// virtual void reload(); // Reloading animation? // This could be tedious
 
 	// int health;
