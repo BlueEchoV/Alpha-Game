@@ -186,13 +186,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		}
 
-		if (player->weapon->fire_cooldown <= 0) {
-			player->weapon->can_fire = true;
-			player->weapon->fire_cooldown = (float)player->weapon->fire_rate;
-		} 
-		if (player->weapon->can_fire == false) {
-			player->weapon->fire_cooldown -= delta_time;
-		}
+		player->update_weapon(delta_time);
 
 		if (key_pressed_and_held(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);

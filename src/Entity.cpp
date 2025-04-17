@@ -152,6 +152,16 @@ void Player::fire_weapon(Game_Data& game_data) {
 	}
 }
 
+void Player::update_weapon(float delta_time) {
+	if (this->weapon->fire_cooldown <= 0) {
+		this->weapon->can_fire = true;
+		this->weapon->fire_cooldown = (float)this->weapon->fire_rate;
+	} 
+	if (this->weapon->can_fire == false) {
+		this->weapon->fire_cooldown -= delta_time;
+	}
+}
+
 Unit_Data unit_data[UT_Total_Unit_Types] = {
 	// Image_Type			  w,   h,   health, damage, speed
 	{IT_Enemy_Clothed_Zombie, 75, 75, 100,    10,     10}

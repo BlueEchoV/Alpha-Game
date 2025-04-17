@@ -203,6 +203,7 @@ struct Player {
 	Weapon* weapon;
 	void equip_weapon(Weapon_Type wt);
 	void fire_weapon(Game_Data& game_data);
+	void update_weapon(float delta_time);
 	// virtual void reload(); // Reloading animation? // This could be tedious
 
 	// int health;

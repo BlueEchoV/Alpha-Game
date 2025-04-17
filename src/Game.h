@@ -29,3 +29,8 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);
 void render(Game_Data& game_data, float delta_time);
+
+void load_csv_file();
+
+// 1: I need to load the CSV file
+// 2: I need to 
