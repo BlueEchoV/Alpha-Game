@@ -162,6 +162,15 @@ void Player::update_weapon(float delta_time) {
 	}
 }
 
+// This will have to be an offset based off where the player is looking
+void Player::draw_weapon() {
+	MP_Rect src = {};
+
+	MP_Rect dst = {};
+
+	mp_render_copy_ex(this->weapon->image->texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
+}
+
 Unit_Data unit_data[UT_Total_Unit_Types] = {
 	// Image_Type			  w,   h,   health, damage, speed
 	{IT_Enemy_Clothed_Zombie, 75, 75, 100,    10,     10}
