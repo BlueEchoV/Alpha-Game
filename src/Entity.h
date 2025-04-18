@@ -166,7 +166,10 @@ struct Projectile {
 };
 
 struct Weapon_Data {
-	Image_Type it;
+	std::string type;
+	std::string image_name;
+
+	std::string projectile_type;
 	// The actual width and height of the weapon on screen
 	int w, h;
 	int damage;
@@ -178,7 +181,13 @@ enum Weapon_Type {
 	WT_Total
 };
 
+enum Projectile_Type {
+	PT_Arrow
+};
+
 struct Weapon {
+	std::string type;
+
 	// Sprite sheet
 	Image* image;
 	int w, h;
@@ -205,6 +214,7 @@ struct Player {
 	void fire_weapon(Game_Data& game_data);
 	void update_weapon(float delta_time);
 	// virtual void reload(); // Reloading animation? // This could be tedious
+	// Should this be here?
 	void draw_weapon();
 
 	// int health;

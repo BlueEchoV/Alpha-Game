@@ -165,7 +165,6 @@ void Player::update_weapon(float delta_time) {
 // This will have to be an offset based off where the player is looking
 void Player::draw_weapon() {
 	MP_Rect src = {};
-
 	MP_Rect dst = {};
 
 	mp_render_copy_ex(this->weapon->image->texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
@@ -226,14 +225,14 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	mp_render_copy_ex(unit.image->texture, NULL, &dst, unit.rb.angle, NULL, SDL_FLIP_NONE);
 }
 
-Projectile_Data projectile_data = {
-	"Arrow", IT_Arrow_1, 32, 32, 100 
+Projectile_Data projectile_data[] = {
+	{"Arrow", IT_Arrow_1, 32, 32, 100}
 };
 
-void spawn_projectile(Game_Data& game_data, V2 origin_ws, V2 target_ws) {
+void spawn_projectile(Game_Data& game_data, Projectile_Type pt, V2 origin_ws, V2 target_ws) {
 	Projectile result = {};
 
-	Projectile_Data data = projectile_data;
+	Projectile_Data data = projectile_data[pt];
 
 	result.rb = create_rigid_body(origin_ws, data.speed);
 	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);
@@ -297,3 +296,7 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 		return false;
 	});
 };
+
+void load_weapon_csv() {
+
+}
