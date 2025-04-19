@@ -35,3 +35,30 @@ void my_mem_copy(const void* src, void* dst, size_t n) {
 		dst_byte[i] = src_byte[i];
 	}
 }
+
+CSV_Data create_csv_data(std::string file_name) {
+	CSV_Data result = {};
+
+	result.file_name = file_name;
+}
+
+// Return 0 on success
+int open_csv_data_file(CSV_Data* data) {
+	data->file = fopen(data->file_name.c_str(), "r");
+	if (data->file == NULL) {
+		log("Error: CSV File did not open correctly.");
+	}
+}
+
+// Return 0 on success
+int close_csv_data_file(CSV_Data* data) {
+	if (fclose(data->file) != 0) {
+		log("Error: csv file did not close properly.");
+		return -1;
+	}
+	return 0;
+}
+
+// 1) Open the CSV file
+// 2) Load the data off the CSV file
+// 3) Close the CSV file

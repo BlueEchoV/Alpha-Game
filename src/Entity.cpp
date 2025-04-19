@@ -297,6 +297,6 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 	});
 };
 
-void load_weapon_csv() {
+void load_weapon_csv(const char* file_name) {
 
 }

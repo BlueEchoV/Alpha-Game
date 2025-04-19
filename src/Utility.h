@@ -66,3 +66,7 @@ struct Color_RGBA {
 void log(const char* format, ...);
 bool my_mem_compare(const void* src, const void* dst, size_t n);
 void my_mem_copy(const void* src, void* dst, size_t n);
+
+struct CSV_Info {
+	FILE* file;
+};
