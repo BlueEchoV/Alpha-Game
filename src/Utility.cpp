@@ -61,4 +61,5 @@ int close_csv_data_file(CSV_Data* data) {
 
 // 1) Open the CSV file
 // 2) Load the data off the CSV file
+// 2.b) Hot loading
 // 3) Close the CSV file

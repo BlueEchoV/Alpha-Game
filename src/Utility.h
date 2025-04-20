@@ -67,6 +67,21 @@ void log(const char* format, ...);
 bool my_mem_compare(const void* src, const void* dst, size_t n);
 void my_mem_copy(const void* src, void* dst, size_t n);
 
-struct CSV_Info {
+enum Type {
+	T_Int,
+	T_Float
+};
+
+#define FIELD(struct_type, variable_type, variable_name) { variable_type, offsetof(struct_type, variable_name), #variable_name};
+
+// For each column 
+struct Type_Descriptor {
+	Type variable_type;
+	int offset;
+	std::string variable_name;
+};
+
+struct CSV_Data {
+	std::string file_name;
 	FILE* file;
 };
