@@ -33,7 +33,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	load_images();
 	load_fonts();
 
-	load_weapon_csv();
+	load_weapon_data_csv("");
 
 	game_data.selected_font = FT_Basic;
 

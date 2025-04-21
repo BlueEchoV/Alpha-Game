@@ -166,12 +166,12 @@ struct Projectile {
 };
 
 struct Weapon_Data {
-	std::string type;
+	std::string weapon_type;
 	std::string image_name;
-
 	std::string projectile_type;
 	// The actual width and height of the weapon on screen
-	int w, h;
+	int w;
+	int h;
 	int damage;
 	int fire_rate;
 };
@@ -199,7 +199,7 @@ struct Weapon {
 	float fire_cooldown;
 };
 
-void load_weapon_csv();
+void load_weapon_data_csv(const char* file_name);
 
 struct Game_Data;
 
@@ -269,7 +269,7 @@ void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 void delete_destroyed_entities_from_handles(Game_Data& game_data);
 
-void spawn_projectile(Game_Data& game_data, V2 origin, V2 target);
+void spawn_projectile(Game_Data& game_data, Projectile_Type pt, V2 origin, V2 target);
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 

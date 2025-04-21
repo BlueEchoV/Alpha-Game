@@ -40,6 +40,8 @@ CSV_Data create_csv_data(std::string file_name) {
 	CSV_Data result = {};
 
 	result.file_name = file_name;
+
+	return result;
 }
 
 // Return 0 on success
@@ -47,7 +49,9 @@ int open_csv_data_file(CSV_Data* data) {
 	data->file = fopen(data->file_name.c_str(), "r");
 	if (data->file == NULL) {
 		log("Error: CSV File did not open correctly.");
+		return -1;
 	}
+	return 0;
 }
 
 // Return 0 on success

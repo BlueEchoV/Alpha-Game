@@ -121,8 +121,8 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 }
 
 Weapon_Data weapon_data[WT_Total] = {
-	// Image_Type	w		h		damage  fire rate
-	{IT_Arrow_1,	100,	50,		10,		1}
+	// weapon_type  image_name  projectile_type w		h		damage  fire rate
+	{  "Bow", "Bow", "Arrow",	100,	50,		10,		1}
 };
 
 Weapon_Data get_weapon_data(Weapon_Type wt) {
@@ -133,7 +133,7 @@ void Player::equip_weapon(Weapon_Type wt) {
 	Weapon* new_weapon = new Weapon();
 
 	Weapon_Data current_weapon_data = get_weapon_data(wt);
-	new_weapon->image = get_image(current_weapon_data.it);
+	// new_weapon->image = get_image(current_weapon_data.it);
 	new_weapon->damage = current_weapon_data.damage;
 	new_weapon->fire_rate = current_weapon_data.fire_rate;
 
@@ -146,7 +146,7 @@ void Player::fire_weapon(Game_Data& game_data) {
 	if (this->weapon->can_fire) {
 		V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-		spawn_projectile(game_data, this->rb.pos_ws, mouse_ws_pos);
+		spawn_projectile(game_data, PT_Arrow, this->rb.pos_ws, mouse_ws_pos);
 		Globals::debug_total_arrows++;
 		this->weapon->can_fire = false;
 	}
@@ -295,8 +295,18 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 		}
 		return false;
 	});
+}
+
+Type_Descriptor weapon_data_type_descriptor[] = {
+	FIELD(Weapon_Data, VT_String, weapon_type),
+	FIELD(Weapon_Data, VT_String, image_name),
+	FIELD(Weapon_Data, VT_String, projectile_type),
+	FIELD(Weapon_Data, VT_Int, w),
+	FIELD(Weapon_Data, VT_Int, h),
+	FIELD(Weapon_Data, VT_Int, damage),
+	FIELD(Weapon_Data, VT_Int, fire_rate)
 };
 
-void load_weapon_csv(const char* file_name) {
-
+void load_weapon_data_csv(const char* file_name) {
+	REF(file_name);
 }

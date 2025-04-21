@@ -67,19 +67,23 @@ void log(const char* format, ...);
 bool my_mem_compare(const void* src, const void* dst, size_t n);
 void my_mem_copy(const void* src, void* dst, size_t n);
 
-enum Type {
-	T_Int,
-	T_Float
+enum Variable_Type {
+	VT_Int,
+	VT_Float, 
+	VT_String
 };
-
-#define FIELD(struct_type, variable_type, variable_name) { variable_type, offsetof(struct_type, variable_name), #variable_name};
 
 // For each column 
 struct Type_Descriptor {
-	Type variable_type;
+	Variable_Type variable_type;
 	int offset;
 	std::string variable_name;
 };
+
+// The #name part is needed for the FieldDescriptor’s name field, which expects a string (const char*) to 
+// store the field’s name (e.g., "age") for metadata. Without #name, you’d pass the 
+// raw identifier age, which would cause a compilation error since age isn’t a string.
+#define FIELD(struct_type, variable_type, variable_name) { variable_type, static_cast<int>(offsetof(struct_type, variable_name)), #variable_name }
 
 struct CSV_Data {
 	std::string file_name;
