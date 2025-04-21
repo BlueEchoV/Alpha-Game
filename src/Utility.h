@@ -89,3 +89,6 @@ struct CSV_Data {
 	std::string file_name;
 	FILE* file;
 };
+
+void open_csv_data_file(CSV_Data* data);
+void close_csv_data_file(CSV_Data* data);

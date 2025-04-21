@@ -45,22 +45,24 @@ CSV_Data create_csv_data(std::string file_name) {
 }
 
 // Return 0 on success
-int open_csv_data_file(CSV_Data* data) {
+void open_csv_data_file(CSV_Data* data) {
 	data->file = fopen(data->file_name.c_str(), "r");
 	if (data->file == NULL) {
 		log("Error: CSV File did not open correctly.");
-		return -1;
+		assert(false);
 	}
-	return 0;
 }
 
 // Return 0 on success
-int close_csv_data_file(CSV_Data* data) {
+void close_csv_data_file(CSV_Data* data) {
 	if (fclose(data->file) != 0) {
 		log("Error: csv file did not close properly.");
-		return -1;
+		assert(false);
 	}
-	return 0;
+}
+
+void load_csv_data() {
+
 }
 
 // 1) Open the CSV file
