@@ -1,4 +1,8 @@
 #include "Utility.h" 
+#include <vector>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 void log(const char* format, ...) {
 	char buffer[256];
@@ -57,6 +61,17 @@ bool close_csv_data_file(CSV_Data* data) {
 	return true;
 }
 
+std::vector<std::string> split(const std::string& str, char delimiter) {
+	std::vector<std::string> tokens;
+	std::istringstream my_string(str);
+
+	for (std::string token; std::getline(my_string, token, delimiter);) {
+		tokens.push_back(token);
+	}
+
+	return tokens;
+}
+
 int count_csv_data_columns(CSV_Data* data) {
 	bool file_was_not_open = false;
 	if (data->file == NULL) {
@@ -66,19 +81,48 @@ int count_csv_data_columns(CSV_Data* data) {
 		file_was_not_open = true;
 	}
 
-	int result = 0;
-
 	char buffer[50];
-	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
-		int i = 0;
-		i++;
+	if (fgets(buffer, sizeof(buffer), data->file) != 0) {
+		log("Error: fgets failed.");
+		return -1;
 	}
+	std::string line = buffer;
+	std::vector<std::string> tokens = split(line, ',');
+
 	rewind(data->file);
 
 	if (file_was_not_open) {
 		close_csv_data_file(data);
 	}
 
+	return tokens.size();;
+}
+
+int count_csv_data_rows(CSV_Data* data) {
+	bool file_was_not_open = false;
+	if (data->file == NULL) {
+		if (open_csv_data_file(data) == false) {
+			return 0;
+		}
+		file_was_not_open = true;
+	}
+	int result = 0;
+
+	char buffer[50];
+
+	// Ignore the first row
+	if (fgets(buffer, sizeof(buffer), data->file) == NULL) {
+		return 0;
+	}
+
+	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
+		result++;
+	}
+	rewind(data->file);
+
+	if (file_was_not_open) {
+		close_csv_data_file(data);
+	}
 	return result;
 }
 
