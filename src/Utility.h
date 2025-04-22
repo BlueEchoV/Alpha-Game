@@ -87,8 +87,10 @@ struct Type_Descriptor {
 
 struct CSV_Data {
 	std::string file_name;
+	int total_colunms;
 	FILE* file;
 };
 
-void open_csv_data_file(CSV_Data* data);
-void close_csv_data_file(CSV_Data* data);
+CSV_Data create_open_csv_data(std::string file_name);
+bool open_csv_data_file(CSV_Data* data);
+bool close_csv_data_file(CSV_Data* data);

@@ -307,6 +307,6 @@ Type_Descriptor weapon_data_type_descriptor[] = {
 	FIELD(Weapon_Data, VT_Int, fire_rate)
 };
 
-void load_weapon_data_csv(const char* file_name) {
-	REF(file_name);
+void load_weapon_data_csv(CSV_Data* data) {
+	REF(data);
 }

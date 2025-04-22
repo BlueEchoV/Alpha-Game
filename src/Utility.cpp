@@ -36,34 +36,67 @@ void my_mem_copy(const void* src, void* dst, size_t n) {
 	}
 }
 
-CSV_Data create_csv_data(std::string file_name) {
-	CSV_Data result = {};
-
-	result.file_name = file_name;
-
-	return result;
-}
-
-// Return 0 on success
-void open_csv_data_file(CSV_Data* data) {
+bool open_csv_data_file(CSV_Data* data) {
 	data->file = fopen(data->file_name.c_str(), "r");
 	if (data->file == NULL) {
 		log("Error: CSV File did not open correctly.");
 		assert(false);
+		return false;
 	}
+	return true;
 }
 
-// Return 0 on success
-void close_csv_data_file(CSV_Data* data) {
+bool close_csv_data_file(CSV_Data* data) {
 	if (fclose(data->file) != 0) {
 		log("Error: csv file did not close properly.");
 		assert(false);
+		return false;
 	}
+	// Set it to NULL to avoid issues
+	data->file = NULL;
+	return true;
 }
 
-void load_csv_data() {
+int count_csv_data_columns(CSV_Data* data) {
+	bool file_was_not_open = false;
+	if (data->file == NULL) {
+		if (open_csv_data_file(data) == false) {
+			return -1;
+		}
+		file_was_not_open = true;
+	}
 
+	int result = 0;
+
+	char buffer[50];
+	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
+		int i = 0;
+		i++;
+	}
+	rewind(data->file);
+
+	if (file_was_not_open) {
+		close_csv_data_file(data);
+	}
+
+	return result;
 }
+
+CSV_Data create_open_csv_data(std::string file_name) {
+	CSV_Data result = {};
+
+	result.file_name = file_name;
+
+	open_csv_data_file(&result);
+	result.total_colunms = count_csv_data_columns(&result);
+
+	return result;
+}
+
+
+// void load_csv_data_file(CSV_Data* data, char* destination, size_t stride) {
+// 
+// }
 
 // 1) Open the CSV file
 // 2) Load the data off the CSV file
