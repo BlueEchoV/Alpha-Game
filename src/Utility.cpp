@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <span>
 
 void log(const char* format, ...) {
 	char buffer[256];
@@ -137,10 +138,21 @@ CSV_Data create_open_csv_data(std::string file_name) {
 	return result;
 }
 
+void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descriptor> type_descriptors, size_t stride) {
+	if (data->file == NULL) {
+		open_csv_data_file(data);
+	}
 
-// void load_csv_data_file(CSV_Data* data, char* destination, size_t stride) {
-// 
-// }
+	char buffer[50];
+	if (fgets(buffer, sizeof(buffer), data->file) == NULL) {
+		return;
+	}
+
+	std::string line = buffer;
+	for (int i = 0; i < type_descriptors.size(); i++) {
+
+	}
+}
 
 // 1) Open the CSV file
 // 2) Load the data off the CSV file
