@@ -133,7 +133,7 @@ CSV_Data create_open_csv_data(std::string file_name) {
 	result.file_name = file_name;
 
 	open_csv_data_file(&result);
-	result.total_colunms = count_csv_data_columns(&result);
+	result.total_rows = count_csv_data_rows(&result);
 
 	return result;
 }
@@ -144,13 +144,17 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 	}
 
 	char buffer[50];
+	// Get the first line
 	if (fgets(buffer, sizeof(buffer), data->file) == NULL) {
 		return;
 	}
 
 	std::string line = buffer;
-	for (int i = 0; i < type_descriptors.size(); i++) {
 
+	for (int i = 0; i < data->total_rows; i++) {
+		for (int j = 0; j < type_descriptors.size(); j++) {
+			Type_Descriptor current = type_descriptors[i];
+		}
 	}
 }
 
