@@ -138,6 +138,16 @@ CSV_Data create_open_csv_data(std::string file_name) {
 	return result;
 }
 
+int get_column_index(std::vector<std::string>& column_names, std::string name) {
+	int index = -1;
+	for (int i = 0; i < column_names.size(); i++) {
+		if (column_names[i] == name) {
+			index = i;
+		}
+	}
+	return index;
+}
+
 void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descriptor> type_descriptors, size_t stride) {
 	if (data->file == NULL) {
 		open_csv_data_file(data);
@@ -151,9 +161,14 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 
 	std::string line = buffer;
 
-	for (int i = 0; i < data->total_rows; i++) {
-		for (int j = 0; j < type_descriptors.size(); j++) {
-			Type_Descriptor current = type_descriptors[i];
+	std::vector<std::string> columns_names = split(line, ',');
+
+	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
+		for (int i = 0; i < data->total_rows; i++) {
+			for (int j = 0; j < type_descriptors.size(); j++) {
+				Type_Descriptor current = type_descriptors[i];
+
+			}
 		}
 	}
 }

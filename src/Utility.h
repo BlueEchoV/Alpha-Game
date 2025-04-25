@@ -87,7 +87,7 @@ struct Type_Descriptor {
 
 struct CSV_Data {
 	std::string file_name;
-	int total_colunms;
+	int total_rows;
 	FILE* file;
 };
 
