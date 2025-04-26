@@ -160,14 +160,24 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 	}
 
 	std::string line = buffer;
-
 	std::vector<std::string> columns_names = split(line, ',');
 
 	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
-		for (int i = 0; i < data->total_rows; i++) {
+		for (int i = 0; i < columns_names.size(); i++) {
 			for (int j = 0; j < type_descriptors.size(); j++) {
 				Type_Descriptor current = type_descriptors[i];
+				int index = get_column_index(columns_names, current.variable_name);
 
+				if (current.variable_type == VT_Int) {
+				}
+				else if (current.variable_type == VT_Float) {
+				}
+				else if (current.variable_type == VT_String) {
+
+				}
+				else {
+					log("ERROR: Type Descriptor variable type not found");
+				}
 			}
 		}
 	}
