@@ -162,15 +162,22 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 	std::string line = buffer;
 	std::vector<std::string> columns_names = split(line, ',');
 
+	int current_row = 0;
 	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
 		for (int i = 0; i < columns_names.size(); i++) {
 			for (int j = 0; j < type_descriptors.size(); j++) {
 				Type_Descriptor current = type_descriptors[i];
 				int index = get_column_index(columns_names, current.variable_name);
 
+				//			      std::vector	 bytes of struct
+				void* write_ptr = destination + (stride * current_row);
+				current_row++;
+
 				if (current.variable_type == VT_Int) {
+					int destination_ptr = ;
 				}
 				else if (current.variable_type == VT_Float) {
+
 				}
 				else if (current.variable_type == VT_String) {
 
