@@ -174,7 +174,7 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 				current_row++;
 
 				if (current.variable_type == VT_Int) {
-					int destination_ptr = ;
+					int* destination_ptr = (int*)((char*)write_ptr + current.offset);
 				}
 				else if (current.variable_type == VT_Float) {
 
