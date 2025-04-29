@@ -153,6 +153,7 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 		open_csv_data_file(data);
 	}
 
+	// TODO: INCREASE BUFFER SIZE
 	char buffer[50];
 	// Get the first line
 	if (fgets(buffer, sizeof(buffer), data->file) == NULL) {
@@ -164,28 +165,26 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 
 	int current_row = 0;
 	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
-		for (int i = 0; i < columns_names.size(); i++) {
-			for (int j = 0; j < type_descriptors.size(); j++) {
-				Type_Descriptor current = type_descriptors[i];
-				int index = get_column_index(columns_names, current.variable_name);
+		Type_Descriptor current = type_descriptors[i];
+		// std::vector<std::string> column_values = split(line, ',');
+		int index = get_column_index(columns_names, current.variable_name);
 
-				//			      std::vector	 bytes of struct
-				void* write_ptr = destination + (stride * current_row);
-				current_row++;
+		//			      std::vector	 bytes of struct
+		void* write_ptr = destination + (stride * current_row);
+		current_row++;
 
-				if (current.variable_type == VT_Int) {
-					int* destination_ptr = (int*)((char*)write_ptr + current.offset);
-				}
-				else if (current.variable_type == VT_Float) {
+		if (current.variable_type == VT_Int) {
+			int* destination_ptr = (int*)((char*)write_ptr + current.offset);
+			// *destination_ptr = column_values[index];
+		}
+		else if (current.variable_type == VT_Float) {
 
-				}
-				else if (current.variable_type == VT_String) {
+		}
+		else if (current.variable_type == VT_String) {
 
-				}
-				else {
-					log("ERROR: Type Descriptor variable type not found");
-				}
-			}
+		}
+		else {
+			log("ERROR: Type Descriptor variable type not found");
 		}
 	}
 }
