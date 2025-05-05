@@ -185,7 +185,8 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 			}
 			else if (current.variable_type == VT_String) {
 				std::string* destination_ptr = (std::string*)((char*)write_ptr + current.offset);
-			}
+				*destination_ptr = column_values[column_index];
+			} 
 			else {
 				log("ERROR: Type Descriptor variable type not found");
 			}
