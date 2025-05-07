@@ -96,7 +96,7 @@ int count_csv_data_columns(CSV_Data* data) {
 		close_csv_data_file(data);
 	}
 
-	return (int)tokens.size();;
+	return (int)tokens.size();
 }
 
 int count_csv_data_rows(CSV_Data* data) {

@@ -307,6 +307,19 @@ Type_Descriptor weapon_data_type_descriptor[] = {
 	FIELD(Weapon_Data, VT_Int, fire_rate)
 };
 
-void load_weapon_data_csv(CSV_Data* data) {
-	REF(data);
+void load_weapon_data_csv(CSV_Data* data);
+
+Type_Descriptor weapon_data_type_descriptor[] = {
+	FIELD(Unit_Data, VT_String, image_type),
+	FIELD(Unit_Data, VT_Int, w),
+	FIELD(Unit_Data, VT_Int, h),
+	FIELD(Unit_Data, VT_Int, health),
+	FIELD(Unit_Data, VT_Int, damage),
+	FIELD(Unit_Data, VT_Int, speed)
+};
+
+void load_unit_data_csv(CSV_Data* data) {
+	std::vector<Unit_Data> unit_data;
+
+	// load_csv();
 }

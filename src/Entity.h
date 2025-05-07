@@ -120,7 +120,7 @@ struct Rigid_Body {
 };
 
 struct Unit_Data {
-	Image_Type image_type;
+	std::string image_type;
 	int w;
 	int h;
 	int health;
