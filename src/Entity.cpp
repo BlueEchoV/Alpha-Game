@@ -321,5 +321,5 @@ Type_Descriptor weapon_data_type_descriptor[] = {
 void load_unit_data_csv(CSV_Data* data) {
 	std::vector<Unit_Data> unit_data;
 
-	// load_csv();
+	load_csv_data_file(data, unit_data, unit_type_descriptor_array,sizeof(Unit_Data));
 }
