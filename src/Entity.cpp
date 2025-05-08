@@ -297,7 +297,7 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 	});
 }
 
-Type_Descriptor weapon_data_type_descriptor[] = {
+Type_Descriptor weapon_data_type_descriptors[] = {
 	FIELD(Weapon_Data, VT_String, weapon_type),
 	FIELD(Weapon_Data, VT_String, image_name),
 	FIELD(Weapon_Data, VT_String, projectile_type),
@@ -309,7 +309,7 @@ Type_Descriptor weapon_data_type_descriptor[] = {
 
 void load_weapon_data_csv(CSV_Data* data);
 
-Type_Descriptor weapon_data_type_descriptor[] = {
+Type_Descriptor unit_data_type_descriptors[] = {
 	FIELD(Unit_Data, VT_String, image_type),
 	FIELD(Unit_Data, VT_Int, w),
 	FIELD(Unit_Data, VT_Int, h),
@@ -320,6 +320,9 @@ Type_Descriptor weapon_data_type_descriptor[] = {
 
 void load_unit_data_csv(CSV_Data* data) {
 	std::vector<Unit_Data> unit_data;
+	unit_data.resize(data->total_rows);
 
-	load_csv_data_file(data, unit_data, unit_type_descriptor_array,sizeof(Unit_Data));
+	std::span<Type_Descriptor> safe_unit_daya_type_descriptors(unit_data_type_descriptors);
+
+	load_csv_data_file(data, (char*)unit_data.data(), safe_unit_daya_type_descriptors, sizeof(Unit_Data));
 }

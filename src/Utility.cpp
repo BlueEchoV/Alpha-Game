@@ -3,7 +3,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <span>
 
 void log(const char* format, ...) {
 	char buffer[256];
