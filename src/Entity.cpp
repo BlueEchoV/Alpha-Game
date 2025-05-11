@@ -310,7 +310,8 @@ Type_Descriptor weapon_data_type_descriptors[] = {
 void load_weapon_data_csv(CSV_Data* data);
 
 Type_Descriptor unit_data_type_descriptors[] = {
-	FIELD(Unit_Data, VT_String, image_type),
+	FIELD(Unit_Data, VT_String, unit_name),
+	FIELD(Unit_Data, VT_String, image_name),
 	FIELD(Unit_Data, VT_Int, w),
 	FIELD(Unit_Data, VT_Int, h),
 	FIELD(Unit_Data, VT_Int, health),
@@ -328,7 +329,7 @@ void load_unit_data_csv(CSV_Data* data) {
 
 	load_csv_data_file(data, (char*)unit_data.data(), safe_unit_daya_type_descriptors, sizeof(Unit_Data));
 
-	for (const auto& it : unit_data_map) {
-
+	for (Unit_Data data : unit_data) {
+		unit_data_map[data.unit_name] = data;
 	}
 }
