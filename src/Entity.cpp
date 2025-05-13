@@ -171,8 +171,8 @@ void Player::draw_weapon() {
 }
 
 Unit_Data unit_data[UT_Total_Unit_Types] = {
-	// Image_Type			  w,   h,   health, damage, speed
-	{IT_Enemy_Clothed_Zombie, 75, 75, 100,    10,     10}
+	// Unit_Typew	Image_Type			  w,   h,   health, damage, speed
+	{"Zombie",		"Clothed Zombie", 75, 75, 100,    10,     10}
 };
 
 Unit_Data* get_unit_data(Unit_Type unit_type) {
