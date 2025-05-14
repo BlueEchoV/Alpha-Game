@@ -108,7 +108,7 @@ Font load_font(const char* file_path) {
 }
 
 Image dummy_image = {};
-std::unordered_map<Image_Type, Image> images;
+std::unordered_map<std::string, Image> images;
 void load_images() {
 	// Init the dummy image
 	dummy_image = load_image("assets\\dummy_image.png");
@@ -126,8 +126,8 @@ void load_images() {
 	images[IT_Water_32x32] = load_image("assets\\water_32x32.png");
 }
 
-Image* get_image(Image_Type image_type) {
-	auto iterator = images.find(image_type);
+Image* get_image(std::string image_name) {
+	auto iterator = images.find(image_name);
 
 	if (iterator != images.end()) {
 		return &iterator->second;
