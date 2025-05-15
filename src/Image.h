@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer.h"
 #include <unordered_map>
+#include <string>
 
 struct Image {
 	int w;
@@ -49,9 +50,9 @@ enum Font_Type {
 
 Image load_image(const char* file_path);
 
-extern std::unordered_map<Image_Type, Image> images;
+extern std::unordered_map<std::string , Image> images;
 void load_images();
-Image* get_image(Image_Type image_type);
+Image* get_image(std::string image_name);
 
 extern std::unordered_map<Font_Type, Font> fonts;
 void load_fonts();

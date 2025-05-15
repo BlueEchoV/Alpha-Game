@@ -183,7 +183,7 @@ void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>
 	Unit result = {};
 
 	Unit_Data* data = get_unit_data(unit_type);
-	result.image = get_image(data->image_type);
+	result.image = get_image(data->image_name);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
 	float collider_radius = (float)data->w / 4;
