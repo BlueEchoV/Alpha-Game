@@ -147,7 +147,7 @@ struct Unit {
 
 struct Projectile_Data {
 	std::string projectile_type;
-	Image_Type it;
+	std::string image_name;
 
 	int w, h;
 	int speed;
