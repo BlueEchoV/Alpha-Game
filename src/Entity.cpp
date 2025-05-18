@@ -170,13 +170,13 @@ void Player::draw_weapon() {
 	mp_render_copy_ex(this->weapon->image->texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
 }
 
-Unit_Data unit_data[UT_Total_Unit_Types] = {
+Unit_Data bad_unit_data[UT_Total_Unit_Types] = {
 	// Unit_Typew	Image_Type			  w,   h,   health, damage, speed
 	{"Zombie",		"IT_Enemy_Clothed_Zombie", 75, 75, 100,    10,     10}
 };
 
 Unit_Data* get_unit_data(Unit_Type unit_type) {
-	return &unit_data[(int)unit_type];
+	return &bad_unit_data[(int)unit_type];
 }
 
 void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
