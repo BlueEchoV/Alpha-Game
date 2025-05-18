@@ -262,7 +262,7 @@ void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture
 			static float temp_angle = 0;
 			static float rotation_speed = 8.0f;
 			temp_angle += delta_time * rotation_speed;
-			mp_render_copy_ex(images[IT_Sun].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
+			mp_render_copy_ex(images["IT_Sun"].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
 			break;
 		}
 		default: {
@@ -325,7 +325,7 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 }
 
 void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
-	Image_Type type = IT_Rock_32x32;
+	std::string type = "IT_Rock_32x32";
 
 	// Move everything around the camera
 	int tile_ws_x = (Globals::tile_w * tile_index_x);
@@ -339,11 +339,11 @@ void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float n
 	float perlin = stb_perlin_noise3(perlin_x, perlin_y, 0, 0, 0, 0);
 
 	if (perlin <= -0.2f) {
-		type = IT_Water_32x32;
+		type = "IT_Water_32x32";
 	} else if (perlin > -0.2f && perlin < 0.3f) {
-		type = IT_Grass_32x32;
+		type = "IT_Grass_32x32";
 	} else {
-		type = IT_Rock_32x32;
+		type = "IT_Rock_32x32";
 	}
 
 	Image* image = get_image(type);
