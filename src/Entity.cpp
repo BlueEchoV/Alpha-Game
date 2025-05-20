@@ -329,7 +329,7 @@ void load_unit_data_csv(CSV_Data* data) {
 
 	load_csv_data_file(data, (char*)unit_data.data(), safe_unit_daya_type_descriptors, sizeof(Unit_Data));
 
-	for (Unit_Data& data : unit_data) {
-		unit_data_map[data.unit_name] = data;
+	for (Unit_Data& unit_data_iterator : unit_data) {
+		unit_data_map[unit_data_iterator.unit_name] = unit_data_iterator;
 	}
 }

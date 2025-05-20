@@ -41,7 +41,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 100;
-	game_data.player = create_player(get_image(IT_Player_Rugged_Male), { 0,0 }, player_speed);
+	game_data.player = create_player(get_image("IT_Player_Rugged_Male"), { 0,0 }, player_speed);
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
