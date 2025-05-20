@@ -188,6 +188,7 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 			} 
 			else {
 				log("ERROR: Type Descriptor variable type not found");
+				assert(false);
 			}
 		}
 	}
