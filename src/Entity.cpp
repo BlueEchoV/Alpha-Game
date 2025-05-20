@@ -1,5 +1,7 @@
 #include "Entity.h"
 
+std::unordered_map<std::string, Unit_Data> unit_data_map;
+
 V2 convert_cs_to_ws(V2 entity_pos, V2 camera_pos) {
 	return entity_pos + camera_pos;
 }
@@ -170,19 +172,23 @@ void Player::draw_weapon() {
 	mp_render_copy_ex(this->weapon->image->texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
 }
 
-Unit_Data bad_unit_data[UT_Total_Unit_Types] = {
-	// Unit_Typew	Image_Type			  w,   h,   health, damage, speed
-	{"Zombie",		"IT_Enemy_Clothed_Zombie", 75, 75, 100,    10,     10}
+Unit_Data bad_unit_data = {
+	// Unit_Type	 Image_Type					w,   h,   health, damage, speed
+	"Zombie_Male_1","Zombie_Male_1",  75,  75,  100,    10,     10
 };
 
-Unit_Data* get_unit_data(Unit_Type unit_type) {
-	return &bad_unit_data[(int)unit_type];
+Unit_Data* get_unit_data(std::string unit_type) {
+	if (unit_data_map.find(unit_type) != unit_data_map.end()) {
+		return &unit_data_map[unit_type];
+	}
+
+	return &bad_unit_data;
 }
 
-void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
+void spawn_unit(std::string unit_name, Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
 	Unit result = {};
 
-	Unit_Data* data = get_unit_data(unit_type);
+	Unit_Data* data = get_unit_data(unit_name);
 	result.image = get_image(data->image_name);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
@@ -318,8 +324,6 @@ Type_Descriptor unit_data_type_descriptors[] = {
 	FIELD(Unit_Data, VT_Int, damage),
 	FIELD(Unit_Data, VT_Int, speed)
 };
-
-std::unordered_map<std::string, Unit_Data> unit_data_map;
 
 void load_unit_data_csv(CSV_Data* data) {
 	std::vector<Unit_Data> unit_data;

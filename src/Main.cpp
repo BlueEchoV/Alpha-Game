@@ -197,7 +197,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
 			mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
 			spawn_unit(
-				UT_Zombie,
+				"male_zombie",
 				game_data.unit_storage,
 				game_data.enemy_unit_handles,
 				&game_data.player,

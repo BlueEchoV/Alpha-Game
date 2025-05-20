@@ -263,7 +263,7 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
 void draw_player(Player& p, V2 camera_ws_pos);
 
-void spawn_unit(Unit_Type unit_type, Storage<Unit>& storage, std::vector<Handle>& handles,
+void spawn_unit(std::string unit_name, Storage<Unit>& storage, std::vector<Handle>& handles,
 	Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
