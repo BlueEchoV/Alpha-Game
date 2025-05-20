@@ -200,7 +200,7 @@ struct Weapon {
 	float fire_cooldown;
 };
 
-void load_weapon_data_csv(CSV_Data* data);
+void load_unit_data_csv(CSV_Data* data);
 
 struct Game_Data;
 
