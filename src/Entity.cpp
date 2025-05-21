@@ -173,8 +173,8 @@ void Player::draw_weapon() {
 }
 
 Unit_Data bad_unit_data = {
-	// Unit_Type	 Image_Type					w,   h,   health, damage, speed
-	"Zombie_Male_1","Zombie_Male_1",  75,  75,  100,    10,     10
+	// Unit_Type	 Image_Type		  w,   h,   health, damage, speed
+	"zombie_male",	"zombie_male",  75,  75,  100,    10,     10
 };
 
 Unit_Data* get_unit_data(std::string unit_type) {

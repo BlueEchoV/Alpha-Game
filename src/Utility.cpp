@@ -62,8 +62,14 @@ bool close_csv_data_file(CSV_Data* data) {
 }
 
 std::vector<std::string> split(const std::string& str, char delimiter) {
+	std::string str_copy = str;
+
+	if (!str_copy.empty() && str_copy.back() == '\n') {
+		str_copy.pop_back();
+	}
+
 	std::vector<std::string> tokens;
-	std::istringstream my_string(str);
+	std::istringstream my_string(str_copy);
 
 	for (std::string token; std::getline(my_string, token, delimiter);) {
 		tokens.push_back(token);
@@ -147,6 +153,11 @@ int get_column_index(std::vector<std::string>& column_names, std::string name) {
 	return index;
 }
 
+size_t file_last_time_modified(CSV_Data* data) {
+	REF(data);
+	return 0;
+}
+
 void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descriptor> type_descriptors, size_t stride) {
 	if (data->file == NULL) {
 		open_csv_data_file(data);
@@ -164,7 +175,7 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 
 	int current_row = 0;
 	while (fgets(buffer, sizeof(buffer), data->file) != NULL) {
-		std::vector<std::string> column_values = split(line, ',');
+		std::vector<std::string> column_values = split(buffer, ',');
 
 		//			      std::vector	 bytes of struct
 		void* write_ptr = destination + (stride * current_row);

@@ -1,1 +1,2 @@
 unit_name,image_name,w,h,health,damage,speed
+zombie_male,zombie_male,75,75,100,10,10
