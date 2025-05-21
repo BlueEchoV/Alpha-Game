@@ -280,3 +280,4 @@ void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font, float delta_time)
 	mp_render_draw_line((int)new_bottom_right.x, (int)new_bottom_right.y, (int)new_bottom_left.x, (int)new_bottom_left.y);
 	mp_render_draw_line((int)new_bottom_left.x, (int)new_bottom_left.y, (int)new_top_left.x, (int)new_top_left.y);
 }
+

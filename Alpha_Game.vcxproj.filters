@@ -43,6 +43,9 @@
     <ClCompile Include="src\Audio_DirectSound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Sprite_Sheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -81,5 +84,6 @@
     <ClInclude Include="src\Audio_DirectSound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Sprite_Sheet.h" />
   </ItemGroup>
 </Project>
