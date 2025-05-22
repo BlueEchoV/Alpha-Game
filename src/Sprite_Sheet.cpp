@@ -41,7 +41,7 @@ std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 void load_sprite_sheets() {
 	dummy_sprite_sheet = create_animation_sprite_sheet("dummy_image", 0.25, 1, 1);
 	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("temp_zombie_walk", 0.25, 1, 10);
-	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("idle_zombie_male", NULL, 1, 1);
+	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("idle_temp_zombie", NULL, 1, 1);
 }
 
 Sprite_Sheet* get_sprite_sheet(std::string name) {
@@ -108,4 +108,14 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 	else {
 		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
 	}
+}
+
+Type_Descriptor sprite_sheet_type_descriptors[] = {
+	FIELD(),
+	FIELD()
+}
+
+void load_sprite_sheet_csv(const char* file_name) {
+
+
 }

@@ -176,7 +176,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_y_delta = -1.0f;
 		}
 		if (key_pressed_and_held(KEY_D)) {
-			change_animation(&player->at, "temp_zombie_walk", false);
+			change_animation(&player->at, "temp_zombie_walk", true);
 			player_x_delta = 1.0f;
 		} 
 		if (key_pressed_and_held(KEY_A)) {
@@ -195,7 +195,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed_and_held(VK_SPACE)) {
 			// Change this to fire weapon
 			player->fire_weapon(game_data);
-
 		}
 
 		player->update_weapon(delta_time);
