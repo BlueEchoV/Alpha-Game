@@ -112,6 +112,7 @@ std::unordered_map<std::string, Image> images;
 void load_images() {
 	// Init the dummy image
 	dummy_image = load_image("assets\\dummy_image.png");
+	images["dummy_image"] = load_image("assets\\dummy_image.png");
 	assert(&dummy_image != NULL);
 
 	images["IT_Sun"] = load_image("assets\\sun.png");
@@ -124,6 +125,7 @@ void load_images() {
 	images["IT_Rock_32x32"] = load_image("assets\\rock_32x32.png");
 	images["IT_Grass_32x32"] = load_image("assets\\grass_32x32.png");
 	images["IT_Water_32x32"] = load_image("assets\\water_32x32.png");
+	images["temp_zombie_walk"] = load_image("assets\\temp_zombie_walk.png");
 }
 
 Image* get_image(std::string image_name) {

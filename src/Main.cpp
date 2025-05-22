@@ -1,6 +1,6 @@
 #include "GL_Functions.h"
 #include "Game.h"
-#include "Image.h"
+#include "Sprite_Sheet.h"
 #include "Audio_xAudio2.h"
 #include "Audio_DirectSound.h"
 
@@ -31,6 +31,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	Globals::renderer = mp_create_renderer(hInstance);
 	load_images();
+	load_sprite_sheets();
 	load_fonts();
 
 	CSV_Data csv_data = create_open_csv_data("data\\weapon_data.csv");
@@ -41,7 +42,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 100;
-	game_data.player = create_player(get_image("IT_Player_Rugged_Male"), { 0,0 }, player_speed);
+	game_data.player = create_player("temp_zombie_walk", { 0,0 }, player_speed);
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
@@ -192,6 +193,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		player->update_weapon(delta_time);
+		update_animation_tracker(&player->at, delta_time);
 
 		if (key_pressed_and_held(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
@@ -281,6 +283,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		// Render
 		render(game_data, delta_time);
+
+		draw_player(game_data.player, game_data.camera.pos_ws);
+
+		mp_render_present();
 
 		delete_destroyed_entities_from_handles(game_data);
 	}

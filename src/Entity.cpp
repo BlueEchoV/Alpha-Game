@@ -88,10 +88,10 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	return result;
 }
 
-Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
+Player create_player(std::string selected_sprite_sheet, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
 
-	result.image = image;
+	result.at = create_animation_tracker(selected_sprite_sheet);
 
 	result.w = Globals::player_width;
 	result.h = Globals::player_height;
@@ -101,10 +101,12 @@ Player create_player(Image* image, V2 spawn_pos_ws, int player_speed) {
 		player_speed
 	);
 
+	/*
 	float collider_radius = 32;
 	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
 	add_collider(&result.rb, { 0,   	  						 0 }, collider_radius);
 	add_collider(&result.rb, { 0, -result.image->sprite_radius / 2 }, collider_radius);
+	*/
 
 	return result;
 }
@@ -119,7 +121,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	V2 p_pos_cs = convert_ws_to_cs({ (float)p_draw_rect.x, (float)p_draw_rect.y }, camera_ws_pos);
 	p_draw_rect.x = (int)p_pos_cs.x; 
 	p_draw_rect.y = (int)p_pos_cs.y; 
-	mp_render_copy_ex(p.image->texture, NULL, &p_draw_rect, p.rb.angle, NULL, SDL_FLIP_NONE);
+	draw_animation_tracker(&p.at, p_draw_rect);
 }
 
 Weapon_Data weapon_data[WT_Total] = {

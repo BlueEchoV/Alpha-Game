@@ -84,6 +84,8 @@
     <ClInclude Include="src\Audio_DirectSound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sprite_Sheet.h" />
+    <ClInclude Include="src\Sprite_Sheet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

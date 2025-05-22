@@ -387,13 +387,12 @@ void render(Game_Data& game_data, float delta_time) {
 		}
 	}
 
-	mp_set_texture_alpha_mod(game_data.player.image->texture, 255);
 
-	draw_player(game_data.player, game_data.camera.pos_ws);
-	draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
+	// draw_player(game_data.player, game_data.camera.pos_ws);
+	// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 
 	Font* font = get_font(game_data.selected_font);
-	debug_draw_all_debug_info(game_data, *font, game_data.player.image->texture, delta_time);
+	debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);
 
 	for (Handle projectile: game_data.projectile_handles) {
 		Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
@@ -419,6 +418,6 @@ void render(Game_Data& game_data, float delta_time) {
 		draw_colliders(&u->rb, game_data.camera.pos_ws);
 	}
 
-	mp_render_present();
+
 }
 

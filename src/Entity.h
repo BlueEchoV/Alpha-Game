@@ -1,7 +1,7 @@
 #pragma once
 #include "Utility.h"
 #include "renderer.h"
-#include "Image.h"
+#include "Sprite_Sheet.h"
 #include <vector>
 
 struct MP_Renderer;
@@ -205,7 +205,7 @@ void load_unit_data_csv(CSV_Data* data);
 struct Game_Data;
 
 struct Player {
-	Image* image;
+	Animation_Tracker at;
 
 	Rigid_Body rb;
 
@@ -260,7 +260,7 @@ void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
 void draw_colliders(Rigid_Body* rb, V2 camera_pos);
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 
-Player create_player(Image* image, V2 spawn_pos_ws, int player_speed);
+Player create_player(std::string selected_sprite_sheet, V2 spawn_pos_ws, int player_speed);
 void draw_player(Player& p, V2 camera_ws_pos);
 
 void spawn_unit(std::string unit_name, Storage<Unit>& storage, std::vector<Handle>& handles,
