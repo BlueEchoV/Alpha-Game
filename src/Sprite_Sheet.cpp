@@ -12,7 +12,7 @@ Sprite create_sprite(Image* image, MP_Rect src_rect) {
 Sprite_Sheet create_animation_sprite_sheet(std::string image_name, float default_frame_speed_seconds, 
 	int rows, int columns) {
 	Sprite_Sheet result = {};
-	result.default_frame_speed = default_frame_speed_seconds;
+	result.default_frame_speed_seconds = default_frame_speed_seconds;
 	Image* image = get_image(image_name);
 
 	if (image != NULL) {
@@ -39,8 +39,9 @@ Sprite_Sheet dummy_sprite_sheet = {};
 std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 
 void load_sprite_sheets() {
-	dummy_sprite_sheet = create_animation_sprite_sheet("dummy_image", 1, 1, 1);
-	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("temp_zombie_walk", 1, 1, 10);
+	dummy_sprite_sheet = create_animation_sprite_sheet("dummy_image", 0.25, 1, 1);
+	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("temp_zombie_walk", 0.25, 1, 10);
+	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("idle_zombie_male", NULL, 1, 1);
 }
 
 Sprite_Sheet* get_sprite_sheet(std::string name) {
@@ -59,14 +60,21 @@ Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet) {
 	Animation_Tracker result = {};
 
 	result.selected_sprite_sheet = selected_sprite_sheet;
+	result.current_frame_index = 0;
+	result.current_frame_time = 0.0f;
 
 	return result;
 }
 
-void change_animation(Animation_Tracker* at, std::string new_sprite_sheet) {
-	REF(at);
-	REF(new_sprite_sheet);
+void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, bool flip) {
 	// Init the default frame to zero here
+	if (at->selected_sprite_sheet != new_selected_sprite_sheet) {
+		at->selected_sprite_sheet = new_selected_sprite_sheet;
+		at->current_frame_index = 0;
+	}
+	if (at->flip != flip) {
+		at->flip = !at->flip;
+	}
 }
 
 void update_animation_tracker(Animation_Tracker* at, float delta_time) {
@@ -74,14 +82,17 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time) {
 
 	size_t frame_count = ss->sprites.size();
 
-	if (0.0f > at->current_frame_time) {
-		at->current_frame_time = ss->default_frame_speed;
-		int index = at->current_frame_index;
-		// Increment to next frame
-		at->current_frame_index = (index + 1) % frame_count;
-	}
-	else {
-		at->current_frame_time -= delta_time;
+	// Only update if there is more than 1 image present
+	if (frame_count > 1) {
+		if (0.0f >= at->current_frame_time) {
+			at->current_frame_time = ss->default_frame_speed_seconds;
+			int index = at->current_frame_index;
+			// Increment to next frame
+			at->current_frame_index = (index + 1) % frame_count;
+		}
+		else {
+			at->current_frame_time -= delta_time;
+		}
 	}
 }
 
@@ -90,5 +101,11 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image->texture;
-	mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
+
+	if (at->flip) {
+		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_HORIZONTAL);
+	}
+	else {
+		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
+	}
 }

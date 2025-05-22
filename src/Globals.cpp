@@ -15,8 +15,8 @@ namespace Globals {
 	int tile_w = 32;
 	int tile_h = 32;
 
-	int player_width = 96;
-	int player_height = 96;
+	int player_width = 192;
+	int player_height = 192;
 
 	extern int debug_total_arrows = 0;
 }

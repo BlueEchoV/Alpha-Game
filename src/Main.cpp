@@ -164,23 +164,29 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// uint64_t temp = uint64_t(delta_time * 1000.0f);
 		// log("Frame Time milliseconds %i", temp);
 
+		Player* player = &game_data.player;
+
 		// input()
 		float player_x_delta = 0.0f;
 		float player_y_delta = 0.0f;
 		if (key_pressed_and_held(KEY_W)) {
 			player_y_delta = 1.0f;
-		}
+		} 
 		if (key_pressed_and_held(KEY_S)) {
 			player_y_delta = -1.0f;
 		}
 		if (key_pressed_and_held(KEY_D)) {
+			change_animation(&player->at, "temp_zombie_walk", false);
 			player_x_delta = 1.0f;
-		}
+		} 
 		if (key_pressed_and_held(KEY_A)) {
+			change_animation(&player->at, "temp_zombie_walk", true);
 			player_x_delta = -1.0f;
-		}
+		} 
 
-		Player* player = &game_data.player;
+		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D)) {
+			change_animation(&player->at, "idle_zombie_male", false);
+		}
 
 		if (player->weapon == nullptr) {
 			player->equip_weapon(WT_Bow);

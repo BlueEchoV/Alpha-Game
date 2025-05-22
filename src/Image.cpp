@@ -118,7 +118,7 @@ void load_images() {
 	images["IT_Sun"] = load_image("assets\\sun.png");
 	images["IT_Dummy_Player"] = load_image("assets\\dummy_player.png");
 	images["IT_Player_Rugged_Male"] = load_image("assets\\player_rugged_male.png");
-	images["zombie_male"] = load_image("assets\\zombie_male.png");
+	images["idle_zombie_male"] = load_image("assets\\idle_zombie_male.png");
 	images["IT_Top_Down_Player_Demo"] = load_image("assets\\top_down_player_demo.png");
 	images["IT_Arrow_1"] = load_image("assets\\arrow_1.png");
 	images["IT_Dummy_Tile_32x32"] = load_image("assets\\dummy_tile_32x32.png");
