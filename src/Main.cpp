@@ -184,17 +184,29 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed_and_held(KEY_S)) {
 			player_y_delta = -1.0f;
 		}
-		if (key_pressed_and_held(KEY_D)) {
-			change_animation(&player->at, "temp_zombie_walk", true);
-			player_x_delta = 1.0f;
-		} 
-		if (key_pressed_and_held(KEY_A)) {
-			change_animation(&player->at, "temp_zombie_walk", false);
+
+		if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
+			player->facing_direction = FD_Left;
+			change_animation(&player->at, "player_1_run", player->facing_direction);
+			player_x_delta = -2.0f;
+		} else if (key_pressed_and_held(KEY_A)) {
+			player->facing_direction = FD_Left;
+			change_animation(&player->at, "player_1_walk", player->facing_direction);
 			player_x_delta = -1.0f;
 		} 
 
+		if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
+			player->facing_direction = FD_Right;
+			change_animation(&player->at, "player_1_run", player->facing_direction);
+			player_x_delta = 2.0f;
+		} else if (key_pressed_and_held(KEY_D)) {
+			player->facing_direction = FD_Right;
+			change_animation(&player->at, "player_1_walk", player->facing_direction);
+			player_x_delta = 1.0f;
+		}
+
 		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D)) {
-			change_animation(&player->at, "idle_temp_zombie", false);
+			change_animation(&player->at, "player_1_idle", player->facing_direction);
 		}
 
 		if (player->weapon == nullptr) {

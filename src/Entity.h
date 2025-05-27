@@ -211,6 +211,8 @@ struct Player {
 
 	int w, h;
 
+	Facing_Direction facing_direction = FD_Right;
+
 	// Could this all be put into a 'weapon_kit' of some sort?
 	Weapon* weapon;
 	void equip_weapon(Weapon_Type wt);

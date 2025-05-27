@@ -60,15 +60,13 @@ Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet) {
 	return result;
 }
 
-void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, bool flip) {
+void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, Facing_Direction facing_direction) {
 	// Init the default frame to zero here
 	if (at->selected_sprite_sheet != new_selected_sprite_sheet) {
 		at->selected_sprite_sheet = new_selected_sprite_sheet;
 		at->current_frame_index = 0;
 	}
-	if (at->flip != flip) {
-		at->flip = !at->flip;
-	}
+	at->fd = facing_direction;
 }
 
 void update_animation_tracker(Animation_Tracker* at, float delta_time) {
@@ -96,7 +94,7 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
-	if (at->flip) {
+	if (at->fd == FD_Left) {
 		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_HORIZONTAL);
 	}
 	else {

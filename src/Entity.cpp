@@ -91,6 +91,7 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 Player create_player(std::string selected_sprite_sheet, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
 
+	result.facing_direction = FD_Right;
 	result.at = create_animation_tracker(selected_sprite_sheet);
 
 	result.w = Globals::player_width;

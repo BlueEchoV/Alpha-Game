@@ -1,6 +1,11 @@
 #pragma once
 #include "Image.h"
 
+enum Facing_Direction {
+	FD_Right,
+	FD_Left
+};
+
 struct Sprite {
 	Image image;
 	MP_Rect src_rect;
@@ -25,7 +30,7 @@ struct Sprite_Sheet {
 struct Animation_Tracker {
 	std::string selected_sprite_sheet;
 
-	bool flip;
+	Facing_Direction fd; 
 	int current_frame_index;
 	float current_frame_time;
 };
@@ -37,7 +42,7 @@ extern std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 Sprite_Sheet* get_sprite_sheet(std::string name);
 Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, float default_frame_speed_seconds, int rows, int columns);
 Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet);
-void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, bool flip);
+void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, Facing_Direction facing_direction);
 void update_animation_tracker(Animation_Tracker* at, float delta_time);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst);
 
