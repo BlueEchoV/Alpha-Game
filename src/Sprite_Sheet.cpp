@@ -9,11 +9,11 @@ Sprite create_sprite(Image image, MP_Rect src_rect) {
 	return result; 
 }
 
-Sprite_Sheet create_animation_sprite_sheet(const char* file_name, float default_frame_speed_seconds, 
+Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, float default_frame_speed_seconds, 
 	int rows, int columns) {
 	Sprite_Sheet result = {};
 	result.default_frame_speed_seconds = default_frame_speed_seconds;
-	Image image = load_image(file_name);
+	Image image = load_image(full_file_path.c_str());
 
 	if (image.texture != NULL) {
 		for (int x = 0; x < rows; x++) {
@@ -105,7 +105,9 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 }
 
 Type_Descriptor sprite_sheet_type_descriptors[] = {
+	FIELD(Sprite_Sheet_Data, VT_String, root),
 	FIELD(Sprite_Sheet_Data, VT_String, image_name),
+	FIELD(Sprite_Sheet_Data, VT_String, ext),
 	FIELD(Sprite_Sheet_Data, VT_Float, default_frame_speed_seconds),
 	FIELD(Sprite_Sheet_Data, VT_Int, rows),
 	FIELD(Sprite_Sheet_Data, VT_Int, columns)
@@ -127,15 +129,15 @@ void load_sprite_sheet_csv(CSV_Data* data) {
 }
 
 void load_sprite_sheets() {
-	dummy_sprite_sheet = create_animation_sprite_sheet("dummy_image", 0.25, 1, 1);
-	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("temp_zombie_walk", 0.25, 1, 10);
-	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("idle_temp_zombie", NULL, 1, 1);
+	dummy_sprite_sheet = create_animation_sprite_sheet("assets\\dummy_image.png", 0.25, 1, 1);
+	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("assets\\temp_zombie_walk.png", 0.25, 1, 10);
+	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("assets\\idle_temp_zombie.png", NULL, 1, 1);
 
 	for (const auto& it : sprite_sheet_data_map) {
-		std::string file_name = it.second.image_name + ".png";
+		std::string full_file_path = it.second.root + it.second.image_name + ".png";
 
-		create_animation_sprite_sheet(
-			file_name, 
+		sprite_sheet_map[it.second.image_name] = create_animation_sprite_sheet(
+			full_file_path.c_str(), 
 			it.second.default_frame_speed_seconds, 
 			it.second.rows, 
 			it.second.columns

@@ -30,14 +30,24 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	REF(nShowCmd);
 
 	Globals::renderer = mp_create_renderer(hInstance);
+
+	// Just raw images
 	load_images();
-	load_sprite_sheets();
+
 	load_fonts();
 
-	CSV_Data csv_data = create_open_csv_data("data\\weapon_data.csv");
-	open_csv_data_file(&csv_data);
-	load_unit_data_csv(&csv_data);
-	close_csv_data_file(&csv_data);
+	// Sprite sheets for the animation trackers
+	load_sprite_sheets();
+
+	CSV_Data unit_csv_data = create_open_csv_data("data\\unit_data.csv");
+	open_csv_data_file(&unit_csv_data);
+	load_unit_data_csv(&unit_csv_data);
+	close_csv_data_file(&unit_csv_data);
+
+	CSV_Data sprite_sheet_csv_data = create_open_csv_data("data\\sprite_sheet_data.csv");
+	open_csv_data_file(&sprite_sheet_csv_data);
+	load_unit_data_csv(&sprite_sheet_csv_data);
+	close_csv_data_file(&sprite_sheet_csv_data);
 
 	game_data.selected_font = FT_Basic;
 

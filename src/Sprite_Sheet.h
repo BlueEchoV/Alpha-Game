@@ -7,7 +7,11 @@ struct Sprite {
 };
 
 struct Sprite_Sheet_Data {
+	// For constructing the file path
+	std::string root;
 	std::string image_name;
+	std::string ext;
+
 	float default_frame_speed_seconds;
 	int rows;
 	int columns;
@@ -33,7 +37,7 @@ extern std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 
 void load_sprite_sheets();
 Sprite_Sheet* get_sprite_sheet(std::string name);
-Sprite_Sheet create_animation_sprite_sheet(const char* image_name, float default_frame_speed, int rows, int columns);
+Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, float default_frame_speed_seconds, int rows, int columns);
 Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet);
 void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, bool flip);
 void update_animation_tracker(Animation_Tracker* at, float delta_time);
