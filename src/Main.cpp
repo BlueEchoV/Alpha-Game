@@ -178,35 +178,48 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// input()
 		float player_x_delta = 0.0f;
 		float player_y_delta = 0.0f;
-		if (key_pressed_and_held(KEY_W)) {
+
+		if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
+			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
 			player_y_delta = 1.0f;
 		} 
+		if (key_pressed_and_held(KEY_W)) {
+			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Slow);
+			player_y_delta = 1.0f;
+		} 
+
+		if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
+			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
+			player_y_delta = -1.0f;
+		}
 		if (key_pressed_and_held(KEY_S)) {
+			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Slow);
 			player_y_delta = -1.0f;
 		}
 
 		if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
-			player->facing_direction = FD_Left;
-			change_animation(&player->at, "player_1_run", player->facing_direction);
+			player->at.fd = FD_Left;
+			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
 			player_x_delta = -2.0f;
 		} else if (key_pressed_and_held(KEY_A)) {
-			player->facing_direction = FD_Left;
-			change_animation(&player->at, "player_1_walk", player->facing_direction);
+			player->at.fd = FD_Left;
+			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Slow);
 			player_x_delta = -1.0f;
 		} 
 
 		if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
-			player->facing_direction = FD_Right;
-			change_animation(&player->at, "player_1_run", player->facing_direction);
+			player->at.fd = FD_Right;
+			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
 			player_x_delta = 2.0f;
 		} else if (key_pressed_and_held(KEY_D)) {
-			player->facing_direction = FD_Right;
-			change_animation(&player->at, "player_1_walk", player->facing_direction);
+			player->at.fd = FD_Right;
+			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Fast);
 			player_x_delta = 1.0f;
 		}
 
-		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D)) {
-			change_animation(&player->at, "player_1_idle", player->facing_direction);
+		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
+			!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
+			change_animation(&player->at, "player_1_idle", player->at.fd, APS_Slow);
 		}
 
 		if (player->weapon == nullptr) {

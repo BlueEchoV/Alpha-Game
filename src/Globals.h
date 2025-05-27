@@ -24,7 +24,9 @@ namespace Globals {
 
 	extern int debug_total_arrows;
 
-	extern float default_animation_play_speed;
+	extern float slow_frames_per_sec;
+	extern float fast_frames_per_sec;
+	extern float travel_speed_based_frames_per_second;
 
 	const int MAX_COLLIDERS = 100;
 }

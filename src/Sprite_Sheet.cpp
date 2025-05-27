@@ -9,10 +9,8 @@ Sprite create_sprite(Image image, MP_Rect src_rect) {
 	return result; 
 }
 
-Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, float default_frame_speed_seconds, 
-	int rows, int columns) {
+Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows, int columns) {
 	Sprite_Sheet result = {};
-	result.default_frame_speed_seconds = default_frame_speed_seconds;
 	Image image = load_image(full_file_path.c_str());
 
 	if (image.texture != NULL) {
@@ -60,11 +58,13 @@ Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet) {
 	return result;
 }
 
-void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, Facing_Direction facing_direction) {
+void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, 
+	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed) {
 	// Init the default frame to zero here
 	if (at->selected_sprite_sheet != new_selected_sprite_sheet) {
 		at->selected_sprite_sheet = new_selected_sprite_sheet;
 		at->current_frame_index = 0;
+		at->aps = animation_play_speed;
 	}
 	at->fd = facing_direction;
 }
@@ -77,7 +77,25 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time) {
 	// Only update if there is more than 1 image present
 	if (frame_count > 1) {
 		if (0.0f >= at->current_frame_time) {
-			at->current_frame_time = ss->default_frame_speed_seconds;
+			switch (at->aps) {
+			case APS_Slow: {
+				at->current_frame_time = 1.0f / Globals::slow_frames_per_sec;
+				break;
+			}
+			case APS_Fast: {
+				at->current_frame_time = 1.0f / Globals::fast_frames_per_sec;
+				break;
+			}
+			case APS_Speed_Based: {
+				// Speed Based
+				at->current_frame_time = 1.0f / (Globals::fast_frames_per_sec * 2);
+				break;
+			}
+			default: {
+				// 1 is enough to recognize there is a bug
+				at->current_frame_time = 1.0f;
+			}
+			}
 			int index = at->current_frame_index;
 			// Increment to next frame
 			at->current_frame_index = (index + 1) % frame_count;
@@ -126,14 +144,13 @@ void load_sprite_sheet_data_csv(CSV_Data* data) {
 }
 
 void load_sprite_sheets() {
-	dummy_sprite_sheet = create_animation_sprite_sheet("assets\\dummy_image.png", Globals::default_animation_play_speed, 1, 1);
+	dummy_sprite_sheet = create_animation_sprite_sheet("assets\\dummy_image.png", 1, 1);
 
 	for (const auto& it : sprite_sheet_data_map) {
 		std::string full_file_path = it.second.root + it.second.sprite_sheet_name+ ".png";
 
 		sprite_sheet_map[it.second.sprite_sheet_name] = create_animation_sprite_sheet(
 			full_file_path.c_str(), 
-			Globals::default_animation_play_speed,
 			it.second.rows, 
 			it.second.columns
 		);
