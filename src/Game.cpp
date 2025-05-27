@@ -417,7 +417,5 @@ void render(Game_Data& game_data, float delta_time) {
 		draw_unit(*u, game_data.camera.pos_ws);
 		draw_colliders(&u->rb, game_data.camera.pos_ws);
 	}
-
-
 }
 

@@ -106,16 +106,15 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 
 Type_Descriptor sprite_sheet_type_descriptors[] = {
 	FIELD(Sprite_Sheet_Data, VT_String, root),
-	FIELD(Sprite_Sheet_Data, VT_String, image_name),
+	FIELD(Sprite_Sheet_Data, VT_String, sprite_sheet_name),
 	FIELD(Sprite_Sheet_Data, VT_String, ext),
-	FIELD(Sprite_Sheet_Data, VT_Float, default_frame_speed_seconds),
 	FIELD(Sprite_Sheet_Data, VT_Int, rows),
 	FIELD(Sprite_Sheet_Data, VT_Int, columns)
 };
 
 std::unordered_map<std::string, Sprite_Sheet_Data> sprite_sheet_data_map;
 
-void load_sprite_sheet_csv(CSV_Data* data) {
+void load_sprite_sheet_data_csv(CSV_Data* data) {
 	std::vector<Sprite_Sheet_Data> sprite_sheet_data = {};
 	sprite_sheet_data.resize(data->total_rows);
 
@@ -124,21 +123,19 @@ void load_sprite_sheet_csv(CSV_Data* data) {
 	load_csv_data_file(data, (char*)sprite_sheet_data.data(), sprite_sheet_type_descriptors, sizeof(Sprite_Sheet_Data));
 
 	for (Sprite_Sheet_Data& it : sprite_sheet_data) {
-		sprite_sheet_data_map[it.image_name] = it;
+		sprite_sheet_data_map[it.sprite_sheet_name] = it;
 	}
 }
 
 void load_sprite_sheets() {
-	dummy_sprite_sheet = create_animation_sprite_sheet("assets\\dummy_image.png", 0.25, 1, 1);
-	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("assets\\temp_zombie_walk.png", 0.25, 1, 10);
-	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("assets\\idle_temp_zombie.png", NULL, 1, 1);
+	dummy_sprite_sheet = create_animation_sprite_sheet("assets\\dummy_image.png", Globals::default_animation_play_speed, 1, 1);
 
 	for (const auto& it : sprite_sheet_data_map) {
-		std::string full_file_path = it.second.root + it.second.image_name + ".png";
+		std::string full_file_path = it.second.root + it.second.sprite_sheet_name+ ".png";
 
-		sprite_sheet_map[it.second.image_name] = create_animation_sprite_sheet(
+		sprite_sheet_map[it.second.sprite_sheet_name] = create_animation_sprite_sheet(
 			full_file_path.c_str(), 
-			it.second.default_frame_speed_seconds, 
+			Globals::default_animation_play_speed,
 			it.second.rows, 
 			it.second.columns
 		);

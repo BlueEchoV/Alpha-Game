@@ -19,4 +19,6 @@ namespace Globals {
 	int player_height = 192;
 
 	extern int debug_total_arrows = 0;
+
+	extern float default_animation_play_speed = 0.25f;
 }

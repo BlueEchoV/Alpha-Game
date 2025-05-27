@@ -36,9 +36,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	load_fonts();
 
-	// Sprite sheets for the animation trackers
-	load_sprite_sheets();
-
 	CSV_Data unit_csv_data = create_open_csv_data("data\\unit_data.csv");
 	open_csv_data_file(&unit_csv_data);
 	load_unit_data_csv(&unit_csv_data);
@@ -46,8 +43,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	CSV_Data sprite_sheet_csv_data = create_open_csv_data("data\\sprite_sheet_data.csv");
 	open_csv_data_file(&sprite_sheet_csv_data);
-	load_unit_data_csv(&sprite_sheet_csv_data);
+	load_sprite_sheet_data_csv(&sprite_sheet_csv_data);
 	close_csv_data_file(&sprite_sheet_csv_data);
+	// Sprite sheets for the animation trackers
+	load_sprite_sheets();
 
 	game_data.selected_font = FT_Basic;
 
@@ -190,12 +189,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_x_delta = 1.0f;
 		} 
 		if (key_pressed_and_held(KEY_A)) {
-			change_animation(&player->at, "temp_zombie_walk", true);
+			change_animation(&player->at, "temp_zombie_walk", false);
 			player_x_delta = -1.0f;
 		} 
 
 		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D)) {
-			change_animation(&player->at, "idle_zombie_male", false);
+			change_animation(&player->at, "idle_temp_zombie", false);
 		}
 
 		if (player->weapon == nullptr) {
