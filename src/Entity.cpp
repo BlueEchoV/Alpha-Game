@@ -331,9 +331,9 @@ void load_unit_data_csv(CSV_Data* data) {
 	std::vector<Unit_Data> unit_data;
 	unit_data.resize(data->total_rows);
 
-	std::span<Type_Descriptor> safe_unit_daya_type_descriptors(unit_data_type_descriptors);
+	std::span<Type_Descriptor> safe_unit_data_type_descriptors(unit_data_type_descriptors);
 
-	load_csv_data_file(data, (char*)unit_data.data(), safe_unit_daya_type_descriptors, sizeof(Unit_Data));
+	load_csv_data_file(data, (char*)unit_data.data(), safe_unit_data_type_descriptors, sizeof(Unit_Data));
 
 	for (Unit_Data& unit_data_iterator : unit_data) {
 		unit_data_map[unit_data_iterator.unit_name] = unit_data_iterator;

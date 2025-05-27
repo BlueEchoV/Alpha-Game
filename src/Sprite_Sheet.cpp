@@ -1,6 +1,6 @@
 #include "Sprite_Sheet.h"
 
-Sprite create_sprite(Image* image, MP_Rect src_rect) {
+Sprite create_sprite(Image image, MP_Rect src_rect) {
 	Sprite result = {};
 
 	result.image = image;
@@ -9,21 +9,21 @@ Sprite create_sprite(Image* image, MP_Rect src_rect) {
 	return result; 
 }
 
-Sprite_Sheet create_animation_sprite_sheet(std::string image_name, float default_frame_speed_seconds, 
+Sprite_Sheet create_animation_sprite_sheet(const char* file_name, float default_frame_speed_seconds, 
 	int rows, int columns) {
 	Sprite_Sheet result = {};
 	result.default_frame_speed_seconds = default_frame_speed_seconds;
-	Image* image = get_image(image_name);
+	Image image = load_image(file_name);
 
-	if (image != NULL) {
+	if (image.texture != NULL) {
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < columns; y++) {
 				MP_Rect src_rect = {};
 
-				src_rect.x = (y * image->h);
-				src_rect.y = (x * image->w);
-				src_rect.w = (image->w / columns);
-				src_rect.h = (image->h / rows);
+				src_rect.x = (y * image.h);
+				src_rect.y = (x * image.w);
+				src_rect.w = (image.w / columns);
+				src_rect.h = (image.h / rows);
 
 				Sprite new_sprite = create_sprite(image, src_rect);
 
@@ -37,12 +37,6 @@ Sprite_Sheet create_animation_sprite_sheet(std::string image_name, float default
 
 Sprite_Sheet dummy_sprite_sheet = {};
 std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
-
-void load_sprite_sheets() {
-	dummy_sprite_sheet = create_animation_sprite_sheet("dummy_image", 0.25, 1, 1);
-	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("temp_zombie_walk", 0.25, 1, 10);
-	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("idle_temp_zombie", NULL, 1, 1);
-}
 
 Sprite_Sheet* get_sprite_sheet(std::string name) {
 	auto it = sprite_sheet_map.find(name);
@@ -100,7 +94,7 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
-	MP_Texture* texture = ss->sprites[at->current_frame_index].image->texture;
+	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
 	if (at->flip) {
 		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_HORIZONTAL);
@@ -111,11 +105,40 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
 }
 
 Type_Descriptor sprite_sheet_type_descriptors[] = {
-	FIELD(),
-	FIELD()
+	FIELD(Sprite_Sheet_Data, VT_String, image_name),
+	FIELD(Sprite_Sheet_Data, VT_Float, default_frame_speed_seconds),
+	FIELD(Sprite_Sheet_Data, VT_Int, rows),
+	FIELD(Sprite_Sheet_Data, VT_Int, columns)
+};
+
+std::unordered_map<std::string, Sprite_Sheet_Data> sprite_sheet_data_map;
+
+void load_sprite_sheet_csv(CSV_Data* data) {
+	std::vector<Sprite_Sheet_Data> sprite_sheet_data = {};
+	sprite_sheet_data.resize(data->total_rows);
+
+	std::span<Type_Descriptor> safe_sprite_sheet_decsriptors(sprite_sheet_type_descriptors);
+
+	load_csv_data_file(data, (char*)sprite_sheet_data.data(), sprite_sheet_type_descriptors, sizeof(Sprite_Sheet_Data));
+
+	for (Sprite_Sheet_Data& it : sprite_sheet_data) {
+		sprite_sheet_data_map[it.image_name] = it;
+	}
 }
 
-void load_sprite_sheet_csv(const char* file_name) {
+void load_sprite_sheets() {
+	dummy_sprite_sheet = create_animation_sprite_sheet("dummy_image", 0.25, 1, 1);
+	sprite_sheet_map["temp_zombie_walk"] = create_animation_sprite_sheet("temp_zombie_walk", 0.25, 1, 10);
+	sprite_sheet_map["idle_zombie_male"] = create_animation_sprite_sheet("idle_temp_zombie", NULL, 1, 1);
 
+	for (const auto& it : sprite_sheet_data_map) {
+		std::string file_name = it.second.image_name + ".png";
 
+		create_animation_sprite_sheet(
+			file_name, 
+			it.second.default_frame_speed_seconds, 
+			it.second.rows, 
+			it.second.columns
+		);
+	}
 }
