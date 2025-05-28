@@ -320,9 +320,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				if (unit == NULL) {
 					continue;
 				}
-				float distance_between = calculate_distance_between(proj->rb.pos_ws, unit->rb.pos_ws);
-				float radius_sum = 100.0f;
-				if (distance_between <= radius_sum) {
+				if (check_rb_collision(&proj->rb, &unit->rb)) {
 					proj->destroyed = true;
 					unit->destroyed = true;
 				}

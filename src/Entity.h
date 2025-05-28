@@ -257,6 +257,7 @@ void draw_circle_ws(Color_Type c, V2 center_pos_ws, int radius, float total_line
 void draw_circle_cs(Color_Type c, V2 center_pos_ws, V2 camera_pos, int radius, float total_lines);
 
 void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
+bool check_rb_collision(Rigid_Body* rb_1, Rigid_Body* rb_2);
 void draw_colliders(Rigid_Body* rb, V2 camera_pos);
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 

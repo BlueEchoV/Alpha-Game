@@ -78,6 +78,27 @@ void draw_colliders(Rigid_Body* rb, V2 camera_pos) {
 	}
 }
 
+bool check_rb_collision(Rigid_Body* rb_1, Rigid_Body* rb_2) {
+	for (int i = 0; i < rb_1->num_colliders; i++) {
+		for (int j = 0; j < rb_2->num_colliders; j++) {
+			Collider* collider_a = &rb_1->colliders[i];
+			Collider* collider_b = &rb_2->colliders[j];
+
+			V2 collider_a_ws_pos = rb_1->pos_ws + collider_a->pos_ls;
+			V2 collider_b_ws_pos = rb_2->pos_ws + collider_b->pos_ls;
+
+			float radius_sum = collider_a->radius + collider_b->radius;
+			float distance_between = calculate_distance_between(collider_a_ws_pos, collider_b_ws_pos);
+
+			if (distance_between < radius_sum) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	Rigid_Body result = {};
 
