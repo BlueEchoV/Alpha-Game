@@ -126,7 +126,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 
 Weapon_Data weapon_data[WT_Total] = {
 	// weapon_type  image_name  projectile_type w		h		damage  fire rate
-	{  "Bow", "Bow", "Arrow",	100,	50,		10,		1}
+	{  "Bow",		"Bow",		"Arrow",		100,	50,		10,		4}
 };
 
 Weapon_Data get_weapon_data(Weapon_Type wt) {
@@ -159,7 +159,7 @@ void Player::fire_weapon(Game_Data& game_data) {
 void Player::update_weapon(float delta_time) {
 	if (this->weapon->fire_cooldown <= 0) {
 		this->weapon->can_fire = true;
-		this->weapon->fire_cooldown = (float)this->weapon->fire_rate;
+		this->weapon->fire_cooldown = 1.0f / (float)this->weapon->fire_rate;
 	} 
 	if (this->weapon->can_fire == false) {
 		this->weapon->fire_cooldown -= delta_time;
