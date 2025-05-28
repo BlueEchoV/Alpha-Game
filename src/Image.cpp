@@ -10,6 +10,9 @@ Image load_image(const char* file_path) {
 	unsigned char* data = stbi_load(file_path, &width, &height, &channels, 4);
 	if (data == NULL) {
 		log("Error: stbi_load is null: %s", file_path);
+		assert(false);
+		result = {};
+		return result;
 	}
 
 	// Get the radius from the center of the image 

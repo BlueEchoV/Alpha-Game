@@ -88,10 +88,10 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	return result;
 }
 
-Player create_player(std::string selected_sprite_sheet, V2 spawn_pos_ws, int player_speed) {
+Player create_player(std::string entity_name, Animation_State as, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
 
-	result.at = create_animation_tracker(selected_sprite_sheet);
+	result.at = create_animation_tracker(entity_name, as);
 
 	result.w = Globals::player_width;
 	result.h = Globals::player_height;
@@ -175,8 +175,8 @@ void Player::draw_weapon() {
 }
 
 Unit_Data bad_unit_data = {
-	// Unit_Type	 Image_Type		  w,   h,   health, damage, speed
-	"zombie_male",	"zombie_male",  75,  75,  100,    10,     10
+	// Unit_Type	 w,   h,   health, damage, speed
+	"zombie_male",	75,  75,  100,    10,     10
 };
 
 Unit_Data* get_unit_data(std::string unit_type) {
@@ -187,11 +187,13 @@ Unit_Data* get_unit_data(std::string unit_type) {
 	return &bad_unit_data;
 }
 
-void spawn_unit(std::string unit_name, Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
+void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles, 
+	Player* target, V2 spawn_pos) {
 	Unit result = {};
 
 	Unit_Data* data = get_unit_data(unit_name);
-	result.image = get_image(data->image_name);
+	result.at = create_animation_tracker(unit_name, as);
+
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
 	float collider_radius = (float)data->w / 4;
@@ -223,6 +225,12 @@ V2 update_unit_position(Unit& unit, float dt) {
 
 void update_unit(Unit& unit, float dt) {
 	update_unit_position(unit, dt);
+
+	Animation_Tracker* at = &unit.at;
+	float vel_x = unit.rb.vel.x;
+	// Change the animation to be facing left or right
+	change_animation(at, at->entity_name, at->as, vel_x > 0.0f ? FD_Right : FD_Left, APS_Speed_Based);
+	update_animation_tracker(&unit.at, dt);
 }
 
 void draw_unit(Unit& unit, V2 camera_pos) {
@@ -230,7 +238,7 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
 
-	mp_render_copy_ex(unit.image->texture, NULL, &dst, unit.rb.angle, NULL, SDL_FLIP_NONE);
+	draw_animation_tracker(&unit.at, dst);
 }
 
 Projectile_Data projectile_data[] = {
@@ -319,7 +327,6 @@ void load_weapon_data_csv(CSV_Data* data);
 
 Type_Descriptor unit_data_type_descriptors[] = {
 	FIELD(Unit_Data, VT_String, unit_name),
-	FIELD(Unit_Data, VT_String, image_name),
 	FIELD(Unit_Data, VT_Int, w),
 	FIELD(Unit_Data, VT_Int, h),
 	FIELD(Unit_Data, VT_Int, health),

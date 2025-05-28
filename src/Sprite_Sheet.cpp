@@ -48,25 +48,59 @@ Sprite_Sheet* get_sprite_sheet(std::string name) {
 	}
 }
 
-Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet) {
-	Animation_Tracker result = {};
+std::string get_sprite_sheet_name(std::string entity_name, Animation_State as) {
+	std::string result = {};
 
-	result.selected_sprite_sheet = selected_sprite_sheet;
-	result.current_frame_index = 0;
-	result.current_frame_time = 0.0f;
+	switch (as) {
+	case AS_Idle: {
+		result = entity_name + "_idle";
+		break;
+	}
+	case AS_Walking: {
+		result = entity_name + "_walking";
+		break;
+	}
+	case AS_Running: {
+		result = entity_name + "_running";
+		break;
+	}
+	case AS_Attacking: {
+		result = entity_name + "_attacking";
+		break;
+	}
+	default: {
+		// Just return the dummy image if case is not found
+		result = "dummy_image";
+		break;
+	}
+	}
 
 	return result;
 }
 
-void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet, 
+void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as, 
 	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed) {
-	// Init the default frame to zero here
-	if (at->selected_sprite_sheet != new_selected_sprite_sheet) {
-		at->selected_sprite_sheet = new_selected_sprite_sheet;
+	if (at->as != new_as || entity_name != at->entity_name) {
+		at->entity_name = entity_name;
+		at->as = new_as;
+		at->selected_sprite_sheet = get_sprite_sheet_name(at->entity_name, new_as);
 		at->current_frame_index = 0;
+		// TODO: Change this to be apart of the csv file
 		at->aps = animation_play_speed;
 	}
 	at->fd = facing_direction;
+}
+
+Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as) {
+	Animation_Tracker result = {};
+
+	result.entity_name = entity_name;
+	result.as = starting_as;
+	result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
+	result.current_frame_index = 0;
+	result.current_frame_time = 0.0f;
+
+	return result;
 }
 
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed) {

@@ -51,7 +51,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	int player_speed = 100;
-	game_data.player = create_player("temp_zombie_walk", { 0,0 }, player_speed);
+	game_data.player = create_player("player_1", AS_Idle, { 0,0 }, player_speed);
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
@@ -180,46 +180,46 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		float player_y_delta = 0.0f;
 
 		if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
-			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
+			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
 			player_y_delta = 1.0f;
 		} 
 		if (key_pressed_and_held(KEY_W)) {
-			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Slow);
+			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
 			player_y_delta = 1.0f;
 		} 
 
 		if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
-			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
+			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
 			player_y_delta = -1.0f;
 		}
 		if (key_pressed_and_held(KEY_S)) {
-			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Slow);
+			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
 			player_y_delta = -1.0f;
 		}
 
 		if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
 			player->at.fd = FD_Left;
-			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
+			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
 			player_x_delta = -2.0f;
 		} else if (key_pressed_and_held(KEY_A)) {
 			player->at.fd = FD_Left;
-			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Slow);
+			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
 			player_x_delta = -1.0f;
 		} 
 
 		if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
 			player->at.fd = FD_Right;
-			change_animation(&player->at, "player_1_run", player->at.fd, APS_Speed_Based);
+			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
 			player_x_delta = 2.0f;
 		} else if (key_pressed_and_held(KEY_D)) {
 			player->at.fd = FD_Right;
-			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Speed_Based);
+			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
 			player_x_delta = 1.0f;
 		}
 
 		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
 			!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
-			change_animation(&player->at, "player_1_idle", player->at.fd, APS_Slow);
+			change_animation(&player->at, player->at.entity_name, AS_Idle, player->at.fd, APS_Slow);
 		}
 
 		if (player->weapon == nullptr) {
@@ -238,7 +238,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
 			mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
 			spawn_unit(
-				"zombie_male",
+				"zombie_woman",
+				AS_Walking,
 				game_data.unit_storage,
 				game_data.enemy_unit_handles,
 				&game_data.player,
@@ -320,7 +321,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					continue;
 				}
 				float distance_between = calculate_distance_between(proj->rb.pos_ws, unit->rb.pos_ws);
-				float radius_sum = proj->image->sprite_radius + unit->image->sprite_radius;
+				float radius_sum = 100.0f;
 				if (distance_between <= radius_sum) {
 					proj->destroyed = true;
 					unit->destroyed = true;

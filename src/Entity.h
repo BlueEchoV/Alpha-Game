@@ -121,7 +121,6 @@ struct Rigid_Body {
 
 struct Unit_Data {
 	std::string unit_name;
-	std::string image_name;
 	int w;
 	int h;
 	int health;
@@ -132,7 +131,8 @@ struct Unit_Data {
 struct Player;
 
 struct Unit {
-	Image* image;
+	std::string unit_name;
+	Animation_Tracker at;
 	Rigid_Body rb;
 	int w, h;
 
@@ -260,10 +260,10 @@ void add_collider(Rigid_Body* rb, V2 pos_ls, float radius);
 void draw_colliders(Rigid_Body* rb, V2 camera_pos);
 Rigid_Body create_rigid_body(V2 pos_ws, int speed);
 
-Player create_player(std::string selected_sprite_sheet, V2 spawn_pos_ws, int player_speed);
+Player create_player(std::string entity_name, Animation_State as, V2 spawn_pos_ws, int player_speed);
 void draw_player(Player& p, V2 camera_ws_pos);
 
-void spawn_unit(std::string unit_name, Storage<Unit>& storage, std::vector<Handle>& handles,
+void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles,
 	Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
