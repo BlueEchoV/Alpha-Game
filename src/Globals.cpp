@@ -6,9 +6,9 @@ namespace Globals {
 	int resolution_x = 1600;
 	int resolution_y = 900;
 
-	bool toggle_debug_images = true;
-	bool debug_show_coordinates = true;
-	bool debug_show_stats = true;
+	bool toggle_debug_images = false;
+	bool debug_show_coordinates = false;
+	bool debug_show_stats = false;
 
 	float noise_frequency = 0.05f;
 	// Pixels

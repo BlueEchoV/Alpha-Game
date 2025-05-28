@@ -284,6 +284,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		if (key_pressed(VK_F3)) {
 			Globals::debug_show_stats = !Globals::debug_show_stats;
+		} 
+		if (key_pressed(VK_F4)) {
+			Globals::toggle_debug_images = !Globals::toggle_debug_images;
+			if (Globals::debug_show_coordinates != Globals::toggle_debug_images) {
+				Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
+			} if (Globals::debug_show_stats != Globals::toggle_debug_images) {
+				Globals::debug_show_stats = !Globals::debug_show_stats;
+			}
 		}
 
 		// Update
@@ -312,7 +320,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					continue;
 				}
 				float distance_between = calculate_distance_between(proj->rb.pos_ws, unit->rb.pos_ws);
-				float radius_sum = (float)proj->w + (float)unit->w;
+				float radius_sum = proj->image->sprite_radius + unit->image->sprite_radius;
 				if (distance_between <= radius_sum) {
 					proj->destroyed = true;
 					unit->destroyed = true;
