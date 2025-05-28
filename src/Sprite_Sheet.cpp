@@ -69,7 +69,7 @@ void change_animation(Animation_Tracker* at, std::string new_selected_sprite_she
 	at->fd = facing_direction;
 }
 
-void update_animation_tracker(Animation_Tracker* at, float delta_time) {
+void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
 	size_t frame_count = ss->sprites.size();
@@ -88,7 +88,9 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time) {
 			}
 			case APS_Speed_Based: {
 				// Speed Based
-				at->current_frame_time = 1.0f / (Globals::fast_frames_per_sec * 2);
+				at->current_frame_time = 1.0f / (speed / 25.0f);
+				std::string str = std::to_string(at->current_frame_time);
+				log(str.c_str());
 				break;
 			}
 			default: {
@@ -104,6 +106,10 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time) {
 			at->current_frame_time -= delta_time;
 		}
 	}
+}
+
+void update_animation_tracker(Animation_Tracker* at, float delta_time) {
+	update_animation_tracker(at, delta_time, NULL);
 }
 
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {

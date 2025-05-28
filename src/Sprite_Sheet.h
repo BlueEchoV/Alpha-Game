@@ -51,6 +51,7 @@ Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows,
 Animation_Tracker create_animation_tracker(std::string selected_sprite_sheet);
 void change_animation(Animation_Tracker* at, std::string new_selected_sprite_sheet,
 	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed);
+void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed);
 void update_animation_tracker(Animation_Tracker* at, float delta_time);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst);
 

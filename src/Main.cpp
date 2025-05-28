@@ -209,11 +209,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
 			player->at.fd = FD_Right;
-			change_animation(&player->at, "player_1_run", player->at.fd, APS_Fast);
+			change_animation(&player->at, "player_1_run", player->at.fd, APS_Speed_Based);
 			player_x_delta = 2.0f;
 		} else if (key_pressed_and_held(KEY_D)) {
 			player->at.fd = FD_Right;
-			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Fast);
+			change_animation(&player->at, "player_1_walk", player->at.fd, APS_Speed_Based);
 			player_x_delta = 1.0f;
 		}
 
@@ -232,7 +232,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		player->update_weapon(delta_time);
-		update_animation_tracker(&player->at, delta_time);
+		update_animation_tracker(&player->at, delta_time, (float)player->rb.speed);
 
 		if (key_pressed_and_held(KEY_Q)) {
 			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
