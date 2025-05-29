@@ -46,6 +46,9 @@
     <ClCompile Include="src\Sprite_Sheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Rigidbody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer.h">
@@ -85,6 +88,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Sprite_Sheet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rigidbody.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

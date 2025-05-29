@@ -29,6 +29,7 @@
     <ClCompile Include="src\GL_Functions.cpp" />
     <ClCompile Include="src\My_Math.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\Rigidbody.cpp" />
     <ClCompile Include="src\Sprite_Sheet.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Windows_Platform.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="src\My_Math.h" />
     <ClInclude Include="src\Perlin.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\Rigidbody.h" />
     <ClInclude Include="src\Sprite_Sheet.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\Windows_Platform.h" />

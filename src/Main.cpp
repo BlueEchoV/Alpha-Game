@@ -256,7 +256,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			current_debug_spawning_delay -= delta_time;
 		}
 
-
 		if (key_pressed(KEY_E)) {
 			for (Handle handle : game_data.enemy_unit_handles) {
 				Unit* enemy_unit = get_entity_pointer_from_handle(game_data.unit_storage, handle);
