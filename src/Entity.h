@@ -140,6 +140,7 @@ struct Unit {
 	int damage;
 	Player* target;
 
+	bool dead = false;
 	bool destroyed = false;
 
 	Handle handle;

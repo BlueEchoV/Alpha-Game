@@ -13,6 +13,7 @@ namespace Globals {
 	extern bool toggle_debug_images;
 	extern bool debug_show_coordinates;
 	extern bool debug_show_stats;
+	extern bool debug_show_colliders;
 
 	extern float noise_frequency;
 

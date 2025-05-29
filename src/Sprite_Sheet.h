@@ -18,6 +18,7 @@ enum Animation_State {
 	AS_Walking,
 	AS_Running,
 	AS_Attacking,
+	AS_Death,
 	AS_No_Animation
 };
 
@@ -51,6 +52,7 @@ struct Animation_Tracker {
 	Facing_Direction fd; 
 	int current_frame_index;
 	float current_frame_time;
+	bool loops = true;
 };
 
 Sprite create_sprite(Image image, MP_Rect src_rect);
@@ -59,7 +61,7 @@ extern std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 
 Sprite_Sheet* get_sprite_sheet(std::string name);
 Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows, int columns);
-Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as);
+Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops);
 void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as,
 	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed);
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed);

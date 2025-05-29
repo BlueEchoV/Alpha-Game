@@ -68,6 +68,10 @@ std::string get_sprite_sheet_name(std::string entity_name, Animation_State as) {
 		result = entity_name + "_attacking";
 		break;
 	}
+	case AS_Death: {
+		result = entity_name + "_death";
+		break;
+	}
 	default: {
 		// Just return the dummy image if case is not found
 		result = "dummy_image";
@@ -87,11 +91,14 @@ void change_animation(Animation_Tracker* at, std::string entity_name, Animation_
 		at->current_frame_index = 0;
 		// TODO: Change this to be apart of the csv file
 		at->aps = animation_play_speed;
+		if (new_as == AS_Death) {
+			at->loops = false;
+		}
 	}
 	at->fd = facing_direction;
 }
 
-Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as) {
+Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops) {
 	Animation_Tracker result = {};
 
 	result.entity_name = entity_name;
@@ -99,6 +106,7 @@ Animation_Tracker create_animation_tracker(std::string entity_name, Animation_St
 	result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
 	result.current_frame_index = 0;
 	result.current_frame_time = 0.0f;
+	result.loops = loops;
 
 	return result;
 }
@@ -132,9 +140,17 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
 				at->current_frame_time = 1.0f;
 			}
 			}
+
 			int index = at->current_frame_index;
-			// Increment to next frame
-			at->current_frame_index = (index + 1) % frame_count;
+			if (at->loops == true) {
+				// Increment to next frame
+				at->current_frame_index = (index + 1) % frame_count;
+			}
+			else {
+				if (at->current_frame_index < frame_count - 1) {
+					at->current_frame_index++;
+				}
+			}
 		}
 		else {
 			at->current_frame_time -= delta_time;

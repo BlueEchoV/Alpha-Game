@@ -112,7 +112,7 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 Player create_player(std::string entity_name, Animation_State as, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
 
-	result.at = create_animation_tracker(entity_name, as);
+	result.at = create_animation_tracker(entity_name, as, true);
 
 	result.w = Globals::player_width;
 	result.h = Globals::player_height;
@@ -212,9 +212,10 @@ void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storag
 	Player* target, V2 spawn_pos) {
 	Unit result = {};
 
-	Unit_Data* data = get_unit_data(unit_name);
-	result.at = create_animation_tracker(unit_name, as);
+	result.unit_name = unit_name;
 
+	Unit_Data* data = get_unit_data(unit_name);
+	result.at = create_animation_tracker(unit_name, as, true);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
 	float collider_radius = (float)data->w / 4;
@@ -236,30 +237,42 @@ void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storag
 V2 update_unit_position(Unit& unit, float dt) {
 	V2 result = {};
 
-	unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
+	if (unit.dead == false) {
+		unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
 
-	unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.speed) * dt;
-	unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.speed) * dt;
+		unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.speed) * dt;
+		unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.speed) * dt;
+	}
 
 	return result;
 };
 
 void update_unit(Unit& unit, float dt) {
-	update_unit_position(unit, dt);
+	if (unit.destroyed == false) {
+		if (unit.dead == false) {
+			update_unit_position(unit, dt);
 
-	Animation_Tracker* at = &unit.at;
-	float vel_x = unit.rb.vel.x;
-	// Change the animation to be facing left or right
-	change_animation(at, at->entity_name, at->as, vel_x > 0.0f ? FD_Right : FD_Left, APS_Speed_Based);
-	update_animation_tracker(&unit.at, dt);
+			Animation_Tracker* at = &unit.at;
+			float vel_x = unit.rb.vel.x;
+			// Change the animation to be facing left or right
+			Facing_Direction new_fd = vel_x > 0.0f ? FD_Right : FD_Left;
+			if (new_fd != at->fd) {
+				at->fd = new_fd;
+				change_animation(at, at->entity_name, at->as, at->fd, APS_Speed_Based);
+			}
+		}
+		update_animation_tracker(&unit.at, dt);
+	}
 }
 
 void draw_unit(Unit& unit, V2 camera_pos) {
-	V2 entity_pos_cs = convert_ws_to_cs(unit.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y});
-	// Center the image on the position of the entity
-	MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
+	if (unit.destroyed == false) {
+		V2 entity_pos_cs = convert_ws_to_cs(unit.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y });
+		// Center the image on the position of the entity
+		MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
 
-	draw_animation_tracker(&unit.at, dst);
+		draw_animation_tracker(&unit.at, dst);
+	}
 }
 
 Projectile_Data projectile_data[] = {

@@ -287,11 +287,18 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Globals::debug_show_stats = !Globals::debug_show_stats;
 		} 
 		if (key_pressed(VK_F4)) {
+			Globals::debug_show_colliders = !Globals::debug_show_colliders;
+		}
+		if (key_pressed(VK_F5)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 			if (Globals::debug_show_coordinates != Globals::toggle_debug_images) {
 				Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
-			} if (Globals::debug_show_stats != Globals::toggle_debug_images) {
+			} 
+			if (Globals::debug_show_stats != Globals::toggle_debug_images) {
 				Globals::debug_show_stats = !Globals::debug_show_stats;
+			}
+			if (Globals::debug_show_colliders != Globals::toggle_debug_images) {
+				Globals::debug_show_colliders = !Globals::debug_show_colliders;
 			}
 		}
 
@@ -310,6 +317,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		// Collision
+		// TODO: Add the destroyed checks into a function for consistency
 		for (Handle& projectile_handle : game_data.projectile_handles) {
 			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 				Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
@@ -317,18 +325,90 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					continue;
 				}
 				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-				if (unit == NULL) {
+				if (unit == NULL || unit->dead == true) {
 					continue;
 				}
 				if (check_rb_collision(&proj->rb, &unit->rb)) {
 					proj->destroyed = true;
-					unit->destroyed = true;
+					unit->dead = true;
 				}
 			}
 		}
 
 		// Render
-		render(game_data, delta_time);
+
+		// TODO: Move everything into here at some point
+		// render(game_data, delta_time);
+		MP_Renderer* renderer = Globals::renderer;
+
+		int window_width = 0;
+		int window_height = 0;
+		get_window_size(renderer->open_gl.window_handle, window_width, window_height);
+		MP_Rect viewport = { 0, 0, window_width, window_height};
+		mp_render_set_viewport(&viewport);
+
+		renderer->window_width= window_width;
+		renderer->window_height = window_height;
+
+		update_camera(game_data.camera, game_data.player);
+
+		mp_set_render_draw_color(155, 155, 155, 255);
+
+		mp_render_clear();
+
+		// Truncates by default
+		int starting_tile_x = (int)game_data.camera.pos_ws.x / Globals::tile_w;
+		int starting_tile_y = (int)game_data.camera.pos_ws.y / Globals::tile_h;
+
+		int ending_tile_x = ((int)game_data.camera.pos_ws.x + game_data.camera.w) / Globals::tile_w;
+		int ending_tile_y = ((int)game_data.camera.pos_ws.y + game_data.camera.h) / Globals::tile_h;
+
+		// Only render tiles in the view of the player
+		// Currently in world space
+		// Draw the tiles around the player
+		for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
+			for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
+				draw_tile(game_data, tile_x, tile_y, Globals::noise_frequency);
+			}
+		}
+
+		// draw_player(game_data.player, game_data.camera.pos_ws);
+		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
+
+		Font* font = get_font(game_data.selected_font);
+		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);
+
+		for (Handle projectile: game_data.projectile_handles) {
+			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
+			if (p == NULL) {
+				log("Error: handle returned null");
+				continue;
+			}
+			draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
+			if (Globals::debug_show_coordinates) {
+				debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true, 
+					CT_Green, true, "WS Pos: ");
+			}
+			if (Globals::debug_show_colliders) {
+				draw_colliders(&p->rb, game_data.camera.pos_ws);
+			}
+		}
+
+		for (Handle zombie_handle: game_data.enemy_unit_handles) {
+			Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
+			if (u == NULL) {
+				log("Error: handle returned null");
+				continue;
+			}
+			if (u->dead) {
+				change_animation(&u->at, u->unit_name, AS_Death, u->at.fd, u->at.aps);
+			}
+			draw_unit(*u, game_data.camera.pos_ws);
+
+			if (Globals::debug_show_colliders) {
+				draw_colliders(&u->rb, game_data.camera.pos_ws);
+			}
+		}
 
 		draw_player(game_data.player, game_data.camera.pos_ws);
 

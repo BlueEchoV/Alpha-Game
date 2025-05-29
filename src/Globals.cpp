@@ -9,6 +9,7 @@ namespace Globals {
 	bool toggle_debug_images = false;
 	bool debug_show_coordinates = false;
 	bool debug_show_stats = false;
+	bool debug_show_colliders = false;
 
 	float noise_frequency = 0.05f;
 	// Pixels
