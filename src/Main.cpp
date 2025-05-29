@@ -152,6 +152,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	uint64_t last_frame_time = 0;
 	float delta_time = 0;
 
+	float debug_spawning_delay = 0.25f;
+	float current_debug_spawning_delay = 0.0f;
+
 	while (running) {
 		reset_is_pressed();
 
@@ -234,19 +237,26 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		player->update_weapon(delta_time);
 		update_animation_tracker(&player->at, delta_time, (float)player->rb.speed);
 
-		if (key_pressed_and_held(KEY_Q)) {
-			V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
-			mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
-			spawn_unit(
-				"zombie_woman",
-				AS_Walking,
-				game_data.unit_storage,
-				game_data.enemy_unit_handles,
-				&game_data.player,
-				mouse_position
-			);
-			log("Spawning Zombie");
+		if (current_debug_spawning_delay < 0) {
+			current_debug_spawning_delay = debug_spawning_delay;
+			if (key_pressed_and_held(KEY_Q)) {
+				V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
+				mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
+				spawn_unit(
+					"zombie_woman",
+					AS_Walking,
+					game_data.unit_storage,
+					game_data.enemy_unit_handles,
+					&game_data.player,
+					mouse_position
+				);
+			}
 		}
+		else {
+			current_debug_spawning_delay -= delta_time;
+		}
+
+
 		if (key_pressed(KEY_E)) {
 			for (Handle handle : game_data.enemy_unit_handles) {
 				Unit* enemy_unit = get_entity_pointer_from_handle(game_data.unit_storage, handle);

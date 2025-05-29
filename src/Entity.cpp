@@ -276,7 +276,8 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 }
 
 Projectile_Data projectile_data[] = {
-	{"Arrow", "IT_Arrow_1", 32, 32, 100}
+	//						w	h	speed
+	{"Arrow", "IT_Arrow_1", 32, 32, 300}
 };
 
 void spawn_projectile(Game_Data& game_data, Projectile_Type pt, V2 origin_ws, V2 target_ws) {
