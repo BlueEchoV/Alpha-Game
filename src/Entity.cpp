@@ -38,7 +38,7 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 
 void unequip_weapon();
 
-void delete_weapon(Weapon* weapon) {
+void delete_weapon(Weapon*& weapon) {
 	delete weapon;
 	// No dangling pointers
 	weapon = nullptr;
@@ -127,8 +127,9 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	draw_animation_tracker(&p.at, p_draw_rect, 0);
 }
 
-void delete_player() {
-
+void delete_player(Player* player) {
+	delete_weapon(player->weapon);
+	*player = {};
 }
 
 Unit_Data bad_unit_data = {
