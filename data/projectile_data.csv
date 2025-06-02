@@ -1,1 +1,4 @@
-
+projectile_name,w,h,damage,projectile_speed
+slash,100,100,100,100
+arrow,50,50,10,300
+bullet,50,50,50,500

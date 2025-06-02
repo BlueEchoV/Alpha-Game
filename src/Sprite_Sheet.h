@@ -66,7 +66,7 @@ void change_animation(Animation_Tracker* at, std::string entity_name, Animation_
 	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed);
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed);
 void update_animation_tracker(Animation_Tracker* at, float delta_time);
-void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst);
+void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);
 
 void load_sprite_sheets();
 void load_sprite_sheet_data_csv(CSV_Data* data);

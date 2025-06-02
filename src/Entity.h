@@ -5,6 +5,7 @@
 #include <vector>
 
 struct MP_Renderer;
+struct Game_Data;
 
 enum Unit_Type {
 	UT_Zombie,
@@ -16,6 +17,12 @@ enum Storage_Type : uint8_t {
 	ST_Unit = 1,
 	ST_Projectile,
 	ST_Building
+};
+
+enum Entity_Type {
+	ET_Player,
+	ET_Allies,
+	ET_Enemies
 };
 
 const int MAX_STORAGE_SIZE = 1000;
@@ -123,10 +130,10 @@ struct Unit {
 };
 
 struct Projectile_Data {
-	std::string projectile_type;
-	std::string image_name;
+	std::string projectile_name;
 
 	int w, h;
+	int damage;
 	int speed;
 };
 
@@ -134,9 +141,8 @@ struct Projectile {
 	Rigid_Body rb;
 
 	int w, h;
-	float angle;
 
-	Image* image;
+	Animation_Tracker at;
 
 	bool destroyed = false;
 
@@ -144,9 +150,9 @@ struct Projectile {
 };
 
 struct Weapon_Data {
-	std::string weapon_type;
-	std::string image_name;
-	std::string projectile_type;
+	std::string weapon_name;
+	std::string projectile_name;
+
 	// The actual width and height of the weapon on screen
 	int w;
 	int h;
@@ -155,9 +161,7 @@ struct Weapon_Data {
 };
 
 enum Weapon_Type {
-	WT_Axe,
 	WT_Bow,
-	WT_Pistol,
 	WT_Total
 };
 
@@ -166,7 +170,8 @@ enum Projectile_Type {
 };
 
 struct Weapon {
-	std::string type;
+	std::string weapon_name;
+	std::string projectile_name;
 
 	// Sprite sheet
 	Image* image;
@@ -177,11 +182,20 @@ struct Weapon {
 
 	bool can_fire = true;
 	float fire_cooldown;
+
+	void fire_weapon(Game_Data& game_data, Entity_Type et);
+	void update_weapon(float delta_time);
+	// virtual void reload(); // Reloading animation? // This could be tedious
+	// Should this be here?
+	// IN PROGRESS
+	void draw_weapon(Animation_Tracker* at, V2 pos);
 };
 
-void load_unit_data_csv(CSV_Data* data);
+void equip_weapon(Weapon*& weapon, std::string weapon_name);
+void unequip_weapon();
+void delete_weapon(Weapon* weapon);
 
-struct Game_Data;
+void load_unit_data_csv(CSV_Data* data);
 
 struct Player {
 	Animation_Tracker at;
@@ -192,12 +206,6 @@ struct Player {
 
 	// Could this all be put into a 'weapon_kit' of some sort?
 	Weapon* weapon;
-	void equip_weapon(Weapon_Type wt);
-	void fire_weapon(Game_Data& game_data);
-	void update_weapon(float delta_time);
-	// virtual void reload(); // Reloading animation? // This could be tedious
-	// Should this be here?
-	void draw_weapon();
 
 	// int health;
 	// int damage;
@@ -235,7 +243,7 @@ void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 void delete_destroyed_entities_from_handles(Game_Data& game_data);
 
-void spawn_projectile(Game_Data& game_data, Projectile_Type pt, V2 origin, V2 target);
+void spawn_projectile(Game_Data& game_data, std::string projectile_name, V2 origin_ws, V2 target_ws);
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 

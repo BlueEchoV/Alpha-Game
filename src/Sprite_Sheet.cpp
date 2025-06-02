@@ -72,6 +72,10 @@ std::string get_sprite_sheet_name(std::string entity_name, Animation_State as) {
 		result = entity_name + "_death";
 		break;
 	}
+	case AS_No_Animation: {
+		result = entity_name;
+		break;
+	}
 	default: {
 		// Just return the dummy image if case is not found
 		result = "dummy_image";
@@ -162,17 +166,17 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time) {
 	update_animation_tracker(at, delta_time, NULL);
 }
 
-void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst) {
+void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
 	if (at->fd == FD_Left) {
-		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_HORIZONTAL);
+		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL);
 	}
 	else {
-		mp_render_copy_ex(texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
+		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
 	}
 }
 

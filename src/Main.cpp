@@ -159,7 +159,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		reset_is_pressed();
 
 		MSG message;
-		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE)) {
+		// GetMessage function inside our WinMain will sit and wait for new 
+		// messages forever if there aren't any.
+		// The new parameter at the end is wRemoveMsg, which tells PeekMessage 
+		// what to do with the message peeked. We want to remove the message 
+		// from the queue, so we pass PM_REMOVE.
+		while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 
@@ -226,15 +231,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (player->weapon == nullptr) {
-			player->equip_weapon(WT_Bow);
+			equip_weapon(player->weapon, "bow");
 		}
 
 		if (key_pressed_and_held(VK_SPACE)) {
-			// Change this to fire weapon
-			player->fire_weapon(game_data);
+			player->weapon->fire_weapon(game_data, ET_Player);
 		}
 
-		player->update_weapon(delta_time);
+		player->weapon->update_weapon(delta_time);
 		update_animation_tracker(&player->at, delta_time, (float)player->rb.speed);
 
 		if (current_debug_spawning_delay < 0) {

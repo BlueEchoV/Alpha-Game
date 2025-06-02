@@ -1,6 +1,95 @@
 #include "Entity.h"
 
 std::unordered_map<std::string, Unit_Data> unit_data_map;
+std::unordered_map<std::string, Weapon_Data> weapon_data_map;
+std::unordered_map<std::string, Projectile_Data> projectile_data_map;
+
+Weapon_Data bad_weapon_data = {
+	// weapon_name	proj_name	w		h		damage		fire_rate
+	 "bow",			"arrow",	50,		50,		10,			4			
+};
+
+Weapon_Data get_weapon_data(std::string weapon_name) {
+	Weapon_Data result = {};
+	auto it = weapon_data_map.find(weapon_name);
+	if (it == weapon_data_map.end()) {
+		return bad_weapon_data;
+	}
+
+	return it->second;
+};
+
+// Pass the pointer as a reference so we can modify the actual address it pointing at
+void equip_weapon(Weapon*& weapon, std::string weapon_name) {
+	if (weapon == NULL) {
+		// New re-assigns the pointer to point to a new location in memory
+		weapon = new Weapon();
+	}
+	*weapon = {};
+
+	Weapon_Data current_weapon_data = get_weapon_data(weapon_name);
+	weapon->weapon_name = current_weapon_data.weapon_name;
+	weapon->projectile_name = current_weapon_data.projectile_name;
+	weapon->w = current_weapon_data.w;
+	weapon->h = current_weapon_data.h;
+	weapon->damage = current_weapon_data.damage;
+	weapon->fire_rate = current_weapon_data.fire_rate;
+}
+
+void unequip_weapon();
+
+void delete_weapon(Weapon* weapon) {
+	delete weapon;
+	// No dangling pointers
+	weapon = nullptr;
+}
+
+// Fires at the mouse
+void Weapon::fire_weapon(Game_Data& game_data, Entity_Type et) {
+	switch (et) {
+	case ET_Player: {
+		if (this->can_fire) {
+			// Change this to fire weapon
+			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
+			spawn_projectile(game_data, this->projectile_name, game_data.player.rb.pos_ws, mouse_ws_pos);
+			Globals::debug_total_arrows++;
+			this->can_fire = false;
+		}
+		break;
+	}
+	case ET_Allies: {
+		break;
+	}
+	case ET_Enemies: {
+		break;
+	}
+	default: {
+		log("Entity_Type not specified");
+		break;
+	}
+	}
+
+}
+
+void Weapon::update_weapon(float delta_time) {
+	if (this != nullptr) {
+		if (this->fire_cooldown <= 0) {
+			this->can_fire = true;
+			this->fire_cooldown = 1.0f / (float)this->fire_rate;
+		}
+		if (this->can_fire == false) {
+			this->fire_cooldown -= delta_time;
+		}
+	}
+}
+
+// This will have to be an offset based off where the player is looking
+void Weapon::draw_weapon(Animation_Tracker* at, V2 pos) {
+	MP_Rect dst = {(int)pos.x, (int)pos.y, this->w, this->h};
+
+	draw_animation_tracker(at, dst, 0);
+}
 
 Player create_player(std::string entity_name, Animation_State as, V2 spawn_pos_ws, int player_speed) {
 	Player result = {};
@@ -35,57 +124,11 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	V2 p_pos_cs = convert_ws_to_cs({ (float)p_draw_rect.x, (float)p_draw_rect.y }, camera_ws_pos);
 	p_draw_rect.x = (int)p_pos_cs.x; 
 	p_draw_rect.y = (int)p_pos_cs.y; 
-	draw_animation_tracker(&p.at, p_draw_rect);
+	draw_animation_tracker(&p.at, p_draw_rect, 0);
 }
 
-Weapon_Data weapon_data[WT_Total] = {
-	// weapon_type  image_name  projectile_type w		h		damage  fire rate
-	{  "Bow",		"Bow",		"Arrow",		100,	50,		10,		4}
-};
+void delete_player() {
 
-Weapon_Data get_weapon_data(Weapon_Type wt) {
-	return weapon_data[(int)wt];
-};
-
-void Player::equip_weapon(Weapon_Type wt) {
-	Weapon* new_weapon = new Weapon();
-
-	Weapon_Data current_weapon_data = get_weapon_data(wt);
-	// new_weapon->image = get_image(current_weapon_data.it);
-	new_weapon->damage = current_weapon_data.damage;
-	new_weapon->fire_rate = current_weapon_data.fire_rate;
-
-	// No colliders on weapons
-	this->weapon = new_weapon;
-}
-
-// Fires at the mouse
-void Player::fire_weapon(Game_Data& game_data) {
-	if (this->weapon->can_fire) {
-		V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
-		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-		spawn_projectile(game_data, PT_Arrow, this->rb.pos_ws, mouse_ws_pos);
-		Globals::debug_total_arrows++;
-		this->weapon->can_fire = false;
-	}
-}
-
-void Player::update_weapon(float delta_time) {
-	if (this->weapon->fire_cooldown <= 0) {
-		this->weapon->can_fire = true;
-		this->weapon->fire_cooldown = 1.0f / (float)this->weapon->fire_rate;
-	} 
-	if (this->weapon->can_fire == false) {
-		this->weapon->fire_cooldown -= delta_time;
-	}
-}
-
-// This will have to be an offset based off where the player is looking
-void Player::draw_weapon() {
-	MP_Rect src = {};
-	MP_Rect dst = {};
-
-	mp_render_copy_ex(this->weapon->image->texture, &src, &dst, 0, NULL, SDL_FLIP_NONE);
 }
 
 Unit_Data bad_unit_data = {
@@ -164,33 +207,44 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 		// Center the image on the position of the entity
 		MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
 
-		draw_animation_tracker(&unit.at, dst);
+		draw_animation_tracker(&unit.at, dst, 0);
 	}
 }
 
-Projectile_Data projectile_data[] = {
-	//						w	h	speed
-	{"Arrow", "IT_Arrow_1", 32, 32, 300}
+Projectile_Data bad_projectile_data = {
+	// name		w	h	damage	speed
+	"Arrow",	32, 32, 25,		100
 };
 
-void spawn_projectile(Game_Data& game_data, Projectile_Type pt, V2 origin_ws, V2 target_ws) {
+Projectile_Data get_projectile_data(std::string projectile_name) {
+	auto it = projectile_data_map.find(projectile_name);
+	if (it == projectile_data_map.end()) {
+		return bad_projectile_data;
+	}
+	return it->second;
+}
+
+void spawn_projectile(Game_Data& game_data, std::string projectile_name, V2 origin_ws, V2 target_ws) {
 	Projectile result = {};
 
-	Projectile_Data data = projectile_data[pt];
+	Projectile_Data data = get_projectile_data(projectile_name);
 
 	result.rb = create_rigid_body(origin_ws, data.speed);
 	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);
 	result.rb.vel = vel_normalized;
 
-	result.image = get_image(data.image_name);
+	result.at = create_animation_tracker(projectile_name, AS_No_Animation, true);
+
 	result.w = data.w;
 	result.h = data.h;
-	result.angle = calculate_facing_direction(result.rb.vel);
+	result.rb.angle = calculate_facing_direction(result.rb.vel);
 	result.handle = create_handle(game_data.projectile_storage);
 
-	V2 pos_ls = rotate_point_based_off_angle(result.angle, 0, 0, result.image->sprite_radius * 0.8f, 0);
+	Sprite_Sheet* sprite_sheet = get_sprite_sheet(projectile_name);
+	float first_sprite_radius = sprite_sheet->sprites[0].image.sprite_radius;
+	V2 pos_ls = rotate_point_based_off_angle(result.rb.angle, 0, 0, first_sprite_radius * 0.8f, 0);
 
-	add_collider(&result.rb, pos_ls, result.image->sprite_radius / 4);
+	add_collider(&result.rb, pos_ls, first_sprite_radius / 4);
 
 	game_data.projectile_handles.push_back(result.handle);
 	game_data.projectile_storage.storage[result.handle.index] = result;
@@ -209,7 +263,7 @@ void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile)
 	MP_Rect dst = { (int)entity_pos_cs.x - projectile.w / 2, 
 		(int)entity_pos_cs.y - projectile.h / 2, projectile.w, projectile.h };
 
-	mp_render_copy_ex(projectile.image->texture, NULL, &dst, projectile.angle, NULL, SDL_FLIP_NONE);
+	draw_animation_tracker(&projectile.at, dst, projectile.rb.angle);
 }
 
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle) {
@@ -241,18 +295,6 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 	});
 }
 
-Type_Descriptor weapon_data_type_descriptors[] = {
-	FIELD(Weapon_Data, VT_String, weapon_type),
-	FIELD(Weapon_Data, VT_String, image_name),
-	FIELD(Weapon_Data, VT_String, projectile_type),
-	FIELD(Weapon_Data, VT_Int, w),
-	FIELD(Weapon_Data, VT_Int, h),
-	FIELD(Weapon_Data, VT_Int, damage),
-	FIELD(Weapon_Data, VT_Int, fire_rate)
-};
-
-void load_weapon_data_csv(CSV_Data* data);
-
 Type_Descriptor unit_data_type_descriptors[] = {
 	FIELD(Unit_Data, VT_String, unit_name),
 	FIELD(Unit_Data, VT_Int, w),
@@ -274,3 +316,49 @@ void load_unit_data_csv(CSV_Data* data) {
 		unit_data_map[unit_data_iterator.unit_name] = unit_data_iterator;
 	}
 }
+
+Type_Descriptor weapon_data_type_descriptors[] = {
+	FIELD(Weapon_Data, VT_String, weapon_name),
+	FIELD(Weapon_Data, VT_String, projectile_name),
+	FIELD(Weapon_Data, VT_Int, w),
+	FIELD(Weapon_Data, VT_Int, h),
+	FIELD(Weapon_Data, VT_Int, damage),
+	FIELD(Weapon_Data, VT_Int, fire_rate)
+};
+
+void load_weapon_data_csv(CSV_Data* data) {
+	std::vector<Weapon_Data> weapon_data;
+
+	weapon_data.resize(data->total_rows);
+
+	std::span<Type_Descriptor> safe_weapon_data_type_descriptors(weapon_data_type_descriptors);
+
+	load_csv_data_file(data, (char*)weapon_data.data(), safe_weapon_data_type_descriptors, sizeof(Weapon_Data));
+
+	for (Weapon_Data& weapon_data_iterator : weapon_data) {
+		weapon_data_map[weapon_data_iterator.weapon_name] = weapon_data_iterator;
+	}
+}
+
+Type_Descriptor projectile_data_type_descriptors[] = {
+	FIELD(Projectile_Data, VT_String, projectile_name),
+	FIELD(Projectile_Data, VT_Int, w),
+	FIELD(Projectile_Data, VT_Int, h),
+	FIELD(Projectile_Data, VT_Int, damage),
+	FIELD(Projectile_Data, VT_Int, speed)
+};
+
+void load_projectile_data_csv(CSV_Data* data) {
+	std::vector<Projectile_Data> projectile_data;
+
+	projectile_data.resize(data->total_rows);
+
+	std::span<Type_Descriptor> safe_projectile_data_type_descriptors(projectile_data_type_descriptors);
+
+	load_csv_data_file(data, (char*)projectile_data.data(), safe_projectile_data_type_descriptors, sizeof(Projectile_Data));
+
+	for (Projectile_Data& projectile_data_iterator : projectile_data) {
+		projectile_data_map[projectile_data_iterator.projectile_name] = projectile_data_iterator;
+	}
+}
+
