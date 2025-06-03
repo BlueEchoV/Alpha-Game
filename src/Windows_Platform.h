@@ -31,6 +31,17 @@
 #define KEY_Y 0x59  
 #define KEY_Z 0x5A  
 
+#define	KEY_0 0x30	
+#define	KEY_1 0x31	
+#define	KEY_2 0x32	
+#define	KEY_3 0x33	
+#define	KEY_4 0x34	
+#define	KEY_5 0x35	
+#define	KEY_6 0x36	
+#define	KEY_7 0x37	
+#define	KEY_8 0x38	
+#define	KEY_9 0x39	
+
 #define VK_F1 0x70
 #define VK_F2 0x71	
 #define VK_F3 0x72	
@@ -43,6 +54,7 @@
 
 #define VK_SHIFT 0x10
 #define VK_SPACE 0x20
+
 
 struct Key_State {
 	bool is_pressed;

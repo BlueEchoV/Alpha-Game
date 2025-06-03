@@ -244,6 +244,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			equip_weapon(player->weapon, "pistol");
 		}
 
+		if (key_pressed(KEY_1)) {
+			equip_weapon(player->weapon, "bow");
+		}
+		if (key_pressed(KEY_2)) {
+			equip_weapon(player->weapon, "pistol");
+		}
+
+
 		if (key_pressed_and_held(VK_SPACE)) {
 			player->weapon->fire_weapon(game_data, ET_Player);
 		}
