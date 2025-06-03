@@ -33,7 +33,7 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->w = current_weapon_data.w;
 	weapon->h = current_weapon_data.h;
 	weapon->damage = current_weapon_data.damage;
-	weapon->fire_rate = current_weapon_data.fire_rate;
+	weapon->attacks_per_second = current_weapon_data.attacks_per_second;
 }
 
 void unequip_weapon();
@@ -76,7 +76,7 @@ void Weapon::update_weapon(float delta_time) {
 	if (this != nullptr) {
 		if (this->fire_cooldown <= 0) {
 			this->can_fire = true;
-			this->fire_cooldown = 1.0f / (float)this->fire_rate;
+			this->fire_cooldown = 1.0f / (float)this->attacks_per_second;
 		}
 		if (this->can_fire == false) {
 			this->fire_cooldown -= delta_time;
@@ -214,7 +214,7 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 
 Projectile_Data bad_projectile_data = {
 	// name		w	h	damage	speed
-	"Arrow",	32, 32, 25,		100
+	"arrow",	32, 32, 25,		100
 };
 
 Projectile_Data get_projectile_data(std::string projectile_name) {
@@ -324,7 +324,7 @@ Type_Descriptor weapon_data_type_descriptors[] = {
 	FIELD(Weapon_Data, VT_Int, w),
 	FIELD(Weapon_Data, VT_Int, h),
 	FIELD(Weapon_Data, VT_Int, damage),
-	FIELD(Weapon_Data, VT_Int, fire_rate)
+	FIELD(Weapon_Data, VT_Int, attacks_per_second)
 };
 
 void load_weapon_data_csv(CSV_Data* data) {

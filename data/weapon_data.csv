@@ -1,4 +1,4 @@
 weapon_name,w,h,damage,attacks_per_second,projectile_name
 sword,20,20,300,4,slash
-bow,20,20,0,4,arrow
-pistol,20,20,0,2,bullet
+bow,20,20,50,4,arrow
+pistol,20,20,50,2,bullet

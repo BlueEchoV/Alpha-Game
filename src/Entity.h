@@ -157,7 +157,7 @@ struct Weapon_Data {
 	int w;
 	int h;
 	int damage;
-	int fire_rate;
+	int attacks_per_second;
 };
 
 enum Weapon_Type {
@@ -176,7 +176,7 @@ struct Weapon {
 	// Sprite sheet
 	Image* image;
 	int w, h;
-	int fire_rate;
+	int attacks_per_second;
 	int damage;
 	// bool can_stick
 
@@ -247,6 +247,8 @@ void spawn_projectile(Game_Data& game_data, std::string projectile_name, V2 orig
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 
+void load_weapon_data_csv(CSV_Data* data);
+void load_projectile_data_csv(CSV_Data* data);
 // void spawn_entity(V2_F pos);
 // void update_entity();
 // void draw_entity();

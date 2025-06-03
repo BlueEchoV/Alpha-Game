@@ -36,17 +36,27 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	load_fonts();
 
-	CSV_Data unit_csv_data = create_open_csv_data("data\\unit_data.csv");
-	open_csv_data_file(&unit_csv_data);
-	load_unit_data_csv(&unit_csv_data);
-	close_csv_data_file(&unit_csv_data);
+	CSV_Data unit_data_csv = create_open_csv_data("data\\unit_data.csv");
+	open_csv_data_file(&unit_data_csv);
+	load_unit_data_csv(&unit_data_csv);
+	close_csv_data_file(&unit_data_csv);
 
-	CSV_Data sprite_sheet_csv_data = create_open_csv_data("data\\sprite_sheet_data.csv");
-	open_csv_data_file(&sprite_sheet_csv_data);
-	load_sprite_sheet_data_csv(&sprite_sheet_csv_data);
-	close_csv_data_file(&sprite_sheet_csv_data);
+	CSV_Data sprite_sheet_data_csv = create_open_csv_data("data\\sprite_sheet_data.csv");
+	open_csv_data_file(&sprite_sheet_data_csv);
+	load_sprite_sheet_data_csv(&sprite_sheet_data_csv);
+	close_csv_data_file(&sprite_sheet_data_csv);
 	// Sprite sheets for the animation trackers
 	load_sprite_sheets();
+
+	CSV_Data weapon_data_csv = create_open_csv_data("data\\weapon_data.csv");
+	open_csv_data_file(&weapon_data_csv);
+	load_weapon_data_csv(&weapon_data_csv);
+	close_csv_data_file(&weapon_data_csv);
+
+	CSV_Data projectile_data_csv = create_open_csv_data("data\\projectile_data.csv");
+	open_csv_data_file(&projectile_data_csv);
+	load_projectile_data_csv(&projectile_data_csv);
+	close_csv_data_file(&projectile_data_csv);
 
 	game_data.selected_font = FT_Basic;
 
@@ -231,7 +241,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (player->weapon == nullptr) {
-			equip_weapon(player->weapon, "bow");
+			equip_weapon(player->weapon, "pistol");
 		}
 
 		if (key_pressed_and_held(VK_SPACE)) {
