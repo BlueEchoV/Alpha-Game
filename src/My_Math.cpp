@@ -102,6 +102,15 @@ V2 normalize(V2 vec) {
 	return result;
 }
 
+void clamp(float& clamp_value, float min, float max) {
+	if (clamp_value < min) {
+		clamp_value = min;
+	}
+	else if (clamp_value > max) {
+		clamp_value = max;
+	}
+}
+
 void swap(V2& vec_1, V2& vec_2) {
 	V2 temp = vec_1;
 	vec_1 = vec_2;
@@ -147,4 +156,8 @@ float calculate_distance_between(V2 vec_1, V2 vec_2) {
 	result = hypotenuse(direction_vector.x, direction_vector.y);
 
 	return result;
+}
+
+float lerp(float a_starting_val, float b_ending_val, float t_where) {
+	return a_starting_val + (t_where * (b_ending_val - a_starting_val));
 }

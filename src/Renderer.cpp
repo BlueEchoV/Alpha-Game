@@ -345,10 +345,10 @@ int mp_render_draw_points(const MP_Point* points, int count) {
 }
 
 int mp_render_draw_rect(const MP_Rect* rect) {
-	mp_render_draw_line(rect->x		   , rect->y          , rect->x + rect->w, rect->y			);
-	mp_render_draw_line(rect->x + rect->w, rect->y          , rect->x + rect->w, rect->y + rect->h);
-	mp_render_draw_line(rect->x + rect->w, rect->y + rect->h, rect->x          , rect->y + rect->h);
-	mp_render_draw_line(rect->x		   , rect->y + rect->h, rect->x          , rect->y			);
+	mp_render_draw_line(rect->x,		   rect->y          , rect->x + rect->w, rect->y			);
+	mp_render_draw_line(rect->x + rect->w, rect->y          , rect->x + rect->w, rect->y + rect->h  );
+	mp_render_draw_line(rect->x + rect->w, rect->y + rect->h, rect->x          , rect->y + rect->h  );
+	mp_render_draw_line(rect->x,		   rect->y + rect->h, rect->x          , rect->y			);
 
 	return 0;
 }

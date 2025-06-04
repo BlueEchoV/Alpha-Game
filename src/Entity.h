@@ -103,14 +103,14 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 }
 
 struct Health_Bar {
+	int offset;
 	int max_hp;
 	int current_hp;
 	int w, h;
 };
 
-void create_health_bar();
-void update_health_bar();
-void draw_health_bar();
+Health_Bar create_health_bar(int hp, int w, int h, int offset);
+void draw_health_bar(Health_Bar& health_bar, V2 pos);
 
 struct Unit_Data {
 	std::string unit_name;

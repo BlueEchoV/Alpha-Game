@@ -61,6 +61,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	game_data.player = create_player("player_1", { 0.0f, 0.0f });
+	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
@@ -241,7 +242,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (player->weapon == nullptr) {
-			equip_weapon(player->weapon, "pistol");
+			equip_weapon(player->weapon, "bow");
 		}
 
 		if (key_pressed(KEY_1)) {
@@ -257,6 +258,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		player->weapon->update_weapon(delta_time);
 		update_animation_tracker(&player->at, delta_time, (float)player->rb.current_speed);
+
+		if (key_pressed(KEY_3)) {
+			player->health_bar.current_hp -= 5;
+		}
+		if (key_pressed(KEY_4)) {
+			player->health_bar.current_hp += 5;
+		}
 
 		if (current_debug_spawning_delay < 0) {
 			current_debug_spawning_delay = debug_spawning_delay;

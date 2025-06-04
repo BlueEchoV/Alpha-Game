@@ -4,9 +4,10 @@ std::unordered_map<std::string, Unit_Data> unit_data_map;
 std::unordered_map<std::string, Weapon_Data> weapon_data_map;
 std::unordered_map<std::string, Projectile_Data> projectile_data_map;
 
-Health_Bar create_health_bar(int hp, int w, int h) {
+Health_Bar create_health_bar(int hp, int w, int h, int offset) {
 	Health_Bar result = {};
 
+	result.offset = offset;
 	result.max_hp = hp;
 	result.current_hp = result.max_hp;
 	result.w = w;
@@ -15,35 +16,54 @@ Health_Bar create_health_bar(int hp, int w, int h) {
 	return result;
 }
 
-float lerp(float a_starting_val, float b_ending_val, float t_where) {
-	return a_starting_val + (t_where * (b_ending_val - a_starting_val));
-}
-
 void draw_health_bar(Health_Bar& health_bar, V2 pos) {
 	// EXAMPLE: Hp = 500 / 1000
 	float hp_percent = (float)health_bar.current_hp / (float)health_bar.max_hp;
+	clamp(hp_percent, 0.0f, 1.0f);
 
 	// Outline
-	MP_Rect outline_rect = {};
-	outline_rect.x = (int)pos.x - health_bar.w / 2;
-	outline_rect.y = (int)pos.y - health_bar.h / 2;
-	outline_rect.w = health_bar.w;
-	outline_rect.h = health_bar.h;
 	mp_set_render_draw_color(CT_Black);
-	mp_render_draw_rect(&outline_rect);
+	MP_Rect outline_rect_bottom = {};
+	outline_rect_bottom.x = ((int)pos.x - health_bar.w / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	outline_rect_bottom.y = ((int)pos.y - health_bar.h / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	outline_rect_bottom.w = health_bar.w + (Globals::DEFAULT_HEALTH_BAR_OUTLINE * 2);
+	outline_rect_bottom.h = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	mp_render_fill_rect(&outline_rect_bottom);
 
-	// Red section
+	MP_Rect outline_rect_top = {};
+	outline_rect_top.x = ((int)pos.x - health_bar.w / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	outline_rect_top.y = ((int)pos.y + health_bar.h / 2);
+	outline_rect_top.w = health_bar.w + (Globals::DEFAULT_HEALTH_BAR_OUTLINE * 2);
+	outline_rect_top.h = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	mp_render_fill_rect(&outline_rect_top);
+
+	MP_Rect outline_rect_left = {};
+	outline_rect_left.x = ((int)pos.x - health_bar.w / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	outline_rect_left.y = ((int)pos.y - health_bar.h / 2);
+	outline_rect_left.w = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	outline_rect_left.h = health_bar.h;
+	mp_render_fill_rect(&outline_rect_left);
+
+	MP_Rect outline_rect_right = {};
+	outline_rect_right.x = ((int)pos.x + health_bar.w / 2);
+	outline_rect_right.y = ((int)pos.y - health_bar.h / 2);
+	outline_rect_right.w = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
+	outline_rect_right.h = health_bar.h;
+	mp_render_fill_rect(&outline_rect_right);
+
+	// Green section
 	MP_Rect green_rect = {};
 	green_rect.x = (int)pos.x - health_bar.w / 2;
 	green_rect.y = (int)pos.y - health_bar.h / 2;
 	green_rect.w = (int)((float)health_bar.w * hp_percent);
+	green_rect.w = (int)lerp(0.0f, (float)health_bar.w, hp_percent);
 	green_rect.h = health_bar.h;
 	mp_set_render_draw_color(CT_Green);
 	mp_render_fill_rect(&green_rect);
 
-	// Green section
+	// Red section
 	MP_Rect red_rect = {};
-	red_rect.x = (int)lerp(0.0f, (float)health_bar.w, hp_percent);
+	red_rect.x = green_rect.x + green_rect.w;
 	red_rect.y = (int)pos.y - health_bar.h / 2;
 	red_rect.w = health_bar.w - green_rect.w;
 	red_rect.h = health_bar.h;
@@ -159,6 +179,12 @@ Player create_player(std::string character_name, V2 spawn_pos_ws) {
 
 	Player_Data data = get_player_data(character_name);
 
+	result.health_bar = create_health_bar(
+		data.hp, 
+		Globals::DEFAULT_HEALTH_BAR_WIDTH, 
+		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
+		data.h + Globals::DEFAULT_HEALTH_BAR_HEIGHT
+	);
 	// NOTE: AS_Idle is the default starting animation for the player
 	result.at = create_animation_tracker(character_name, AS_Idle, true);
 
@@ -181,16 +207,20 @@ Player create_player(std::string character_name, V2 spawn_pos_ws) {
 }
 
 void draw_player(Player& p, V2 camera_ws_pos) {
-	// Convert the player's position to camera space
+	// WE ARE DRAWING THE PLAYER RELATIVE TO THE CAMERA.
 	MP_Rect p_draw_rect = {
 		(int)p.rb.pos_ws.x - p.w / 2,
 		(int)p.rb.pos_ws.y - p.h / 2,
 		p.w, p.h};
-	// This is the camera space position of the player. Not the world space position.
 	V2 p_pos_cs = convert_ws_to_cs({ (float)p_draw_rect.x, (float)p_draw_rect.y }, camera_ws_pos);
 	p_draw_rect.x = (int)p_pos_cs.x; 
 	p_draw_rect.y = (int)p_pos_cs.y; 
 	draw_animation_tracker(&p.at, p_draw_rect, 0);
+
+	V2 health_bar_cs_pos = p.rb.pos_ws;
+	health_bar_cs_pos.y += p.health_bar.offset;
+	health_bar_cs_pos = convert_ws_to_cs(health_bar_cs_pos, camera_ws_pos);
+	draw_health_bar(p.health_bar, health_bar_cs_pos);
 }
 
 void delete_player(Player* player) {

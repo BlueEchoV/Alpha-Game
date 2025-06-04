@@ -26,6 +26,7 @@ V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float ce
 void swap(V2& vec_1, V2& vec_2);
 float hypotenuse(float a, float b);
 V2 normalize(V2 vec);
+void clamp(float& clamp_value, float min, float max);
 
 float convert_degrees_to_radians(float degrees);
 float convert_radians_to_degrees(float radians);
@@ -33,3 +34,5 @@ float convert_radians_to_degrees(float radians);
 V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin);
 float calculate_facing_direction(V2 vec);
 float calculate_distance_between(V2 vec_1, V2 vec_2);
+
+float lerp(float a_starting_val, float b_ending_val, float t_where);

@@ -13,6 +13,7 @@ void update_camera(Camera& camera, Player& player) {
 	camera.h = Globals::resolution_y;
 }
 
+// NOTE: The camera is based off the player, and the player is draw relative to the camera.
 Camera create_camera(Player& player) {
 	Camera result = {};
 
