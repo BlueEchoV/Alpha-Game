@@ -101,7 +101,8 @@ Rigid_Body create_rigid_body(V2 pos_ws, int speed) {
 	Rigid_Body result = {};
 
 	result.pos_ws = pos_ws;
-	result.speed = speed;
+	result.base_speed = speed;
+	result.current_speed = result.base_speed;
 	result.angle = 0.0f;
 
 	return result;

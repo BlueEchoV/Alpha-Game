@@ -17,7 +17,8 @@ struct Rigid_Body {
 
 	float angle;
 
-	int speed;
+	int base_speed;
+	int current_speed;
 
 	int num_colliders;
 	Collider colliders[Globals::MAX_COLLIDERS];

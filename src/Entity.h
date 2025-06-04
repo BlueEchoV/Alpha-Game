@@ -102,6 +102,16 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 	return nullptr;
 }
 
+struct Health_Bar {
+	int max_hp;
+	int current_hp;
+	int w, h;
+};
+
+void create_health_bar();
+void update_health_bar();
+void draw_health_bar();
+
 struct Unit_Data {
 	std::string unit_name;
 	int w;
@@ -197,18 +207,26 @@ void delete_weapon(Weapon*& weapon);
 
 void load_unit_data_csv(CSV_Data* data);
 
+struct Player_Data {
+	std::string character_name;
+	int hp;
+	int base_speed;
+	int damage;
+	int w, h;
+};
+
 struct Player {
 	Animation_Tracker at;
 
 	Rigid_Body rb;
+	Health_Bar health_bar;
 
 	int w, h;
 
 	// Could this all be put into a 'weapon_kit' of some sort?
 	Weapon* weapon;
 
-	// int health;
-	// int damage;
+	int damage;
 };
 
 // Make sure and release weapon memory
@@ -233,7 +251,7 @@ struct Game_Data {
 	Font_Type selected_font;
 };
 
-Player create_player(std::string entity_name, Animation_State as, V2 spawn_pos_ws, int player_speed);
+Player create_player(std::string character_name, V2 spawn_pos_ws);
 void draw_player(Player& p, V2 camera_ws_pos);
 
 void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles,

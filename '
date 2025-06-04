@@ -243,8 +243,8 @@ V2 update_unit_position(Unit& unit, float dt) {
 	if (unit.dead == false) {
 		unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
 
-		unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.current_speed) * dt;
-		unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.current_speed) * dt;
+		unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.speed) * dt;
+		unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.speed) * dt;
 	}
 
 	return result;
@@ -318,8 +318,8 @@ void spawn_projectile(Game_Data& game_data, std::string projectile_name, V2 orig
 }
 
 void update_projectile(Projectile& projectile, float delta_time) {
-	projectile.rb.pos_ws.x += projectile.rb.current_speed * (projectile.rb.vel.x * delta_time);
-	projectile.rb.pos_ws.y += projectile.rb.current_speed * (projectile.rb.vel.y * delta_time);
+	projectile.rb.pos_ws.x += projectile.rb.speed * (projectile.rb.vel.x * delta_time);
+	projectile.rb.pos_ws.y += projectile.rb.speed * (projectile.rb.vel.y * delta_time);
 }
 
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile) {

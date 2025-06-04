@@ -60,8 +60,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.selected_font = FT_Basic;
 
-	int player_speed = 100;
-	game_data.player = create_player("player_1", AS_Idle, { 0,0 }, player_speed);
+	game_data.player = create_player("player_1", { 0.0f, 0.0f });
 	game_data.camera = create_camera(game_data.player);
 
 	bool running = true;
@@ -87,7 +86,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
 	bool sound_is_playing = false;
 	init_direct_sound(&Globals::renderer->open_gl.window_handle, samples_per_second, secondary_buffer_size);
-	global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
+	// UNCOMMENT THIS PLAY BUFFER
+	// global_secondary_buffer->Play(0, 0, DSBPLAY_LOOPING);
 
 	// NOTE: Direct Sound output test
 	DWORD play_cursor;
@@ -251,13 +251,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			equip_weapon(player->weapon, "pistol");
 		}
 
-
 		if (key_pressed_and_held(VK_SPACE)) {
 			player->weapon->fire_weapon(game_data, ET_Player);
 		}
 
 		player->weapon->update_weapon(delta_time);
-		update_animation_tracker(&player->at, delta_time, (float)player->rb.speed);
+		update_animation_tracker(&player->at, delta_time, (float)player->rb.current_speed);
 
 		if (current_debug_spawning_delay < 0) {
 			current_debug_spawning_delay = debug_spawning_delay;
@@ -287,8 +286,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		player_x_delta *= game_data.player.rb.speed * delta_time;
-		player_y_delta *= game_data.player.rb.speed * delta_time;
+		player_x_delta *= game_data.player.rb.current_speed * delta_time;
+		player_y_delta *= game_data.player.rb.current_speed * delta_time;
 
 		if (player_x_delta != 0.0f && player_y_delta != 0.0f) {
 			// See HMH 042 at 24:30 for reference. 
@@ -303,9 +302,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		game_data.player.rb.pos_ws.y += player_y_delta;
 
 		if (key_pressed_and_held(VK_SHIFT)) {
-			game_data.player.rb.speed = player_speed * 2;
+			game_data.player.rb.current_speed = game_data.player.rb.base_speed * 2;
 		} else {
-			game_data.player.rb.speed = player_speed;
+			game_data.player.rb.current_speed = game_data.player.rb.base_speed;
 		}
 
 		if (key_pressed(VK_F1)) {
