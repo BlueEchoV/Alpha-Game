@@ -19,10 +19,10 @@ enum Storage_Type : uint8_t {
 	ST_Building
 };
 
-enum Entity_Type {
-	ET_Player,
-	ET_Allies,
-	ET_Enemies
+enum Faction {
+	F_Player,
+	F_Allies,
+	F_Enemies
 };
 
 const int MAX_STORAGE_SIZE = 1000;
@@ -110,7 +110,8 @@ struct Health_Bar {
 };
 
 Health_Bar create_health_bar(int hp, int w, int h, int offset);
-void draw_health_bar(Health_Bar& health_bar, V2 pos);
+void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos);
+void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos);
 
 struct Unit_Data {
 	std::string unit_name;
@@ -124,8 +125,10 @@ struct Unit_Data {
 struct Player;
 
 struct Unit {
+	Faction faction;
 	std::string unit_name;
 	Animation_Tracker at;
+	Health_Bar health_bar;
 	Rigid_Body rb;
 	int w, h;
 
@@ -193,7 +196,7 @@ struct Weapon {
 	bool can_fire = true;
 	float fire_cooldown;
 
-	void fire_weapon(Game_Data& game_data, Entity_Type et);
+	void fire_weapon(Game_Data& game_data, Faction faction);
 	void update_weapon(float delta_time);
 	// virtual void reload(); // Reloading animation? // This could be tedious
 	// Should this be here?
@@ -216,6 +219,8 @@ struct Player_Data {
 };
 
 struct Player {
+	Faction faction = F_Player;
+	std::string character_name;
 	Animation_Tracker at;
 
 	Rigid_Body rb;
@@ -254,8 +259,8 @@ struct Game_Data {
 Player create_player(std::string character_name, V2 spawn_pos_ws);
 void draw_player(Player& p, V2 camera_ws_pos);
 
-void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles,
-	Player* target, V2 spawn_pos);
+void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Storage<Unit>& storage, 
+	std::vector<Handle>& handles, Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);

@@ -253,7 +253,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (key_pressed_and_held(VK_SPACE)) {
-			player->weapon->fire_weapon(game_data, ET_Player);
+			player->weapon->fire_weapon(game_data, F_Player);
 		}
 
 		player->weapon->update_weapon(delta_time);
@@ -272,6 +272,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
 				mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
 				spawn_unit(
+					F_Enemies,
 					"zombie_woman",
 					AS_Walking,
 					game_data.unit_storage,
@@ -315,6 +316,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			game_data.player.rb.current_speed = game_data.player.rb.base_speed;
 		}
 
+		// NOTE: Bind these all to console in the future?
 		if (key_pressed(VK_F1)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 		}
@@ -441,7 +443,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (u->dead) {
 				change_animation(&u->at, u->unit_name, AS_Death, u->at.fd, u->at.aps);
 			}
+
 			draw_unit(*u, game_data.camera.pos_ws);
+
 
 			if (Globals::debug_show_colliders) {
 				draw_colliders(&u->rb, game_data.camera.pos_ws);

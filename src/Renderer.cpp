@@ -393,6 +393,9 @@ Color_RGBA get_color_type(Color_Type c) {
         case CT_Red:
 			result = { 255, 0, 0, 255 };
             break;
+        case CT_Red_Wine:
+			result = { 114, 47, 55, 255 };
+            break;
         case CT_Green:
 			result = { 0, 255, 0, 255 };
             break;

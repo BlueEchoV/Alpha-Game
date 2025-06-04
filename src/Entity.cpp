@@ -16,7 +16,7 @@ Health_Bar create_health_bar(int hp, int w, int h, int offset) {
 	return result;
 }
 
-void draw_health_bar(Health_Bar& health_bar, V2 pos) {
+void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos) {
 	// EXAMPLE: Hp = 500 / 1000
 	float hp_percent = (float)health_bar.current_hp / (float)health_bar.max_hp;
 	clamp(hp_percent, 0.0f, 1.0f);
@@ -58,7 +58,7 @@ void draw_health_bar(Health_Bar& health_bar, V2 pos) {
 	green_rect.w = (int)((float)health_bar.w * hp_percent);
 	green_rect.w = (int)lerp(0.0f, (float)health_bar.w, hp_percent);
 	green_rect.h = health_bar.h;
-	mp_set_render_draw_color(CT_Green);
+	mp_set_render_draw_color(c);
 	mp_render_fill_rect(&green_rect);
 
 	// Red section
@@ -67,8 +67,33 @@ void draw_health_bar(Health_Bar& health_bar, V2 pos) {
 	red_rect.y = (int)pos.y - health_bar.h / 2;
 	red_rect.w = health_bar.w - green_rect.w;
 	red_rect.h = health_bar.h;
-	mp_set_render_draw_color(CT_Red);
+	mp_set_render_draw_color(CT_Red_Wine);
 	mp_render_fill_rect(&red_rect);
+}
+
+void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {
+	Color_Type c;
+
+	switch (faction) {
+	case F_Player: {
+		c = CT_Dark_Yellow;
+		break;
+	}
+	case F_Allies: {
+		c = CT_Dark_Blue;
+		break;
+	}
+	case F_Enemies: {
+		c = CT_Red_Wine;
+		break;
+	}
+	default: {
+		c = CT_Blue;
+		break;
+	}
+	}
+
+	draw_health_bar(c, health_bar, pos);
 }
 
 Weapon_Data bad_weapon_data = {
@@ -112,9 +137,9 @@ void delete_weapon(Weapon*& weapon) {
 }
 
 // Fires at the mouse
-void Weapon::fire_weapon(Game_Data& game_data, Entity_Type et) {
-	switch (et) {
-	case ET_Player: {
+void Weapon::fire_weapon(Game_Data& game_data, Faction faction) {
+	switch (faction) {
+	case F_Player: {
 		if (this->can_fire) {
 			// Change this to fire weapon
 			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
@@ -125,10 +150,10 @@ void Weapon::fire_weapon(Game_Data& game_data, Entity_Type et) {
 		}
 		break;
 	}
-	case ET_Allies: {
+	case F_Allies: {
 		break;
 	}
-	case ET_Enemies: {
+	case F_Enemies: {
 		break;
 	}
 	default: {
@@ -160,7 +185,7 @@ void Weapon::draw_weapon(Animation_Tracker* at, V2 pos) {
 
 Player_Data bad_player_data = {
 	// character_name		hp		speed		damage		w		h
-	"player_1",		100,	200,		100,		50,		50
+	"player_1",				100,	200,		100,		100,	100 	
 };
 
 std::unordered_map<std::string, Player_Data> player_data_map;
@@ -177,23 +202,27 @@ Player_Data get_player_data(std::string character_name) {
 Player create_player(std::string character_name, V2 spawn_pos_ws) {
 	Player result = {};
 
+	result.faction = F_Player;
+	result.character_name = character_name;
+
 	Player_Data data = get_player_data(character_name);
+
+	// NOTE: AS_Idle is the default starting animation for the player
+	result.at = create_animation_tracker(character_name, AS_Idle, true);
+
+	result.w = data.h;
+	result.h = data.w;
+
+	result.rb = create_rigid_body(
+		{ spawn_pos_ws.x, spawn_pos_ws.y}, 
+		data.base_speed
+	);
 
 	result.health_bar = create_health_bar(
 		data.hp, 
 		Globals::DEFAULT_HEALTH_BAR_WIDTH, 
 		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
-		data.h + Globals::DEFAULT_HEALTH_BAR_HEIGHT
-	);
-	// NOTE: AS_Idle is the default starting animation for the player
-	result.at = create_animation_tracker(character_name, AS_Idle, true);
-
-	result.w = Globals::player_width;
-	result.h = Globals::player_height;
-
-	result.rb = create_rigid_body(
-		{ spawn_pos_ws.x, spawn_pos_ws.y}, 
-		data.base_speed
+		data.h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
 	);
 
 	/*
@@ -220,7 +249,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	V2 health_bar_cs_pos = p.rb.pos_ws;
 	health_bar_cs_pos.y += p.health_bar.offset;
 	health_bar_cs_pos = convert_ws_to_cs(health_bar_cs_pos, camera_ws_pos);
-	draw_health_bar(p.health_bar, health_bar_cs_pos);
+	draw_faction_health_bar(p.faction, p.health_bar, health_bar_cs_pos);
 }
 
 void delete_player(Player* player) {
@@ -241,13 +270,20 @@ Unit_Data* get_unit_data(std::string unit_type) {
 	return &bad_unit_data;
 }
 
-void spawn_unit(std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles, 
+void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles, 
 	Player* target, V2 spawn_pos) {
 	Unit result = {};
 
+	result.faction = faction;
 	result.unit_name = unit_name;
 
 	Unit_Data* data = get_unit_data(unit_name);
+	result.health_bar = create_health_bar(
+		data->health, 
+		Globals::DEFAULT_HEALTH_BAR_WIDTH, 
+		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
+		data->h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
+	);
 	result.at = create_animation_tracker(unit_name, as, true);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
@@ -305,6 +341,12 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 		MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
 
 		draw_animation_tracker(&unit.at, dst, 0);
+
+		if (!unit.dead) {
+			V2 health_bar_cs_pos = entity_pos_cs;
+			health_bar_cs_pos.y += unit.health_bar.offset;
+			draw_faction_health_bar(unit.faction, unit.health_bar, health_bar_cs_pos);
+		}
 	}
 }
 

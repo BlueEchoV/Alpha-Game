@@ -20,9 +20,6 @@ namespace Globals {
 	extern int tile_w;
 	extern int tile_h;
 
-	extern int player_width;
-	extern int player_height;
-
 	extern int debug_total_arrows;
 
 	extern float slow_frames_per_sec;

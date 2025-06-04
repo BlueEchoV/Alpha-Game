@@ -7,6 +7,7 @@ enum Color_Type {
 	CT_White,
 	CT_Black,
 	CT_Red,
+	CT_Red_Wine,
 	CT_Green,
 	CT_Blue,
 	CT_Orange,
