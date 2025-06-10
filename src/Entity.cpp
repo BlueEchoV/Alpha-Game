@@ -4,6 +4,27 @@ std::unordered_map<std::string, Unit_Data> unit_data_map;
 std::unordered_map<std::string, Weapon_Data> weapon_data_map;
 std::unordered_map<std::string, Projectile_Data> projectile_data_map;
 
+Cooldown create_cooldown(float max_cd) {
+	Cooldown result = {};
+
+	result.max = max_cd;
+	result.current = 0.0f;
+
+	return result;;
+}
+
+// Returns true if the cooldown is down, false elsewise
+bool check_and_update_cooldown(Cooldown& cd, float delta_time) {
+	if (cd.current <= 0.0f) {
+		cd.current = cd.max;
+		return true;
+	}
+	else {
+		cd.current -= delta_time;
+		return false;
+	}
+}
+
 Health_Bar create_health_bar(int hp, int w, int h, int offset) {
 	Health_Bar result = {};
 
@@ -432,6 +453,74 @@ void delete_destroyed_entities_from_handles(Game_Data& game_data) {
 		}
 		return false;
 	});
+}
+
+Horde_Data bad_horde_data = {
+	// level		total_zombies		spawning_cd
+	   1,			20,					0.5f
+};
+
+std::unordered_map<std::string, Horde_Data> horde_data_map;
+
+Horde_Data get_horde_data(Horde_Type horde_type) {
+	Horde_Data result = {};
+
+	if (horde_type == HT_Not_Specified) {
+		return bad_horde_data;
+	}
+	return bad_horde_data;
+};
+
+// Call this at the end of every day?
+Horde create_horde(Faction faction, Horde_Type ht, MP_Rect rect) {
+	Horde result;
+
+	Horde_Data data = get_horde_data(ht);
+
+	result.faction = faction;
+	result.level = data.level;
+	result.spawning_cd = create_cooldown(data.max_spawning_cd);
+	result.spawn_region_ws = rect;
+	result.begin_spawning = false;
+	result.total_to_spawn = data.total_to_spawn;
+	result.total_spawned = 0;
+
+	return result;
+}
+
+void spawn_and_update_horde(Game_Data& game_data, float delta_time) {
+	if (game_data.current_horde.begin_spawning) {
+		if (game_data.current_horde.total_spawned < game_data.current_horde.total_to_spawn) {
+			if (check_and_update_cooldown(game_data.current_horde.spawning_cd, delta_time)) {
+				if (game_data.current_horde.faction == F_Enemies) {
+					V2 random_pos_ws = {};
+					MP_Rect spawn_region_ws = game_data.current_horde.spawn_region_ws;
+					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() % spawn_region_ws.w));
+					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() % spawn_region_ws.h));
+					spawn_unit(
+						game_data.current_horde.faction,
+						"zombie_woman",
+						AS_Running,
+						game_data.unit_storage,
+						game_data.enemy_unit_handles,
+						&game_data.player,
+						random_pos_ws
+					);
+					game_data.current_horde.spawning_cd.current++;
+				}
+			}
+		}
+	}
+}
+
+// NOTE: Draw diagnal lines? Or dotted lines?
+void draw_horde_spawn_region(Color_Type c, Horde& horde, V2 camera_pos) {
+	V2 pos_ws = {(float)horde.spawn_region_ws.x, (float)horde.spawn_region_ws.y};
+	V2 pos_cs = convert_ws_to_cs(pos_ws, camera_pos);
+	MP_Rect cs_rect = { (int)pos_cs.x, (int)pos_cs.y, horde.spawn_region_ws.w, horde.spawn_region_ws.h };
+
+	mp_set_render_draw_color(c);
+	mp_render_draw_rect(&cs_rect);
 }
 
 Type_Descriptor unit_data_type_descriptors[] = {

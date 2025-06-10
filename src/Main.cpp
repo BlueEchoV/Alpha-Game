@@ -64,6 +64,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player);
 
+	MP_Rect spawn_region = {400, -200, 200, 400};
+	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, spawn_region);
+
 	bool running = true;
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
@@ -266,7 +269,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player->health_bar.current_hp += 5;
 		}
 
-		if (current_debug_spawning_delay < 0) {
+		if (current_debug_spawning_delay <= 0.0f) {
 			current_debug_spawning_delay = debug_spawning_delay;
 			if (key_pressed_and_held(KEY_Q)) {
 				V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
@@ -274,7 +277,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				spawn_unit(
 					F_Enemies,
 					"zombie_woman",
-					AS_Walking,
+					AS_Running,
 					game_data.unit_storage,
 					game_data.enemy_unit_handles,
 					&game_data.player,
@@ -284,6 +287,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		else {
 			current_debug_spawning_delay -= delta_time;
+		}
+
+		if (key_pressed(KEY_R)) {
+			game_data.current_horde.begin_spawning = true;
+		}
+		if (key_pressed(KEY_T)) {
+			game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, spawn_region);
 		}
 
 		if (key_pressed(KEY_E)) {
@@ -379,6 +389,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
+		spawn_and_update_horde(game_data, delta_time);
+
 		// Render
 
 		// TODO: Move everything into here at some point
@@ -455,6 +467,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				draw_colliders(&u->rb, game_data.camera.pos_ws);
 			}
 		}
+
+		draw_horde_spawn_region(CT_Red, game_data.current_horde, game_data.camera.pos_ws);
 
 		draw_player(game_data.player, game_data.camera.pos_ws);
 

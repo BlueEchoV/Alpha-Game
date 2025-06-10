@@ -25,6 +25,12 @@ enum Faction {
 	F_Enemies
 };
 
+struct Cooldown {
+	float max;
+	float current;
+};
+Cooldown create_cooldown(float max_cd);
+
 const int MAX_STORAGE_SIZE = 1000;
 
 // This goes on the entities
@@ -241,6 +247,30 @@ struct Camera {
 	int w, h;
 };
 
+enum Horde_Type {
+	HT_Not_Specified,
+	HT_Basic
+};
+
+struct Horde_Data {
+	int level;
+	int total_to_spawn;
+	// In seconds
+	float max_spawning_cd;
+	// Zombie Types
+};
+
+struct Horde {
+	Faction faction;
+	int level;
+	MP_Rect spawn_region_ws;
+	bool begin_spawning;
+	int total_to_spawn;
+	int total_spawned;
+
+	Cooldown spawning_cd;
+}; 
+
 struct Game_Data {
 	Camera camera;
 
@@ -251,6 +281,8 @@ struct Game_Data {
 
 	std::vector<Handle> enemy_unit_handles;
 	std::vector<Handle> projectile_handles;
+
+	Horde current_horde;
 
 	Font_Type selected_font;
 };
@@ -264,6 +296,9 @@ void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 void delete_destroyed_entities_from_handles(Game_Data& game_data);
+Horde create_horde(Faction faction, Horde_Type ht, MP_Rect rect);
+void spawn_and_update_horde(Game_Data& game_data, float delta_time);
+void draw_horde_spawn_region(Color_Type c, Horde& horde, V2 camera_pos);
 
 void spawn_projectile(Game_Data& game_data, std::string projectile_name, int damage, V2 origin_ws, V2 target_ws);
 void update_projectile(Projectile& projectile, float delta_time);
