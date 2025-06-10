@@ -1,4 +1,4 @@
-projectile_name,w,h,damage,speed
-slash,100,100,100,100
-arrow,50,50,10,400
-bullet,25,25,50,700
+projectile_name,w,h,speed
+slash,100,100,100
+arrow,50,50,400
+bullet,25,25,700

@@ -132,7 +132,6 @@ struct Unit {
 	Rigid_Body rb;
 	int w, h;
 
-	int health;
 	int damage;
 	Player* target;
 
@@ -146,7 +145,6 @@ struct Projectile_Data {
 	std::string projectile_name;
 
 	int w, h;
-	int damage;
 	int speed;
 };
 
@@ -158,6 +156,7 @@ struct Projectile {
 	Animation_Tracker at;
 
 	bool destroyed = false;
+	int damage;
 
 	Handle handle;
 };
@@ -266,7 +265,7 @@ void draw_unit(Unit& unit, V2 camera_pos);
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 void delete_destroyed_entities_from_handles(Game_Data& game_data);
 
-void spawn_projectile(Game_Data& game_data, std::string projectile_name, V2 origin_ws, V2 target_ws);
+void spawn_projectile(Game_Data& game_data, std::string projectile_name, int damage, V2 origin_ws, V2 target_ws);
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 

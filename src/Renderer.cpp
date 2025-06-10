@@ -411,7 +411,13 @@ Color_RGBA get_color_type(Color_Type c) {
         case CT_Dark_Blue:
 			result = { 0, 0, 139, 255 };
             break;
-        default:
+		case CT_Dark_Green:
+			result = { 2, 139, 32, 255 };
+			break;
+		case CT_Dark_Grey:
+			result = { 39, 39, 39, 255 };
+			break;
+		default:
             return result;
     }
 

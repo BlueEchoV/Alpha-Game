@@ -13,6 +13,8 @@ enum Color_Type {
 	CT_Orange,
 	CT_Dark_Yellow,
 	CT_Dark_Blue,
+	CT_Dark_Green,
+	CT_Dark_Grey,
 	CT_Total
 };
 

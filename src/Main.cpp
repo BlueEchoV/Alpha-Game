@@ -361,7 +361,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Handle& projectile_handle : game_data.projectile_handles) {
 			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 				Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
-				if (proj == NULL) {
+				if (proj == NULL || proj->destroyed == true) {
 					continue;
 				}
 				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
@@ -370,7 +370,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 				if (check_rb_collision(&proj->rb, &unit->rb)) {
 					proj->destroyed = true;
-					unit->dead = true;
+
+					unit->health_bar.current_hp -= proj->damage;
+					if (unit->health_bar.current_hp <= 0) {
+						unit->dead = true;
+					}
 				}
 			}
 		}

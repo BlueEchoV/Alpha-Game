@@ -67,7 +67,7 @@ void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos) {
 	red_rect.y = (int)pos.y - health_bar.h / 2;
 	red_rect.w = health_bar.w - green_rect.w;
 	red_rect.h = health_bar.h;
-	mp_set_render_draw_color(CT_Red_Wine);
+	mp_set_render_draw_color(CT_Dark_Grey);
 	mp_render_fill_rect(&red_rect);
 }
 
@@ -76,7 +76,7 @@ void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {
 
 	switch (faction) {
 	case F_Player: {
-		c = CT_Dark_Yellow;
+		c = CT_Dark_Green;
 		break;
 	}
 	case F_Allies: {
@@ -84,7 +84,7 @@ void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {
 		break;
 	}
 	case F_Enemies: {
-		c = CT_Red_Wine;
+		c = CT_Red;
 		break;
 	}
 	default: {
@@ -144,7 +144,7 @@ void Weapon::fire_weapon(Game_Data& game_data, Faction faction) {
 			// Change this to fire weapon
 			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-			spawn_projectile(game_data, this->projectile_name, game_data.player.rb.pos_ws, mouse_ws_pos);
+			spawn_projectile(game_data, this->projectile_name, this->damage, game_data.player.rb.pos_ws, mouse_ws_pos);
 			Globals::debug_total_arrows++;
 			this->can_fire = false;
 		}
@@ -294,7 +294,6 @@ void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Stor
 
 	result.w = data->w;
 	result.h = data->h;
-	result.health = data->health;
 	result.damage = data->damage;
 	result.target = target;
 	result.handle = create_handle(storage);
@@ -351,8 +350,8 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 }
 
 Projectile_Data bad_projectile_data = {
-	// name		w	h	damage	speed
-	"arrow",	32, 32, 25,		100
+	// name		w	h	speed
+	"arrow",	32, 32, 100
 };
 
 Projectile_Data get_projectile_data(std::string projectile_name) {
@@ -363,8 +362,9 @@ Projectile_Data get_projectile_data(std::string projectile_name) {
 	return it->second;
 }
 
-void spawn_projectile(Game_Data& game_data, std::string projectile_name, V2 origin_ws, V2 target_ws) {
+void spawn_projectile(Game_Data& game_data, std::string projectile_name, int damage, V2 origin_ws, V2 target_ws) {
 	Projectile result = {};
+	result.damage = damage;
 
 	Projectile_Data data = get_projectile_data(projectile_name);
 
@@ -483,7 +483,6 @@ Type_Descriptor projectile_data_type_descriptors[] = {
 	FIELD(Projectile_Data, VT_String, projectile_name),
 	FIELD(Projectile_Data, VT_Int, w),
 	FIELD(Projectile_Data, VT_Int, h),
-	FIELD(Projectile_Data, VT_Int, damage),
 	FIELD(Projectile_Data, VT_Int, speed)
 };
 
