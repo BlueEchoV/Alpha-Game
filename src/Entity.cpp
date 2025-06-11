@@ -495,8 +495,9 @@ void spawn_and_update_horde(Game_Data& game_data, float delta_time) {
 				if (game_data.current_horde.faction == F_Enemies) {
 					V2 random_pos_ws = {};
 					MP_Rect spawn_region_ws = game_data.current_horde.spawn_region_ws;
-					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() % spawn_region_ws.w));
-					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() % spawn_region_ws.h));
+					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
+					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.h));
+					log("Random Position: x = %f, y = %f", random_pos_ws.x, random_pos_ws.y);
 					spawn_unit(
 						game_data.current_horde.faction,
 						"zombie_woman",
