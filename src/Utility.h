@@ -64,6 +64,21 @@ struct Color_RGBA {
 	uint8_t a;
 };
 
+enum Color_Type {
+	CT_White,
+	CT_Black,
+	CT_Red,
+	CT_Red_Wine,
+	CT_Green,
+	CT_Blue,
+	CT_Orange,
+	CT_Dark_Yellow,
+	CT_Dark_Blue,
+	CT_Dark_Green,
+	CT_Dark_Grey,
+	CT_Total
+};
+
 void log(const char* format, ...);
 bool my_mem_compare(const void* src, const void* dst, size_t n);
 void my_mem_copy(const void* src, void* dst, size_t n);
@@ -96,3 +111,5 @@ CSV_Data create_open_csv_data(std::string file_name);
 bool open_csv_data_file(CSV_Data* data);
 bool close_csv_data_file(CSV_Data* data);
 void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descriptor> type_descriptors, size_t stride);
+
+

@@ -23,6 +23,7 @@
     <ClCompile Include="src\Audio_xAudio2.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\Game_Utility.cpp" />
     <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -37,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="src\Audio_DirectSound.h" />
     <ClInclude Include="src\Audio_xAudio2.h" />
+    <ClInclude Include="src\Game_Utility.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Game.h" />

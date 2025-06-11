@@ -1,22 +1,9 @@
 #pragma once
 #include "Windows_Platform.h"
+#include "Utility.h"
+
 #include <unordered_map>
 #include <stdint.h>
-
-enum Color_Type {
-	CT_White,
-	CT_Black,
-	CT_Red,
-	CT_Red_Wine,
-	CT_Green,
-	CT_Blue,
-	CT_Orange,
-	CT_Dark_Yellow,
-	CT_Dark_Blue,
-	CT_Dark_Green,
-	CT_Dark_Grey,
-	CT_Total
-};
 
 typedef unsigned int GLuint;
 

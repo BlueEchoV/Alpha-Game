@@ -1,7 +1,9 @@
 #pragma once
 #include "Utility.h"
-#include "renderer.h"
+#include "Game_Utility.h"
+#include "Renderer.h"
 #include "Rigidbody.h"
+
 #include <vector>
 
 struct MP_Renderer;
@@ -18,18 +20,6 @@ enum Storage_Type : uint8_t {
 	ST_Projectile,
 	ST_Building
 };
-
-enum Faction {
-	F_Player,
-	F_Allies,
-	F_Enemies
-};
-
-struct Cooldown {
-	float max;
-	float current;
-};
-Cooldown create_cooldown(float max_cd);
 
 const int MAX_STORAGE_SIZE = 1000;
 
@@ -107,17 +97,6 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 	// assert(false);
 	return nullptr;
 }
-
-struct Health_Bar {
-	int offset;
-	int max_hp;
-	int current_hp;
-	int w, h;
-};
-
-Health_Bar create_health_bar(int hp, int w, int h, int offset);
-void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos);
-void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos);
 
 struct Unit_Data {
 	std::string unit_name;
