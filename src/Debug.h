@@ -1,5 +1,8 @@
 #pragma once
-#include "Entity.h"
+#include "Utility.h"
+#include "Image.h"
+#include "Rigidbody.h"
+#include "Game_Data.h"
 
 enum Debug_Image {
     DI_mp_render_fill_rect,
@@ -17,20 +20,9 @@ enum Debug_Image {
     DI_Count
 };
 
-Camera create_camera(Player& player);
-void update_camera(Camera& camera, Player& player);
-
 void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
 	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string custom_text);
 void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb);
 void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture, float delta_time);
 void debug_draw_stats(Font& font, MP_Texture* debug_texture);
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
-
-void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency);
-void render(Game_Data& game_data, float delta_time);
-
-void load_csv_file();
-
-// 1: I need to load the CSV file
-// 2: I need to 

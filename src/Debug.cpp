@@ -1,26 +1,4 @@
-#include "Game.h"
-
-#define STB_PERLIN_IMPLEMENTATION
-#include <perlin.h>
-
-// Camera's position is relative to the player
-void update_camera(Camera& camera, Player& player) {
-	// The camera is offset from the player
-	camera.pos_ws.x = (player.rb.pos_ws.x - (Globals::resolution_x / 2.0f));
-	camera.pos_ws.y = (player.rb.pos_ws.y - (Globals::resolution_y / 2.0f));
-
-	camera.w = Globals::resolution_x;
-	camera.h = Globals::resolution_y;
-}
-
-// NOTE: The camera is based off the player, and the player is draw relative to the camera.
-Camera create_camera(Player& player) {
-	Camera result = {};
-
-	update_camera(result, player);
-
-	return result;
-}
+#include "Debug.h"
 
 int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
@@ -323,39 +301,5 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 	if (Globals::debug_show_stats) {
 		debug_draw_stats(font, debug_texture);
 	}
-}
-
-void draw_tile(Game_Data& game_data, int tile_index_x, int tile_index_y, float noise_frequency) {
-	std::string type = "IT_Rock_32x32";
-
-	// Move everything around the camera
-	int tile_ws_x = (Globals::tile_w * tile_index_x);
-	int tile_ws_y = (Globals::tile_h * tile_index_y);
-
-	int tile_cs_x = tile_ws_x - (int)game_data.camera.pos_ws.x;
-	int tile_cs_y = tile_ws_y - (int)game_data.camera.pos_ws.y;
-
-	float perlin_x = tile_index_x * noise_frequency;
-	float perlin_y = tile_index_y * noise_frequency;
-	float perlin = stb_perlin_noise3(perlin_x, perlin_y, 0, 0, 0, 0);
-
-	if (perlin <= -0.2f) {
-		type = "IT_Water_32x32";
-	} else if (perlin > -0.2f && perlin < 0.3f) {
-		type = "IT_Grass_32x32";
-	} else {
-		type = "IT_Rock_32x32";
-	}
-
-	Image* image = get_image(type);
-
-	MP_Rect dst = {tile_cs_x, tile_cs_y, Globals::tile_w, Globals::tile_h};
-
-	mp_render_copy(image->texture, NULL, &dst);
-}
-
-void render(Game_Data& game_data, float delta_time) {
-	REF(game_data);
-	REF(delta_time);
 }
 

@@ -1,12 +1,15 @@
 #include "GL_Functions.h"
-#include "Game.h"
 #include "Sprite_Sheet.h"
+#include "Tile_Map.h"
 #include "Audio_xAudio2.h"
 #include "Audio_DirectSound.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <math.h>
+
+#include "Game_Data.h"
+#include "Debug.h"
 
 typedef int8_t s8;
 typedef int16_t s16;
@@ -62,7 +65,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.player = create_player("player_1", { 0.0f, 0.0f });
 	game_data.player.health_bar.current_hp -= 50;
-	game_data.camera = create_camera(game_data.player);
+	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
 	MP_Rect spawn_region = {400, -200, 200, 400};
 	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, spawn_region);
@@ -256,7 +259,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (key_pressed_and_held(VK_SPACE)) {
-			player->weapon->fire_weapon(game_data, F_Player);
+			player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage, 
+				game_data.camera, game_data.player.rb.pos_ws, F_Player);
 		}
 
 		player->weapon->update_weapon(delta_time);
@@ -389,7 +393,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		spawn_and_update_horde(game_data, delta_time);
+		spawn_and_update_horde(game_data.enemy_unit_handles, game_data.unit_storage, game_data.current_horde, game_data.player, delta_time);
 
 		// Render
 
@@ -406,27 +410,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		renderer->window_width= window_width;
 		renderer->window_height = window_height;
 
-		update_camera(game_data.camera, game_data.player);
+		update_camera(game_data.camera, game_data.player.rb.pos_ws);
 
 		mp_set_render_draw_color(155, 155, 155, 255);
 
 		mp_render_clear();
 
-		// Truncates by default
-		int starting_tile_x = (int)game_data.camera.pos_ws.x / Globals::tile_w;
-		int starting_tile_y = (int)game_data.camera.pos_ws.y / Globals::tile_h;
-
-		int ending_tile_x = ((int)game_data.camera.pos_ws.x + game_data.camera.w) / Globals::tile_w;
-		int ending_tile_y = ((int)game_data.camera.pos_ws.y + game_data.camera.h) / Globals::tile_h;
-
-		// Only render tiles in the view of the player
-		// Currently in world space
-		// Draw the tiles around the player
-		for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
-			for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
-				draw_tile(game_data, tile_x, tile_y, Globals::noise_frequency);
-			}
-		}
+		draw_tile_map();
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
@@ -474,10 +464,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		mp_render_present();
 
-		delete_destroyed_entities_from_handles(game_data);
+		delete_destroyed_entities_from_game_data_handles(game_data);
 	}
 
 
+	destroy_game_data(game_data);
 	ReleaseDC(Globals::renderer->open_gl.window_handle, Globals::renderer->open_gl.window_dc);
 	return 0;
 }

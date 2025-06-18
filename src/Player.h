@@ -1,0 +1,31 @@
+#pragma once
+#include "Utility.h"
+#include "Game_Utility.h"
+#include "Weapon.h"
+
+struct Player_Data {
+	std::string character_name;
+	int hp;
+	int base_speed;
+	int damage;
+	int w, h;
+};
+
+struct Player {
+	Faction faction = F_Player;
+	std::string character_name;
+	Animation_Tracker at;
+
+	Rigid_Body rb;
+	Health_Bar health_bar;
+
+	int w, h;
+
+	// Could this all be put into a 'weapon_kit' of some sort?
+	Weapon* weapon;
+
+	int damage;
+};
+
+Player create_player(std::string character_name, V2 spawn_pos_ws);
+void draw_player(Player& p, V2 camera_ws_pos);

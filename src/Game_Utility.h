@@ -1,6 +1,14 @@
 #pragma once
 #include "Renderer.h"
 
+struct Camera {
+	V2 pos_ws;
+	int w, h;
+};
+
+Camera create_camera(V2 player_pos_ws);
+void update_camera(Camera& camera, V2 player_pos);
+
 enum Faction {
 	F_Player,
 	F_Allies,

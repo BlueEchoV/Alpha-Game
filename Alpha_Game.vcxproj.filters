@@ -5,99 +5,174 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{b8650c01-a932-4a2a-b43e-52b30d05f315}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{7a419980-7a91-4e4d-81db-e496e25b3973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{89eaa0cc-1f64-4b28-b706-67105a537809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{b34ad154-6e6b-4476-8ab8-771e3b38408b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{8ad045b3-0dd3-478e-be82-0c9b5e6c7c21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Entities">
+      <UniqueIdentifier>{1ca31303-abc6-40d3-8830-b5b6853ed295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Gameplay">
+      <UniqueIdentifier>{6e99a273-9bca-4af0-964d-28d0e56ebb99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Characters">
+      <UniqueIdentifier>{d5cfaef1-f71d-4428-a0c8-f400f2039408}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Tile Map">
+      <UniqueIdentifier>{9701c287-3e72-492c-8840-3a7c43f231e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Physics">
+      <UniqueIdentifier>{044094a3-b5d5-42cc-b5e5-78a2b873e377}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Weapons">
+      <UniqueIdentifier>{39515c38-dc22-48f6-bc22-3a55b6cf30ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GL_Functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Windows_Platform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Globals.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\My_Math.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Audio_DirectSound.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
     <ClCompile Include="src\Audio_xAudio2.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio_DirectSound.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Sprite_Sheet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Rigidbody.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Debug.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Game_Utility.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GL_Functions.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Globals.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Image.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\My_Math.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sprite_Sheet.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utility.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Windows_Platform.cpp">
+      <Filter>Source Files\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game_Data.cpp">
+      <Filter>Source Files\Game\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Horde.cpp">
+      <Filter>Source Files\Game\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entity_Manager.cpp">
+      <Filter>Source Files\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Unit.cpp">
+      <Filter>Source Files\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Source Files\Game\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tile_Map.cpp">
+      <Filter>Source Files\Game\Tile Map</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rigidbody.cpp">
+      <Filter>Source Files\Game\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Weapon.cpp">
+      <Filter>Source Files\Game\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Projectile.cpp">
+      <Filter>Source Files\Game\Weapons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Renderer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utility.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GL_Functions.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Windows_Platform.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Entity.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Image.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Globals.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Perlin.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\My_Math.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\Audio_DirectSound.h">
+      <Filter>Source Files\Audio</Filter>
     </ClInclude>
     <ClInclude Include="src\Audio_xAudio2.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio_DirectSound.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprite_Sheet.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Rigidbody.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\Debug.h">
+      <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\Game_Utility.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GL_Functions.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Globals.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Image.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\My_Math.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprite_Sheet.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility.h">
+      <Filter>Source Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Windows_Platform.h">
+      <Filter>Source Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game_Data.h">
+      <Filter>Source Files\Game\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Horde.h">
+      <Filter>Source Files\Game\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entity_Manager.h">
+      <Filter>Source Files\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Unit.h">
+      <Filter>Source Files\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Player.h">
+      <Filter>Source Files\Game\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tile_Map.h">
+      <Filter>Source Files\Game\Tile Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rigidbody.h">
+      <Filter>Source Files\Game\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Weapon.h">
+      <Filter>Source Files\Game\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Projectile.h">
+      <Filter>Source Files\Game\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Perlin.h">
+      <Filter>Source Files\Game\Tile Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

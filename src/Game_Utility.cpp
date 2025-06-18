@@ -1,5 +1,24 @@
 #include "Game_Utility.h"
 
+// Camera's position is relative to the player
+void update_camera(Camera& camera, V2 player_pos) {
+	// The camera is offset from the player
+	camera.pos_ws.x = (player_pos.x - (Globals::resolution_x / 2.0f));
+	camera.pos_ws.y = (player_pos.y - (Globals::resolution_y / 2.0f));
+
+	camera.w = Globals::resolution_x;
+	camera.h = Globals::resolution_y;
+}
+
+// NOTE: The camera is based off the player, and the player is draw relative to the camera.
+Camera create_camera(V2 player_pos_ws) {
+	Camera result = {};
+
+	update_camera(result, player_pos_ws);
+
+	return result;
+}
+
 Cooldown create_cooldown(float max_cd) {
 	Cooldown result = {};
 

@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <math.h>
 #include <span>
+#include <unordered_map>
 
 #include "Globals.h"
 #include "My_Math.h"
