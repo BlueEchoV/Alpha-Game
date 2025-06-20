@@ -130,6 +130,8 @@ void load_images() {
 	images["IT_Water_32x32"] = load_image("assets\\water_32x32.png");
 	images["temp_zombie_walk"] = load_image("assets\\temp_zombie_walk.png");
 	images["idle_temp_zombie"] = load_image("assets\\idle_temp_zombie.png");
+	images["tree"] = load_image("assets\\tree.png");
+	images["rock"] = load_image("assets\\rock.png");
 }
 
 Image* get_image(std::string image_name) {

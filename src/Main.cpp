@@ -416,7 +416,26 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		mp_render_clear();
 
-		draw_tile_map();
+		Camera camera = game_data.camera;
+
+		/*
+		// Truncates by default
+		int starting_tile_x = (int)camera.pos_ws.x / Globals::tile_w;
+		int starting_tile_y = (int)camera.pos_ws.y / Globals::tile_h;
+
+		int ending_tile_x = ((int)camera.pos_ws.x + camera.w) / Globals::tile_w;
+		int ending_tile_y = ((int)camera.pos_ws.y + camera.h) / Globals::tile_h;
+
+		// Only render tiles in the view of the player
+		// Currently in world space
+		// Draw the tiles around the player
+		for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
+			for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
+				draw_tile(camera, tile_x, tile_y, Globals::noise_frequency);
+			}
+		}
+		*/		
+		draw_entire_map(camera);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);

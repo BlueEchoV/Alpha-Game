@@ -39,6 +39,8 @@ struct ExitScopeHelp
 #define SG_CONCAT(a, b) _SG_CONCAT(a, b)
 #define DEFER auto SG_CONCAT(defer__, __LINE__) = ExitScopeHelp() + [&]()
 
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+
 struct Color_3F {
 	float r;
 	float g;
