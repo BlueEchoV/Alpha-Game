@@ -6,7 +6,8 @@
 enum Environment_Entity : int {
 	EE_Empty,
 	EE_Tree, 
-	EE_Rock
+	EE_Rock,
+	EE_Bush
 };
 
 struct Tile {

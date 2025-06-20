@@ -81,6 +81,10 @@ void draw_environment_entity(Camera camera, int tile_index_x, int tile_index_y, 
 		image_name = "rock";
 		break;
 	}
+	case EE_Bush: {
+		image_name = "bush";
+		break;
+	}
 	default: {
 		image_name = "";
 		break;
@@ -103,10 +107,38 @@ void draw_environment_entity(Camera camera, int tile_index_x, int tile_index_y, 
 	}
 }
 
-int walkable_region_w_in_tiles = 20;
+
+int walkable_region_w_in_tiles = 30;
 int walkable_region_h_in_tiles = 20;
 
+float horizontal_radius = 20;
+float vertical_radius = 20;
+
 V2 center_of_map_ws = { 0, 0 };
+
+void draw_ellipse_perlin_environment_tile(Camera camera, int tile_index_x, int tile_index_y) {
+	Environment_Entity ev = EE_Empty;
+
+	// Gives us the percentage different from the center for calculating the perlin value
+	//							convert to a tile index
+	float dx = (tile_index_x - (center_of_map_ws.x / Globals::tile_w)) / horizontal_radius;
+	float dy = (tile_index_y - (center_of_map_ws.y / Globals::tile_h)) / vertical_radius;
+	float ellipse_value = 1.0f - (dx * dx + dy * dy); // 1 at center, 0 at edge
+	clamp(ellipse_value, 0.0f, 1.0f);
+
+	float perlin_value = stb_perlin_noise3((float)tile_index_x * Globals::noise_frequency, (float)tile_index_y * Globals::noise_frequency, 0, 0, 0, 0);
+	float combined_value = ((perlin_value + 1.0f) / 2.0f) * ellipse_value; // normalized perlin
+
+	if (combined_value > 0.0f) {
+		ev = EE_Empty;
+	}
+	else {
+		ev = EE_Bush;
+	}
+
+	draw_environment_entity(camera, tile_index_x, tile_index_y, ev);
+}
+
 	
 // The entire map is techinically an offset of the player
 void draw_entire_map(Camera camera) {
@@ -127,6 +159,7 @@ void draw_entire_map(Camera camera) {
 	}
 	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
 		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
+			/*
 			if (
 				// Left boundary
 				tile_x < ((int)center_of_map_ws.x - walkable_region_w_in_tiles / 2 ) || 
@@ -136,8 +169,10 @@ void draw_entire_map(Camera camera) {
 				tile_y < ((int)center_of_map_ws.y - walkable_region_h_in_tiles / 2) || 
 				// Top Boundary
 				tile_y > ((int)center_of_map_ws.x + walkable_region_h_in_tiles / 2)) {
-				draw_environment_entity(camera, tile_x, tile_y, EE_Tree);
+				draw_environment_entity(camera, tile_x, tile_y, EE_Bush);
 			}
+			*/
+			draw_ellipse_perlin_environment_tile(camera, tile_x, tile_y);
 		}
 	}
 }
