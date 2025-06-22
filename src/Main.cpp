@@ -67,8 +67,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	MP_Rect spawn_region = {400, -200, 200, 400};
-	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, spawn_region);
+	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_North, 2);
 
 	Tile_Map demo_tile_map = create_tile_map(64, 64);
 
@@ -299,7 +298,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			game_data.current_horde.begin_spawning = true;
 		}
 		if (key_pressed(KEY_T)) {
-			game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, spawn_region);
+			game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_West, 2);
 		}
 
 		if (key_pressed(KEY_E)) {
@@ -395,7 +394,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		spawn_and_update_horde(game_data.enemy_unit_handles, game_data.unit_storage, game_data.current_horde, game_data.player, delta_time);
+		spawn_and_update_horde(game_data.enemy_unit_handles, game_data.unit_storage, game_data.current_horde, game_data.player, 
+			demo_tile_map, delta_time);
 
 		// Render
 
@@ -479,7 +479,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		draw_horde_spawn_region(CT_Red, game_data.current_horde, game_data.camera.pos_ws);
+		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);
 
 		draw_player(game_data.player, game_data.camera.pos_ws);
 

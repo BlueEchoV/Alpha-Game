@@ -1,8 +1,7 @@
 #pragma once
 #include "Utility.h"
 #include "Sprite_Sheet.h"
-#include "Game_Data.h"
-#include "Debug.h"
+#include "Game_Utility.h"
 
 enum Environment_Entity : int {
 	EE_Empty,

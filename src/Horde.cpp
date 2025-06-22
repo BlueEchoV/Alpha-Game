@@ -16,8 +16,49 @@ Horde_Data get_horde_data(Horde_Type horde_type) {
 	return bad_horde_data;
 };
 
+MP_Rect get_spawn_region_ws(Horde& horde, Tile_Map& tile_map) {
+	MP_Rect result = {};
+
+	switch (horde.spawn_direction) {
+	case SD_North: {
+		result.x = -(tile_map.w / 2);
+		result.y = tile_map.h / 2;
+		result.w = tile_map.w;
+		result.h = horde.spawn_region_size_in_tiles * Globals::tile_h;
+		break;
+	}
+	case SD_South: {
+		result.x = -(tile_map.w / 2);
+		result.y = -(tile_map.h / 2) - horde.spawn_region_size_in_tiles * Globals::tile_h;
+		result.w = tile_map.w;
+		result.h = horde.spawn_region_size_in_tiles * Globals::tile_h;
+		break;
+	}
+	case SD_East: {
+		result.x = tile_map.w - (tile_map.w / 2);
+		result.y = -(tile_map.h / 2);
+		result.w = horde.spawn_region_size_in_tiles * Globals::tile_w;
+		result.h = tile_map.h;
+		break;
+	}
+	case SD_West: {
+		result.x = -(tile_map.w / 2) - horde.spawn_region_size_in_tiles * Globals::tile_w;
+		result.y = -(tile_map.h / 2);
+		result.w = horde.spawn_region_size_in_tiles * Globals::tile_w;
+		result.h = tile_map.h;
+		break;
+	}
+	default: {
+		log("Error: Spawn region not specified");
+		break;
+	}
+	}
+
+	return result;
+}
+
 // Call this at the end of every day?
-Horde create_horde(Faction faction, Horde_Type ht, MP_Rect rect) {
+Horde create_horde(Faction faction, Horde_Type ht, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles) {
 	Horde result = {};
 
 	Horde_Data data = get_horde_data(ht);
@@ -25,7 +66,8 @@ Horde create_horde(Faction faction, Horde_Type ht, MP_Rect rect) {
 	result.faction = faction;
 	result.level = data.level;
 	result.spawning_cd = create_cooldown(data.max_spawning_cd);
-	result.spawn_region_ws = rect;
+	result.spawn_direction = spawn_direction;
+	result.spawn_region_size_in_tiles = spawn_region_size_in_tiles;
 	result.begin_spawning = false;
 	result.total_to_spawn = data.total_to_spawn;
 	result.total_spawned = 0;
@@ -33,13 +75,14 @@ Horde create_horde(Faction faction, Horde_Type ht, MP_Rect rect) {
 	return result;
 }
 
-void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player, float delta_time) {
+void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player, 
+	Tile_Map& tile_map, float delta_time) {
 	if (horde.begin_spawning) {
 		if (horde.total_spawned < horde.total_to_spawn) {
 			if (check_and_update_cooldown(horde.spawning_cd, delta_time)) {
 				if (horde.faction == F_Enemies) {
 					V2 random_pos_ws = {};
-					MP_Rect spawn_region_ws = horde.spawn_region_ws;
+					MP_Rect spawn_region_ws = get_spawn_region_ws(horde, tile_map);
 					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
 					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.h));
 					log("Random Position: x = %f, y = %f", random_pos_ws.x, random_pos_ws.y);
@@ -60,12 +103,11 @@ void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& uni
 }
 
 // NOTE: Draw diagnal lines? Or dotted lines?
-void draw_horde_spawn_region(Color_Type c, Horde& horde, V2 camera_pos) {
-	V2 pos_ws = {(float)horde.spawn_region_ws.x, (float)horde.spawn_region_ws.y};
-	V2 pos_cs = convert_ws_to_cs(pos_ws, camera_pos);
-	MP_Rect cs_rect = { (int)pos_cs.x, (int)pos_cs.y, horde.spawn_region_ws.w, horde.spawn_region_ws.h };
+void draw_horde_spawn_region(Color_Type c, Horde& horde, Tile_Map& tile_map, V2 camera_pos) {
+	MP_Rect spawn_region_ws = get_spawn_region_ws(horde, tile_map);
+	V2 pos_cs = convert_ws_to_cs({(float)spawn_region_ws.x, (float)spawn_region_ws.y}, camera_pos);
+	MP_Rect spawn_region_cs = { (int)pos_cs.x, (int)pos_cs.y, spawn_region_ws.w, spawn_region_ws.h };
 
 	mp_set_render_draw_color(c);
-	mp_render_draw_rect(&cs_rect);
+	mp_render_draw_rect(&spawn_region_cs);
 }
-
