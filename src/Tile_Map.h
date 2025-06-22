@@ -17,9 +17,14 @@ struct Tile {
 };
 
 struct Tile_Map {
-
+	int w;
+	int h;
 };
 
-void draw_entire_map(Camera camera);
+// By default, the centers of the map are 0,0
+Tile_Map create_tile_map(int w, int h);
+// Check tilemap collision
+// bool check_player_collision_with_tile_map();
+void draw_entire_map(Camera& camera, Tile_Map& tile_map);
 
 // void load_tile_map_csv();

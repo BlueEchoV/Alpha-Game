@@ -70,6 +70,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	MP_Rect spawn_region = {400, -200, 200, 400};
 	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, spawn_region);
 
+	Tile_Map demo_tile_map = create_tile_map(64, 64);
+
 	bool running = true;
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
@@ -435,7 +437,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 		*/		
-		draw_entire_map(camera);
+		draw_entire_map(camera, demo_tile_map);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
