@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "Sprite_Sheet.h"
 #include "Game_Data.h"
+#include "Debug.h"
 
 enum Environment_Entity : int {
 	EE_Empty,
@@ -13,6 +14,10 @@ enum Environment_Entity : int {
 struct Tile {
 	int type;
 	std::string texture_name;
+};
+
+struct Tile_Map {
+
 };
 
 void draw_entire_map(Camera camera);

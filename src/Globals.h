@@ -30,4 +30,7 @@ namespace Globals {
 	const int DEFAULT_HEALTH_BAR_WIDTH = 60;
 	const int DEFAULT_HEALTH_BAR_HEIGHT = 8;
 	const int DEFAULT_HEALTH_BAR_OUTLINE = 3;
+
+	const int WORLD_SIZE_W = 64;
+	const int WORLD_SIZE_H = 64;
 }
