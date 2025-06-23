@@ -44,4 +44,3 @@ void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& uni
 	Tile_Map& tile_map, float delta_time);
 
 void draw_horde_spawn_region(Color_Type c, Horde& horde, Tile_Map& tile_map, V2 camera_pos);
-

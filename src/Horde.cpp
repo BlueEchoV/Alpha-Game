@@ -24,27 +24,27 @@ MP_Rect get_spawn_region_ws(Horde& horde, Tile_Map& tile_map) {
 		result.x = -(tile_map.w / 2);
 		result.y = tile_map.h / 2;
 		result.w = tile_map.w;
-		result.h = horde.spawn_region_size_in_tiles * Globals::tile_h;
+		result.h = horde.spawn_region_size_in_tiles;
 		break;
 	}
 	case SD_South: {
 		result.x = -(tile_map.w / 2);
-		result.y = -(tile_map.h / 2) - horde.spawn_region_size_in_tiles * Globals::tile_h;
+		result.y = -(tile_map.h / 2) - horde.spawn_region_size_in_tiles;
 		result.w = tile_map.w;
-		result.h = horde.spawn_region_size_in_tiles * Globals::tile_h;
+		result.h = horde.spawn_region_size_in_tiles;
 		break;
 	}
 	case SD_East: {
 		result.x = tile_map.w - (tile_map.w / 2);
 		result.y = -(tile_map.h / 2);
-		result.w = horde.spawn_region_size_in_tiles * Globals::tile_w;
+		result.w = horde.spawn_region_size_in_tiles;
 		result.h = tile_map.h;
 		break;
 	}
 	case SD_West: {
-		result.x = -(tile_map.w / 2) - horde.spawn_region_size_in_tiles * Globals::tile_w;
+		result.x = -(tile_map.w / 2) - horde.spawn_region_size_in_tiles;
 		result.y = -(tile_map.h / 2);
-		result.w = horde.spawn_region_size_in_tiles * Globals::tile_w;
+		result.w = horde.spawn_region_size_in_tiles;
 		result.h = tile_map.h;
 		break;
 	}
@@ -54,6 +54,11 @@ MP_Rect get_spawn_region_ws(Horde& horde, Tile_Map& tile_map) {
 	}
 	}
 
+	V2 pos_ws = get_tile_pos_ws(result.x, result.y);
+	result.x = (int)pos_ws.x;
+	result.y = (int)pos_ws.y;
+	result.w = result.w * Globals::tile_w;
+	result.h = result.h * Globals::tile_h;
 	return result;
 }
 

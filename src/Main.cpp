@@ -67,7 +67,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_North, 2);
+	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_South, 2);
 
 	Tile_Map demo_tile_map = create_tile_map(64, 64);
 
@@ -439,6 +439,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		*/		
 		draw_entire_map(camera, demo_tile_map);
 
+		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);
+
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 
@@ -479,7 +481,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);
 
 		draw_player(game_data.player, game_data.camera.pos_ws);
 

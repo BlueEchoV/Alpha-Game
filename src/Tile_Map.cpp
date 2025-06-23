@@ -16,6 +16,23 @@ Tile_Map create_tile_map(int w, int h) {
 	return result;
 }
 
+void draw_tile(std::string tile_type, Camera camera, int tile_index_x, int tile_index_y) {
+	std::string type = tile_type;
+	Image* image = get_image(type);
+
+	// Move everything around the camera
+	int tile_ws_x = (Globals::tile_w * tile_index_x);
+	int tile_ws_y = (Globals::tile_h * tile_index_y);
+
+	int tile_cs_x = tile_ws_x - (int)camera.pos_ws.x;
+	int tile_cs_y = tile_ws_y - (int)camera.pos_ws.y;
+
+	MP_Rect dst = {tile_cs_x, tile_cs_y, Globals::tile_w, Globals::tile_h};
+
+	mp_render_copy(image->texture, NULL, &dst);
+}
+
+
 void draw_perlin_tile(Camera camera, int tile_index_x, int tile_index_y, float noise_frequency) {
 	std::string type = "IT_Rock_32x32";
 
@@ -52,8 +69,9 @@ void draw_perlin_tile_map(Camera& camera, Tile_Map& tile_map) {
 	mp_render_fill_rect(&rect);
 
 	// Truncates by default
-	int starting_tile_x = (int)camera.pos_ws.x / Globals::tile_w;
-	int starting_tile_y = (int)camera.pos_ws.y / Globals::tile_h;
+	// The -1 for the range of -63 to 64. It counts 0 as a negative number
+	int starting_tile_x = ((int)camera.pos_ws.x / Globals::tile_w) - 1;
+	int starting_tile_y = ((int)camera.pos_ws.y / Globals::tile_h) - 1;
 
 	int ending_tile_x = ((int)camera.pos_ws.x + camera.w) / Globals::tile_w;
 	int ending_tile_y = ((int)camera.pos_ws.y + camera.h) / Globals::tile_h;
@@ -64,9 +82,9 @@ void draw_perlin_tile_map(Camera& camera, Tile_Map& tile_map) {
 	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
 		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
 			// Center the world on 0, 0
-			if (tile_x < -(tile_map.w / 2) || 
+			if (tile_x < -((tile_map.w / 2)) || 
 				tile_x >  (tile_map.w / 2) || 
-				tile_y < -(tile_map.h / 2) ||
+				tile_y < -((tile_map.h / 2)) ||
 				tile_y >  (tile_map.h / 2)) {
 				continue;
 			}
@@ -126,5 +144,48 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
 	// Only render tiles in the view of the player
 	// Currently in world space
 	// Draw the tiles around the player
-	draw_perlin_tile_map(camera, tile_map);
+	// draw_perlin_tile_map(camera, tile_map);
+
+	// Clear the background to black
+	MP_Rect rect = {0, 0, Globals::resolution_x, Globals::resolution_y };
+	mp_set_render_draw_color(CT_Black);
+	mp_render_fill_rect(&rect);
+
+	// Truncates by default
+	// The -1 for the range of -63 to 64. It counts 0 as a negative number
+	int starting_tile_x = ((int)camera.pos_ws.x / Globals::tile_w) - 1;
+	int starting_tile_y = ((int)camera.pos_ws.y / Globals::tile_h) - 1;
+
+	int ending_tile_x = ((int)camera.pos_ws.x + camera.w) / Globals::tile_w;
+	int ending_tile_y = ((int)camera.pos_ws.y + camera.h) / Globals::tile_h;
+
+	// Only render tiles in the view of the player
+	// Currently in world space
+	// Draw the tiles around the player
+	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
+		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
+			float perlin_x = tile_x * Globals::noise_frequency;
+			float perlin_y = tile_y * Globals::noise_frequency;
+			float perlin = stb_perlin_noise3(perlin_x, perlin_y, 0, 0, 0, 0);
+
+			std::string tile_type = "";
+			Environment_Entity ee_type = EE_Empty;
+			if (perlin > 0.0f) {
+				ee_type = EE_Tree;
+				tile_type = "IT_Grass_32x32";
+			} else {
+				ee_type = EE_Rock;
+				tile_type = "IT_Rock_32x32";
+			}
+			draw_tile(tile_type, camera, tile_x, tile_y);
+
+			// Center the world on 0, 0
+			if (tile_x < -((tile_map.w / 2)) || 
+				tile_x >  (tile_map.w / 2) || 
+				tile_y < -((tile_map.h / 2)) ||
+				tile_y >  (tile_map.h / 2)) {
+				draw_environment_entity(camera, tile_x, tile_y, ee_type);
+			}
+		}
+	}
 }
