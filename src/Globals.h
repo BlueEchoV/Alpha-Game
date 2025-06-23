@@ -8,6 +8,8 @@ namespace Globals {
 	// POTENTIAL RACE CONDITION IN MULTITHREADING
 	extern MP_Renderer* renderer;
 
+	extern bool running;
+
 	extern int resolution_x;
 	extern int resolution_y;
 	extern bool toggle_debug_images;
@@ -33,4 +35,5 @@ namespace Globals {
 
 	const int WORLD_SIZE_W = 32;
 	const int WORLD_SIZE_H = 32;
+
 }

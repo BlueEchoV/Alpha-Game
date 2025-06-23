@@ -2,6 +2,8 @@
 
 namespace Globals {
 	MP_Renderer* renderer = {};
+	
+	extern bool running = true;
 
 	int resolution_x = 1600;
 	int resolution_y = 900;

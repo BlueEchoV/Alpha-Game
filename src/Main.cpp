@@ -71,7 +71,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	Tile_Map demo_tile_map = create_tile_map(64, 64);
 
-	bool running = true;
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It’s how many "pixels" (samples) you capture per second to draw the sound.
@@ -173,7 +172,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
-	while (running) {
+	while (Globals::running) {
 		reset_is_pressed();
 
 		MSG message;
@@ -187,7 +186,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			DispatchMessage(&message);
 
 			if (message.message == WM_QUIT) {
-				running = false;
+				Globals::running = false;
 			}
 		}
 
