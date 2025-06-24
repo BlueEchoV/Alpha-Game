@@ -47,7 +47,7 @@ IXAudio2SourceVoice* m_pXAudio2SourceVoice = nullptr;
 int init_xAudio2() {
     // #1 - Initialize COM
     // HRRESULT is for error checking
-	HRESULT hr = ::CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	HRESULT hr = ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	if (SUCCEEDED(hr)) {
         // #2 - Create the XAudio2 engine object

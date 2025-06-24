@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "Game_Utility.h"
 #include "Weapon.h"
+#include "Tile_Map.h"
 
 struct Player_Data {
 	std::string character_name;

@@ -7,6 +7,10 @@ V2 get_tile_pos_ws(int tile_index_x, int tile_index_y) {
 	return {(float)Globals::tile_w * (float)tile_index_x, (float)Globals::tile_h * (float)tile_index_y};
 }
 
+V2 get_tile_pos_index(V2 pos_ws) {
+	return { pos_ws.x / Globals::tile_w, pos_ws.y / Globals::tile_h };
+}
+
 Tile_Map create_tile_map(int w, int h) {
 	Tile_Map result = {};
 
@@ -171,7 +175,7 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
 			std::string tile_type = "";
 			Environment_Entity ee_type = EE_Empty;
 			if (perlin > 0.0f) {
-				ee_type = EE_Tree;
+				ee_type = EE_Bush;
 				tile_type = "IT_Grass_32x32";
 			} else {
 				ee_type = EE_Rock;

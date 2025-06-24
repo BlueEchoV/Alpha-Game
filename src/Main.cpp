@@ -324,6 +324,28 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		game_data.player.rb.pos_ws.x += player_x_delta;
 		game_data.player.rb.pos_ws.y += player_y_delta;
 
+		// Collision with the map
+		// TODO: Add these to the tilemap struct?
+		// TODO: DONT FORGET TO ACCOUNT FOR THE APPROPRIATE RANGE (-32 to 31)
+		float left_ws   =  -((float)demo_tile_map.w / 2) * Globals::tile_w;
+		float top_ws    =  (((float)demo_tile_map.h / 2) * Globals::tile_h) + Globals::tile_h;
+		float bottom_ws =  -((float)demo_tile_map.w / 2) * Globals::tile_w;
+		float right_ws  =  (((float)demo_tile_map.h / 2) * Globals::tile_h) + Globals::tile_w;
+
+		V2* p_pos = &game_data.player.rb.pos_ws;
+		if (p_pos->x < left_ws) {
+			p_pos->x = left_ws;
+		}
+		if (p_pos->x > right_ws) {
+			p_pos->x = right_ws;
+		}
+		if (p_pos->y < bottom_ws) {
+			p_pos->y = bottom_ws;
+		}
+		if (p_pos->y > top_ws) {
+			p_pos->y = top_ws;
+		}
+
 		if (key_pressed_and_held(VK_SHIFT)) {
 			game_data.player.rb.current_speed = game_data.player.rb.base_speed * 2;
 		} else {

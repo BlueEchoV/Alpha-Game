@@ -21,6 +21,7 @@ struct Tile_Map {
 };
 
 V2 get_tile_pos_ws(int tile_index_x, int tile_index_y);
+V2 get_tile_pos_index(V2 pos_ws);
 // By default, the centers of the map are 0,0
 Tile_Map create_tile_map(int w, int h);
 // Check tilemap collision
