@@ -67,7 +67,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_South, 2);
+	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_East, 2);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It’s how many "pixels" (samples) you capture per second to draw the sound.
@@ -169,7 +169,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
-	Tile_Map demo_tile_map = create_tile_map(4, 4);
+	Tile_Map demo_tile_map = create_tile_map(16, 16);
 	while (Globals::running) {
 		reset_is_pressed();
 
@@ -434,23 +434,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Camera camera = game_data.camera;
 
-		/*
-		// Truncates by default
-		int starting_tile_x = (int)camera.pos_ws.x / Globals::tile_w;
-		int starting_tile_y = (int)camera.pos_ws.y / Globals::tile_h;
-
-		int ending_tile_x = ((int)camera.pos_ws.x + camera.w) / Globals::tile_w;
-		int ending_tile_y = ((int)camera.pos_ws.y + camera.h) / Globals::tile_h;
-
-		// Only render tiles in the view of the player
-		// Currently in world space
-		// Draw the tiles around the player
-		for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
-			for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
-				draw_tile(camera, tile_x, tile_y, Globals::noise_frequency);
-			}
-		}
-		*/		
 		draw_entire_map(camera, demo_tile_map);
 
 		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);

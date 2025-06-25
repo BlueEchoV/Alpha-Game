@@ -40,7 +40,7 @@ struct Horde {
 }; 
 
 Horde create_horde(Faction faction, Horde_Type ht, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles);
-void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player,
+void spawn_and_update_horde(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player,
 	Tile_Map& tile_map, float delta_time);
 
 void draw_horde_spawn_region(Color_Type c, Horde& horde, Tile_Map& tile_map, V2 camera_pos);

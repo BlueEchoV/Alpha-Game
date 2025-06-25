@@ -80,7 +80,7 @@ Horde create_horde(Faction faction, Horde_Type ht, Spawn_Direction spawn_directi
 	return result;
 }
 
-void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player, 
+void spawn_and_update_horde(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player, 
 	Tile_Map& tile_map, float delta_time) {
 	if (horde.begin_spawning) {
 		if (horde.total_spawned < horde.total_to_spawn) {
@@ -100,7 +100,6 @@ void spawn_and_update_horde(std::vector<Handle> unit_handles, Storage<Unit>& uni
 						&player,
 						random_pos_ws
 					);
-					horde.spawning_cd.current++;
 				}
 			}
 		}
