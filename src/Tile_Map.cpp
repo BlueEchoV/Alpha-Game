@@ -11,11 +11,23 @@ V2 get_tile_pos_index(V2 pos_ws) {
 	return { pos_ws.x / Globals::tile_w, pos_ws.y / Globals::tile_h };
 }
 
+// All tilemaps are centered around 0, 0 ws position
 Tile_Map create_tile_map(int w, int h) {
 	Tile_Map result = {};
 
 	result.w = w;
 	result.h = h;
+
+	assert(w % 2 == 0);
+	assert(h % 2 == 0);
+
+	// NOTE: If the width or height is odd, this gets weird
+	result.left_ws = -((result.w * Globals::tile_w) / 2);
+	// Account for the additional tile (origin is bottom left corner
+	result.top_ws = (result.h * Globals::tile_h) / 2;
+	// Account for the additional tile (origin is bottom left corner
+	result.right_ws = (result.w * Globals::tile_w) / 2;
+	result.bottom_ws = -((result.h * Globals::tile_h) / 2);
 
 	return result;
 }
@@ -185,9 +197,10 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
 
 			// Center the world on 0, 0
 			if (tile_x < -((tile_map.w / 2)) || 
-				tile_x >  (tile_map.w / 2) || 
+				// The -1 is to account for the range -64 to +63
+				tile_x >  (tile_map.w / 2) - 1 || 
 				tile_y < -((tile_map.h / 2)) ||
-				tile_y >  (tile_map.h / 2)) {
+				tile_y >  (tile_map.h / 2) - 1) {
 				draw_environment_entity(camera, tile_x, tile_y, ee_type);
 			}
 		}

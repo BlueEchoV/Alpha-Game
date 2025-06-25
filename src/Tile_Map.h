@@ -18,6 +18,8 @@ struct Tile {
 struct Tile_Map {
 	int w;
 	int h;
+	// The world spawn position of the boundaries
+	int left_ws, top_ws, right_ws, bottom_ws;
 };
 
 V2 get_tile_pos_ws(int tile_index_x, int tile_index_y);

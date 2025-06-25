@@ -69,9 +69,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_South, 2);
 
-	Tile_Map demo_tile_map = create_tile_map(64, 64);
-
-
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It’s how many "pixels" (samples) you capture per second to draw the sound.
     int samples_per_second = 48000;
@@ -172,6 +169,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
+	Tile_Map demo_tile_map = create_tile_map(4, 4);
 	while (Globals::running) {
 		reset_is_pressed();
 
@@ -327,23 +325,18 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// Collision with the map
 		// TODO: Add these to the tilemap struct?
 		// TODO: DONT FORGET TO ACCOUNT FOR THE APPROPRIATE RANGE (-32 to 31)
-		float left_ws   =  -((float)demo_tile_map.w / 2) * Globals::tile_w;
-		float top_ws    =  (((float)demo_tile_map.h / 2) * Globals::tile_h) + Globals::tile_h;
-		float bottom_ws =  -((float)demo_tile_map.w / 2) * Globals::tile_w;
-		float right_ws  =  (((float)demo_tile_map.h / 2) * Globals::tile_h) + Globals::tile_w;
-
 		V2* p_pos = &game_data.player.rb.pos_ws;
-		if (p_pos->x < left_ws) {
-			p_pos->x = left_ws;
+		if (p_pos->x < (float)demo_tile_map.left_ws) {
+			p_pos->x = (float)demo_tile_map.left_ws;
 		}
-		if (p_pos->x > right_ws) {
-			p_pos->x = right_ws;
+		if (p_pos->x > (float)demo_tile_map.right_ws) {
+			p_pos->x = (float)demo_tile_map.right_ws;
 		}
-		if (p_pos->y < bottom_ws) {
-			p_pos->y = bottom_ws;
+		if (p_pos->y < (float)demo_tile_map.bottom_ws) {
+			p_pos->y = (float)demo_tile_map.bottom_ws;
 		}
-		if (p_pos->y > top_ws) {
-			p_pos->y = top_ws;
+		if (p_pos->y > (float)demo_tile_map.top_ws) {
+			p_pos->y = (float)demo_tile_map.top_ws;
 		}
 
 		if (key_pressed_and_held(VK_SHIFT)) {
