@@ -75,7 +75,6 @@ void update_unit(Unit& unit, float dt) {
 				change_animation(at, at->entity_name, at->as, at->fd, APS_Speed_Based);
 			}
 		}
-		update_animation_tracker(&unit.at, dt);
 	}
 }
 

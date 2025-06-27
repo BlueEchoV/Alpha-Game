@@ -376,21 +376,26 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		if (!game_data.player.dead) {
-			// Update
-			for (Handle& projectile_handle : game_data.projectile_handles) {
-				Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
-				if (p != NULL) {
+		// Update
+		for (Handle& projectile_handle : game_data.projectile_handles) {
+			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+			if (p != NULL) {
+				if (!player->dead) {
 					update_projectile(*p, delta_time);
 				}
 			}
-			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
-				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-				if (unit != NULL) {
+		}
+		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
+			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+			if (unit != NULL) {
+				if (!player->dead) {
 					update_unit(*unit, delta_time);
 				}
+				update_animation_tracker(&unit->at, delta_time);
 			}
+		}
 
+		if (!game_data.player.dead) {
 			// Collision
 			// TODO: Add the destroyed checks into a function for consistency
 			for (Handle& projectile_handle : game_data.projectile_handles) {
