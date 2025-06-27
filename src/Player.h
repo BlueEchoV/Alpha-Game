@@ -13,6 +13,8 @@ struct Player_Data {
 };
 
 struct Player {
+	bool dead;
+
 	Faction faction = F_Player;
 	std::string character_name;
 	Animation_Tracker at;

@@ -67,7 +67,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_East, 2);
+	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_North, 2);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It’s how many "pixels" (samples) you capture per second to draw the sound.
@@ -170,6 +170,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float current_debug_spawning_delay = 0.0f;
 
 	Tile_Map demo_tile_map = create_tile_map(64, 64);
+
 	while (Globals::running) {
 		reset_is_pressed();
 
@@ -202,67 +203,71 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		float player_x_delta = 0.0f;
 		float player_y_delta = 0.0f;
 
-		if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
-			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
-			player_y_delta = 1.0f;
-		} 
-		if (key_pressed_and_held(KEY_W)) {
-			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
-			player_y_delta = 1.0f;
-		} 
+		if (!player->dead) {
+			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
+				change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
+				player_y_delta = 1.0f;
+			}
+			if (key_pressed_and_held(KEY_W)) {
+				change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
+				player_y_delta = 1.0f;
+			}
 
-		if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
-			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
-			player_y_delta = -1.0f;
-		}
-		if (key_pressed_and_held(KEY_S)) {
-			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
-			player_y_delta = -1.0f;
-		}
+			if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
+				change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
+				player_y_delta = -1.0f;
+			}
+			if (key_pressed_and_held(KEY_S)) {
+				change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
+				player_y_delta = -1.0f;
+			}
 
-		if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
-			player->at.fd = FD_Left;
-			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
-			player_x_delta = -2.0f;
-		} else if (key_pressed_and_held(KEY_A)) {
-			player->at.fd = FD_Left;
-			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
-			player_x_delta = -1.0f;
-		} 
+			if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
+				player->at.fd = FD_Left;
+				change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
+				player_x_delta = -2.0f;
+			}
+			else if (key_pressed_and_held(KEY_A)) {
+				player->at.fd = FD_Left;
+				change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
+				player_x_delta = -1.0f;
+			}
 
-		if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
-			player->at.fd = FD_Right;
-			change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
-			player_x_delta = 2.0f;
-		} else if (key_pressed_and_held(KEY_D)) {
-			player->at.fd = FD_Right;
-			change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
-			player_x_delta = 1.0f;
-		}
+			if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
+				player->at.fd = FD_Right;
+				change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
+				player_x_delta = 2.0f;
+			}
+			else if (key_pressed_and_held(KEY_D)) {
+				player->at.fd = FD_Right;
+				change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
+				player_x_delta = 1.0f;
+			}
 
-		if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
-			!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
-			change_animation(&player->at, player->at.entity_name, AS_Idle, player->at.fd, APS_Slow);
-		}
+			if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
+				!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
+				change_animation(&player->at, player->at.entity_name, AS_Idle, player->at.fd, APS_Slow);
+			}
 
-		if (player->weapon == nullptr) {
-			equip_weapon(player->weapon, "bow");
-		}
+			if (player->weapon == nullptr) {
+				equip_weapon(player->weapon, "bow");
+			}
 
-		if (key_pressed(KEY_1)) {
-			equip_weapon(player->weapon, "bow");
-		}
-		if (key_pressed(KEY_2)) {
-			equip_weapon(player->weapon, "pistol");
-		}
+			if (key_pressed(KEY_1)) {
+				equip_weapon(player->weapon, "bow");
+			}
+			if (key_pressed(KEY_2)) {
+				equip_weapon(player->weapon, "pistol");
+			}
 
-		if (key_pressed_and_held(VK_SPACE)) {
-			player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage, 
-				game_data.camera, game_data.player.rb.pos_ws, F_Player);
-		}
+			if (key_pressed_and_held(VK_SPACE)) {
+				player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage,
+					game_data.camera, game_data.player.rb.pos_ws, F_Player);
+			}
 
-		player->weapon->update_weapon(delta_time);
-		update_animation_tracker(&player->at, delta_time, (float)player->rb.current_speed);
+			player->weapon->update_weapon(delta_time);
+			update_animation_tracker(&player->at, delta_time, (float)player->rb.current_speed);
+		}
 
 		if (key_pressed(KEY_3)) {
 			player->health_bar.current_hp -= 5;
@@ -371,45 +376,60 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		// Update
-		for (Handle& projectile_handle : game_data.projectile_handles) {
-			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
-			if (p != NULL) {
-				update_projectile(*p, delta_time);
+		if (!game_data.player.dead) {
+			// Update
+			for (Handle& projectile_handle : game_data.projectile_handles) {
+				Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+				if (p != NULL) {
+					update_projectile(*p, delta_time);
+				}
 			}
-		}
-		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
-			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-			if (unit != NULL) {
-				update_unit(*unit, delta_time);
-			}
-		}
-
-		// Collision
-		// TODO: Add the destroyed checks into a function for consistency
-		for (Handle& projectile_handle : game_data.projectile_handles) {
 			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
-				Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
-				if (proj == NULL || proj->destroyed == true) {
-					continue;
-				}
 				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-				if (unit == NULL || unit->dead == true) {
-					continue;
+				if (unit != NULL) {
+					update_unit(*unit, delta_time);
 				}
-				if (check_rb_collision(&proj->rb, &unit->rb)) {
-					proj->destroyed = true;
+			}
 
-					unit->health_bar.current_hp -= proj->damage;
-					if (unit->health_bar.current_hp <= 0) {
-						unit->dead = true;
+			// Collision
+			// TODO: Add the destroyed checks into a function for consistency
+			for (Handle& projectile_handle : game_data.projectile_handles) {
+				for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
+					Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+					if (proj == NULL || proj->destroyed == true) {
+						continue;
+					}
+					Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+					if (unit == NULL || unit->dead == true) {
+						continue;
+					}
+					if (check_rb_collision(&proj->rb, &unit->rb)) {
+						proj->destroyed = true;
+
+						unit->health_bar.current_hp -= proj->damage;
+						if (unit->health_bar.current_hp <= 0) {
+							unit->dead = true;
+						}
 					}
 				}
 			}
-		}
 
-		spawn_and_update_horde(game_data.enemy_unit_handles, game_data.unit_storage, game_data.current_horde, game_data.player, 
-			demo_tile_map, delta_time);
+			for (Handle& enemy_handle : game_data.enemy_unit_handles) {
+				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_handle);
+				if (unit == NULL || unit->dead == true) {
+					continue;
+				}
+				if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
+					player->health_bar.current_hp -= unit->damage;
+					if (player->health_bar.current_hp <= 0) {
+						player->dead = true;
+					}
+				}
+			}
+
+			spawn_and_update_horde(game_data.enemy_unit_handles, game_data.unit_storage, game_data.current_horde, game_data.player,
+				demo_tile_map, delta_time);
+		}
 
 		// Render
 
@@ -472,14 +492,16 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			draw_unit(*u, game_data.camera.pos_ws);
 
-
-			if (Globals::debug_show_colliders) {
+			if (Globals::debug_show_colliders && u->dead == false) {
 				draw_colliders(&u->rb, game_data.camera.pos_ws);
 			}
 		}
 
-
 		draw_player(game_data.player, game_data.camera.pos_ws);
+
+		if (game_data.player.dead) {
+			draw_string(*font, "Game Over", CT_Red_Wine, true, Globals::resolution_x / 2,  Globals::resolution_y / 2, 5, true);
+		}
 
 		mp_render_present();
 

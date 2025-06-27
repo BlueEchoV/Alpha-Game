@@ -19,6 +19,7 @@ Player_Data get_player_data(std::string character_name) {
 Player create_player(std::string character_name, V2 spawn_pos_ws) {
 	Player result = {};
 
+	result.dead = false;
 	result.faction = F_Player;
 	result.character_name = character_name;
 
@@ -42,7 +43,7 @@ Player create_player(std::string character_name, V2 spawn_pos_ws) {
 		data.h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
 	);
 
-	float collider_radius = (float)result.h / 6;
+	float collider_radius = (float)result.h / 6.0f;
 	add_collider(&result.rb, { 0, (float)result.h / 4.0f  }, collider_radius);
 	add_collider(&result.rb, { 0, 		      0 }, collider_radius);
 	add_collider(&result.rb, { 0, (float)-result.h / 4.0f }, collider_radius);

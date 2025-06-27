@@ -32,13 +32,14 @@ void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Stor
 	result.at = create_animation_tracker(unit_name, as, true);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
-	float collider_radius = (float)data->w / 4;
-	add_collider(&result.rb, { 0,  collider_radius / 2 }, collider_radius);
-	add_collider(&result.rb, { 0,					 0 }, collider_radius);
-	add_collider(&result.rb, { 0, -collider_radius / 2 }, collider_radius);
-
 	result.w = data->w;
 	result.h = data->h;
+	
+	float collider_radius = (float)result.h / 6.0f;
+	add_collider(&result.rb, { 0, (float)result.h / 4.0f  }, collider_radius);
+	add_collider(&result.rb, { 0, 		      0 }, collider_radius);
+	add_collider(&result.rb, { 0, (float)-result.h / 4.0f }, collider_radius);
+
 	result.damage = data->damage;
 	result.target = target;
 	result.handle = create_handle(storage);
