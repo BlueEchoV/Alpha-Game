@@ -42,12 +42,10 @@ Player create_player(std::string character_name, V2 spawn_pos_ws) {
 		data.h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
 	);
 
-	/*
-	float collider_radius = 32;
-	add_collider(&result.rb, { 0,  result.image->sprite_radius / 2 }, collider_radius);
-	add_collider(&result.rb, { 0,   	  						 0 }, collider_radius);
-	add_collider(&result.rb, { 0, -result.image->sprite_radius / 2 }, collider_radius);
-	*/
+	float collider_radius = (float)result.h / 6;
+	add_collider(&result.rb, { 0, (float)result.h / 4.0f  }, collider_radius);
+	add_collider(&result.rb, { 0, 		      0 }, collider_radius);
+	add_collider(&result.rb, { 0, (float)-result.h / 4.0f }, collider_radius);
 
 	return result;
 }
@@ -67,6 +65,10 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	health_bar_cs_pos.y += p.health_bar.offset;
 	health_bar_cs_pos = convert_ws_to_cs(health_bar_cs_pos, camera_ws_pos);
 	draw_faction_health_bar(p.faction, p.health_bar, health_bar_cs_pos);
+
+	if (Globals::debug_show_colliders) {
+		draw_colliders(&p.rb, camera_ws_pos);
+	}
 }
 
 void delete_player(Player* player) {

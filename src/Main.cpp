@@ -169,7 +169,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
-	Tile_Map demo_tile_map = create_tile_map(16, 16);
+	Tile_Map demo_tile_map = create_tile_map(64, 64);
 	while (Globals::running) {
 		reset_is_pressed();
 
