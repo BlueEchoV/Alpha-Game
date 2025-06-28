@@ -20,8 +20,8 @@ namespace Globals {
 
 	extern int debug_total_arrows = 0;
 
-	extern float slow_frames_per_sec = 4;
-	extern float fast_frames_per_sec = 8;
+	extern float slow_frames_per_sec = 8;
+	extern float fast_frames_per_sec = 16;
 	extern float travel_speed_based_frames_per_second;
 
 }

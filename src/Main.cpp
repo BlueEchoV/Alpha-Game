@@ -391,6 +391,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				if (!player->dead) {
 					update_unit(*unit, delta_time);
 				}
+				change_animation_direction_8(&unit->at, unit->unit_name, AS_Walking, unit->rb.vel, APS_Fast);
 				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
@@ -427,7 +428,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				if (unit->can_attack) {
 					if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
 						player->health_bar.current_hp -= unit->damage;
-						if (player->health_bar.current_hp <= 0) {
+					if (player->health_bar.current_hp <= 0) {
 							player->dead = true;
 						}
 					}

@@ -60,6 +60,7 @@ struct Animation_Tracker {
 	int current_frame_index;
 	float current_frame_time;
 	bool loops = true;
+	V2 last_velocity = { 0, 0 };
 };
 
 Sprite create_sprite(Image image, MP_Rect src_rect);

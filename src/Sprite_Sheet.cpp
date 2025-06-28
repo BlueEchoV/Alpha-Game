@@ -83,29 +83,6 @@ std::string get_sprite_sheet_name(std::string entity_name, Animation_State as) {
 	}
 	}
 
-	/*
-	switch (fd) {
-		case FD_N:      result += "_N";      break;
-		// case FD_NNE:    result += "_NNE";    break;
-		case FD_NE:     result += "_NE";     break;
-		// case FD_ENE:    result += "_ENE";    break;
-		case FD_E:      result += "_E";      break;
-		// case FD_ESE:    result += "_ESE";    break;
-		case FD_SE:     result += "_SE";     break;
-		// case FD_SSE:    result += "_SSE";    break;
-		case FD_S:      result += "_S";      break;
-		// case FD_SSW:    result += "_SSW";    break;
-		case FD_SW:     result += "_SW";     break;
-		// case FD_WSW:    result += "_WSW";    break;
-		case FD_W:      result += "_W";      break;
-		// case FD_WNW:    result += "_WNW";    break;
-		case FD_NW:     result += "_NW";     break;
-		// case FD_NNW:    result += "_NNW";    break;
-		case FD_NONE: ;break;
-		default:        result += "_UNK";    break;
-		}
-	*/
-
 	return result;
 }
 
@@ -220,20 +197,24 @@ Facing_Direction get_facing_direction_8(V2 vec) {
 
 void change_animation_direction_8(Animation_Tracker* at, std::string entity_name, Animation_State new_as, 
 	V2 velocity, Animation_Play_Speed aps) {
-	REF(velocity);
-	// Facing_Direction new_fd = get_facing_direction_8(velocity);
-	Facing_Direction new_fd = FD_S;
-	//if (new_fd != at->fd || at->as != new_as || entity_name != at->entity_name) {
-		at->fd = new_fd;
-		at->entity_name = entity_name;
-		at->as = new_as;
-		at->selected_sprite_sheet = get_sprite_sheet_name_direction_8(at->entity_name, at->fd, new_as);
-		at->current_frame_index = 0;
-		// TODO: Change this to be apart of the csv file
-		at->aps = aps;
-		if (new_as == AS_Death) {
-			at->loops = false;
+	if (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y 
+		|| at->as != new_as 
+		|| entity_name != at->entity_name) {
+		at->last_velocity = velocity;
+		Facing_Direction new_fd = get_facing_direction_8(velocity);
+		if (at->fd != new_fd) {
+			at->fd = new_fd;
+			at->entity_name = entity_name;
+			at->as = new_as;
+			at->selected_sprite_sheet = get_sprite_sheet_name_direction_8(at->entity_name, at->fd, new_as);
+			at->current_frame_index = 0;
+			// TODO: Change this to be apart of the csv file
+			at->aps = aps;
+			if (new_as == AS_Death) {
+				at->loops = false;
+			}
 		}
+	}
 }
 
 Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops) {
