@@ -83,6 +83,89 @@ std::string get_sprite_sheet_name(std::string entity_name, Animation_State as) {
 	}
 	}
 
+	/*
+	switch (fd) {
+		case FD_N:      result += "_N";      break;
+		// case FD_NNE:    result += "_NNE";    break;
+		case FD_NE:     result += "_NE";     break;
+		// case FD_ENE:    result += "_ENE";    break;
+		case FD_E:      result += "_E";      break;
+		// case FD_ESE:    result += "_ESE";    break;
+		case FD_SE:     result += "_SE";     break;
+		// case FD_SSE:    result += "_SSE";    break;
+		case FD_S:      result += "_S";      break;
+		// case FD_SSW:    result += "_SSW";    break;
+		case FD_SW:     result += "_SW";     break;
+		// case FD_WSW:    result += "_WSW";    break;
+		case FD_W:      result += "_W";      break;
+		// case FD_WNW:    result += "_WNW";    break;
+		case FD_NW:     result += "_NW";     break;
+		// case FD_NNW:    result += "_NNW";    break;
+		case FD_NONE: ;break;
+		default:        result += "_UNK";    break;
+		}
+	*/
+
+	return result;
+}
+
+
+std::string get_sprite_sheet_name_direction_8(std::string entity_name, Facing_Direction fd, Animation_State as) {
+	std::string result = {};
+
+	switch (as) {
+	case AS_Idle: {
+		result = entity_name + "_idle";
+		break;
+	}
+	case AS_Walking: {
+		result = entity_name + "_walking";
+		break;
+	}
+	case AS_Running: {
+		result = entity_name + "_running";
+		break;
+	}
+	case AS_Attacking: {
+		result = entity_name + "_attacking";
+		break;
+	}
+	case AS_Death: {
+		result = entity_name + "_death";
+		break;
+	}
+	case AS_No_Animation: {
+		result = entity_name;
+		break;
+	}
+	default: {
+		// Just return the dummy image if case is not found
+		result = "dummy_image";
+		break;
+	}
+	}
+
+	switch (fd) {
+		case FD_N:      result += "_N";      break;
+		// case FD_NNE:    result += "_NNE";    break;
+		case FD_NE:     result += "_NE";     break;
+		// case FD_ENE:    result += "_ENE";    break;
+		case FD_E:      result += "_E";      break;
+		// case FD_ESE:    result += "_ESE";    break;
+		case FD_SE:     result += "_SE";     break;
+		// case FD_SSE:    result += "_SSE";    break;
+		case FD_S:      result += "_S";      break;
+		// case FD_SSW:    result += "_SSW";    break;
+		case FD_SW:     result += "_SW";     break;
+		// case FD_WSW:    result += "_WSW";    break;
+		case FD_W:      result += "_W";      break;
+		// case FD_WNW:    result += "_WNW";    break;
+		case FD_NW:     result += "_NW";     break;
+		// case FD_NNW:    result += "_NNW";    break;
+		case FD_NONE: ;break;
+		default:        result += "_UNK";    break;
+		}
+
 	return result;
 }
 
@@ -100,6 +183,57 @@ void change_animation(Animation_Tracker* at, std::string entity_name, Animation_
 		}
 	}
 	at->fd = facing_direction;
+}
+
+Facing_Direction get_facing_direction_8(V2 vec) {
+	float angle = calculate_facing_direction(vec);
+
+	Facing_Direction result = FD_NONE;
+
+	if (angle >= 337.5f || angle < 22.5f) {
+		result = FD_E;
+	}
+	else if (angle >= 22.5f && angle < 67.5f) {
+		result = FD_NE;
+	}
+	else if (angle >= 67.5f && angle < 112.5f) {
+		result = FD_N;
+	}
+	else if (angle >= 112.5f && angle < 157.5f) {
+		result = FD_NW;
+	}
+	else if (angle >= 157.5f && angle < 202.5f) {
+		result = FD_W;
+	}
+	else if (angle >= 202.5f && angle < 247.5f) {
+		result = FD_SW;
+	}
+	else if (angle >= 247.5f && angle < 292.5f) {
+		result = FD_S;
+	}
+	else if (angle >= 292.5f && angle < 337.5f) {
+		result = FD_SE;
+	}
+
+	return result;
+}
+
+void change_animation_direction_8(Animation_Tracker* at, std::string entity_name, Animation_State new_as, 
+	V2 velocity, Animation_Play_Speed aps) {
+	REF(velocity);
+	// Facing_Direction new_fd = get_facing_direction_8(velocity);
+	Facing_Direction new_fd = FD_S;
+	//if (new_fd != at->fd || at->as != new_as || entity_name != at->entity_name) {
+		at->fd = new_fd;
+		at->entity_name = entity_name;
+		at->as = new_as;
+		at->selected_sprite_sheet = get_sprite_sheet_name_direction_8(at->entity_name, at->fd, new_as);
+		at->current_frame_index = 0;
+		// TODO: Change this to be apart of the csv file
+		at->aps = aps;
+		if (new_as == AS_Death) {
+			at->loops = false;
+		}
 }
 
 Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops) {
@@ -135,8 +269,6 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
 			case APS_Speed_Based: {
 				// Speed Based
 				at->current_frame_time = 1.0f / (speed / 25.0f);
-				std::string str = std::to_string(at->current_frame_time);
-				log(str.c_str());
 				break;
 			}
 			default: {
@@ -172,12 +304,7 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
-	if (at->fd == FD_W) {
-		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL);
-	}
-	else {
-		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
-	}
+	mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
 }
 
 Type_Descriptor sprite_sheet_type_descriptors[] = {

@@ -283,8 +283,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
 				spawn_unit(
 					F_Enemies,
-					"zombie_woman",
-					AS_Running,
+					"hellhound",
+					AS_Walking,
 					game_data.unit_storage,
 					game_data.enemy_unit_handles,
 					&game_data.player,
@@ -391,7 +391,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				if (!player->dead) {
 					update_unit(*unit, delta_time);
 				}
-				update_animation_tracker(&unit->at, delta_time);
+				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
 

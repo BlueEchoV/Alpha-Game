@@ -2,22 +2,15 @@
 #include "Image.h"
 
 enum Facing_Direction {
-    FD_N,        // 0° 
-    FD_NNE,      // 22.5°
-    FD_NE,       // 45°
-    FD_ENE,      // 67.5°
-    FD_E,        // 90°
-    FD_ESE,      // 112.5°
-    FD_SE,       // 135°
-    FD_SSE,      // 157.5°
-    FD_S,        // 180°
-    FD_SSW,      // 202.5°
-    FD_SW,       // 225°
-    FD_WSW,      // 247.5°
-    FD_W,        // 270°
-    FD_WNW,      // 292.5°
-    FD_NW,       // 315°
-    FD_NNW       // 337.5°
+    FD_N,   // 0°
+    FD_NE,  // 45°
+    FD_E,   // 90°
+    FD_SE,  // 135°
+    FD_S,   // 180°
+    FD_SW,  // 225°
+    FD_W,   // 270°
+    FD_NW,  // 315°
+    FD_NONE // Optional
 };
 
 enum Animation_Play_Speed {
@@ -78,6 +71,8 @@ Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows,
 Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops);
 void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as,
 	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed);
+void change_animation_direction_8(Animation_Tracker* at, std::string entity_name, Animation_State new_as,
+	V2 velocity, Animation_Play_Speed aps);
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed);
 void update_animation_tracker(Animation_Tracker* at, float delta_time);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);

@@ -93,8 +93,8 @@ void spawn_and_update_horde(std::vector<Handle>& unit_handles, Storage<Unit>& un
 					log("Random Position: x = %f, y = %f", random_pos_ws.x, random_pos_ws.y);
 					spawn_unit(
 						horde.faction,
-						"zombie_woman",
-						AS_Running,
+						"hellhound",
+						AS_Walking,
 						unit_storage,
 						unit_handles,
 						&player,

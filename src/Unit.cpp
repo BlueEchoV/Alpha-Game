@@ -30,6 +30,7 @@ void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Stor
 		data->h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
 	);
 	result.at = create_animation_tracker(unit_name, as, true);
+	change_animation_direction_8(&result.at, result.at.entity_name, result.at.as, result.rb.vel, APS_Fast);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
 	result.w = data->w;
@@ -70,13 +71,9 @@ void update_unit(Unit& unit, float dt) {
 			update_unit_position(unit, dt);
 
 			Animation_Tracker* at = &unit.at;
-			float vel_x = unit.rb.vel.x;
-			// Change the animation to be facing left or right
-			Facing_Direction new_fd = vel_x > 0.0f ? FD_E : FD_W;
-			if (new_fd != at->fd) {
-				at->fd = new_fd;
-				change_animation(at, at->entity_name, at->as, at->fd, APS_Speed_Based);
-			}
+			REF(at);
+
+			// change_animation_direction_8(at, at->entity_name, at->as, unit.rb.vel, APS_Fast);
 			if (check_and_update_cooldown(unit.attack_cd, dt)) {
 				unit.can_attack = true;
 			}
