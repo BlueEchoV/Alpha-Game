@@ -18,8 +18,8 @@ Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows,
 			for (int y = 0; y < columns; y++) {
 				MP_Rect src_rect = {};
 
-				src_rect.x = (y * image.h);
-				src_rect.y = (x * image.w);
+				src_rect.x = (y * (image.w / columns));
+				src_rect.y = (x * (image.h / rows));
 				src_rect.w = (image.w / columns);
 				src_rect.h = (image.h / rows);
 
