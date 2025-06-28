@@ -146,24 +146,24 @@ std::string get_sprite_sheet_name_direction_8(std::string entity_name, Facing_Di
 	}
 
 	switch (fd) {
-		case FD_N:      result += "_N";      break;
+		case FD_N:      result += "_n";      break;
 		// case FD_NNE:    result += "_NNE";    break;
-		case FD_NE:     result += "_NE";     break;
+		case FD_NE:     result += "_ne";     break;
 		// case FD_ENE:    result += "_ENE";    break;
-		case FD_E:      result += "_E";      break;
+		case FD_E:      result += "_e";      break;
 		// case FD_ESE:    result += "_ESE";    break;
-		case FD_SE:     result += "_SE";     break;
+		case FD_SE:     result += "_se";     break;
 		// case FD_SSE:    result += "_SSE";    break;
-		case FD_S:      result += "_S";      break;
+		case FD_S:      result += "_s";      break;
 		// case FD_SSW:    result += "_SSW";    break;
-		case FD_SW:     result += "_SW";     break;
+		case FD_SW:     result += "_sw";     break;
 		// case FD_WSW:    result += "_WSW";    break;
-		case FD_W:      result += "_W";      break;
+		case FD_W:      result += "_w";      break;
 		// case FD_WNW:    result += "_WNW";    break;
-		case FD_NW:     result += "_NW";     break;
+		case FD_NW:     result += "_nw";     break;
 		// case FD_NNW:    result += "_NNW";    break;
 		case FD_NONE: ;break;
-		default:        result += "_UNK";    break;
+		default:        result += "_unk";    break;
 		}
 
 	return result;
