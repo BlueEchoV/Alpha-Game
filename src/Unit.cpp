@@ -40,7 +40,10 @@ void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Stor
 	add_collider(&result.rb, { 0, 		      0 }, collider_radius);
 	add_collider(&result.rb, { 0, (float)-result.h / 4.0f }, collider_radius);
 
+	result.can_attack = true;
 	result.damage = data->damage;
+	result.attack_cd.max = (1000.0f / data->attacks_per_sec);
+	result.attack_cd.current = result.attack_cd.max;
 	result.target = target;
 	result.handle = create_handle(storage);
 	
@@ -69,10 +72,16 @@ void update_unit(Unit& unit, float dt) {
 			Animation_Tracker* at = &unit.at;
 			float vel_x = unit.rb.vel.x;
 			// Change the animation to be facing left or right
-			Facing_Direction new_fd = vel_x > 0.0f ? FD_Right : FD_Left;
+			Facing_Direction new_fd = vel_x > 0.0f ? FD_E : FD_W;
 			if (new_fd != at->fd) {
 				at->fd = new_fd;
 				change_animation(at, at->entity_name, at->as, at->fd, APS_Speed_Based);
+			}
+			if (check_and_update_cooldown(unit.attack_cd, dt)) {
+				unit.can_attack = true;
+			}
+			else {
+				unit.can_attack = false;
 			}
 		}
 	}
@@ -104,6 +113,7 @@ Type_Descriptor unit_data_type_descriptors[] = {
 	FIELD(Unit_Data, VT_Int, h),
 	FIELD(Unit_Data, VT_Int, health),
 	FIELD(Unit_Data, VT_Int, damage),
+	FIELD(Unit_Data, VT_Float, attacks_per_sec),
 	FIELD(Unit_Data, VT_Int, speed)
 };
 

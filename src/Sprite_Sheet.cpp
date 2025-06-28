@@ -172,7 +172,7 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
-	if (at->fd == FD_Left) {
+	if (at->fd == FD_W) {
 		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL);
 	}
 	else {
@@ -207,7 +207,10 @@ void load_sprite_sheets() {
 	dummy_sprite_sheet = create_animation_sprite_sheet("assets\\dummy_image.png", 1, 1);
 
 	for (const auto& it : sprite_sheet_data_map) {
-		std::string full_file_path = it.second.root + it.second.sprite_sheet_name+ ".png";
+		if (it.second.sprite_sheet_name == "") {
+			continue;
+		}
+		std::string full_file_path = it.second.root + it.second.sprite_sheet_name + it.second.ext;
 
 		sprite_sheet_map[it.second.sprite_sheet_name] = create_animation_sprite_sheet(
 			full_file_path.c_str(), 

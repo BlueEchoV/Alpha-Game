@@ -19,6 +19,7 @@ struct Unit_Data {
 	int h;
 	int health;
 	int damage;
+	float attacks_per_sec;
 	int speed;
 };
 
@@ -38,6 +39,9 @@ struct Unit {
 
 	bool dead = false;
 	bool destroyed = false;
+
+	bool can_attack = true;
+	Cooldown attack_cd;
 
 	Handle handle;
 };

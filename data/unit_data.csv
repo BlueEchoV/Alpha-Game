@@ -1,2 +1,2 @@
-unit_name,w,h,health,damage,speed
-zombie_woman,100,100,100,10,30
+unit_name,w,h,health,damage,attacks_per_sec,speed
+zombie_woman,100,100,100,10,2,30

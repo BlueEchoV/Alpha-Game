@@ -223,23 +223,23 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
-				player->at.fd = FD_Left;
+				player->at.fd = FD_W;
 				change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
 				player_x_delta = -2.0f;
 			}
 			else if (key_pressed_and_held(KEY_A)) {
-				player->at.fd = FD_Left;
+				player->at.fd = FD_W;
 				change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
 				player_x_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
-				player->at.fd = FD_Right;
+				player->at.fd = FD_E;
 				change_animation(&player->at, player->at.entity_name, AS_Running, player->at.fd, APS_Speed_Based);
 				player_x_delta = 2.0f;
 			}
 			else if (key_pressed_and_held(KEY_D)) {
-				player->at.fd = FD_Right;
+				player->at.fd = FD_E;
 				change_animation(&player->at, player->at.entity_name, AS_Walking, player->at.fd, APS_Speed_Based);
 				player_x_delta = 1.0f;
 			}
@@ -424,10 +424,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				if (unit == NULL || unit->dead == true) {
 					continue;
 				}
-				if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
-					player->health_bar.current_hp -= unit->damage;
-					if (player->health_bar.current_hp <= 0) {
-						player->dead = true;
+				if (unit->can_attack) {
+					if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
+						player->health_bar.current_hp -= unit->damage;
+						if (player->health_bar.current_hp <= 0) {
+							player->dead = true;
+						}
 					}
 				}
 			}

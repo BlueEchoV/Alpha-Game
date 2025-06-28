@@ -2,8 +2,22 @@
 #include "Image.h"
 
 enum Facing_Direction {
-	FD_Right,
-	FD_Left
+    FD_N,        // 0° 
+    FD_NNE,      // 22.5°
+    FD_NE,       // 45°
+    FD_ENE,      // 67.5°
+    FD_E,        // 90°
+    FD_ESE,      // 112.5°
+    FD_SE,       // 135°
+    FD_SSE,      // 157.5°
+    FD_S,        // 180°
+    FD_SSW,      // 202.5°
+    FD_SW,       // 225°
+    FD_WSW,      // 247.5°
+    FD_W,        // 270°
+    FD_WNW,      // 292.5°
+    FD_NW,       // 315°
+    FD_NNW       // 337.5°
 };
 
 enum Animation_Play_Speed {
