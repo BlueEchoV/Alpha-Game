@@ -26,7 +26,7 @@ Player create_player(std::string character_name, V2 spawn_pos_ws) {
 	Player_Data data = get_player_data(character_name);
 
 	// NOTE: AS_Idle is the default starting animation for the player
-	result.at = create_animation_tracker(character_name, AS_Idle, true);
+	result.at = create_animation_tracker(ATT_Direction_2, character_name, AS_Idle, true);
 
 	result.w = data.h;
 	result.h = data.w;

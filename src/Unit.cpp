@@ -29,8 +29,8 @@ void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Stor
 		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
 		data->h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
 	);
-	result.at = create_animation_tracker(unit_name, as, true);
-	change_animation_direction_8(&result.at, result.at.entity_name, result.at.as, result.rb.vel, APS_Fast);
+	result.at = create_animation_tracker(ATT_Direction_8, unit_name, as, true);
+	change_animation(&result.at, result.at.entity_name, result.at.as, APS_Fast, false, result.rb.vel);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
 	result.w = data->w;

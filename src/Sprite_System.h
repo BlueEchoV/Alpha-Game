@@ -49,7 +49,15 @@ struct Sprite_Sheet {
 	std::vector<Sprite> sprites;
 };
 
+enum Animation_Tracker_Type {
+	ATT_Direction_2,
+	ATT_Direction_8,
+	// For Player
+	ATT_Direction_16,
+};
+
 struct Animation_Tracker {
+	Animation_Tracker_Type att;
 	// entity name is the sprite sheet category
 	std::string entity_name;
 	std::string selected_sprite_sheet;
@@ -57,23 +65,19 @@ struct Animation_Tracker {
 	Animation_State as;
 	Animation_Play_Speed aps;
 	Facing_Direction fd; 
+	bool flip_horizontally = false;
 	int current_frame_index;
 	float current_frame_time;
 	bool loops = true;
 	V2 last_velocity = { 0, 0 };
 };
 
-Sprite create_sprite(Image image, MP_Rect src_rect);
-
 extern std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 
 Sprite_Sheet* get_sprite_sheet(std::string name);
 Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows, int columns);
-Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops);
-void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as,
-	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed);
-void change_animation_direction_8(Animation_Tracker* at, std::string entity_name, Animation_State new_as,
-	V2 velocity, Animation_Play_Speed aps);
+Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string entity_name, Animation_State starting_as, bool loops);
+void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity);
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed);
 void update_animation_tracker(Animation_Tracker* at, float delta_time);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);

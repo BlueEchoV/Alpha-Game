@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderable.h"
+#include "Sprite_System.h"
 
 // Colliders
 struct Collider {

@@ -146,22 +146,6 @@ std::string get_sprite_sheet_name_direction_8(std::string entity_name, Facing_Di
 	return result;
 }
 
-void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as, 
-	Facing_Direction facing_direction, Animation_Play_Speed animation_play_speed) {
-	if (at->as != new_as || entity_name != at->entity_name) {
-		at->entity_name = entity_name;
-		at->as = new_as;
-		at->selected_sprite_sheet = get_sprite_sheet_name(at->entity_name, new_as);
-		at->current_frame_index = 0;
-		// TODO: Change this to be apart of the csv file
-		at->aps = animation_play_speed;
-		if (new_as == AS_Death) {
-			at->loops = false;
-		}
-	}
-	at->fd = facing_direction;
-}
-
 Facing_Direction get_facing_direction_8(V2 vec) {
 	float angle = calculate_facing_direction(vec);
 
@@ -195,6 +179,21 @@ Facing_Direction get_facing_direction_8(V2 vec) {
 	return result;
 }
 
+void change_animation_direction_2(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed animation_play_speed, bool flip_horizontally) {
+	if (at->as != new_as || entity_name != at->entity_name) {
+		at->entity_name = entity_name;
+		at->as = new_as;
+		at->selected_sprite_sheet = get_sprite_sheet_name(at->entity_name, new_as);
+		at->current_frame_index = 0;
+		// TODO: Change this to be apart of the csv file
+		at->aps = animation_play_speed;
+		if (new_as == AS_Death) {
+			at->loops = false;
+		}
+	}
+	at->flip_horizontally = flip_horizontally;
+}
+
 void change_animation_direction_8(Animation_Tracker* at, std::string entity_name, Animation_State new_as, 
 	V2 velocity, Animation_Play_Speed aps) {
 	if (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y 
@@ -217,9 +216,32 @@ void change_animation_direction_8(Animation_Tracker* at, std::string entity_name
 	}
 }
 
-Animation_Tracker create_animation_tracker(std::string entity_name, Animation_State starting_as, bool loops) {
+void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity) {
+	switch (at->att) {
+	case ATT_Direction_2: {
+		change_animation_direction_2(at, entity_name, new_as, aps, flip_horizontally);
+		break;
+	}
+	case ATT_Direction_8: {
+		change_animation_direction_8(at, entity_name, new_as, velocity, aps);
+		break;
+	}
+	case ATT_Direction_16: {
+		// WIP
+		break;
+	}
+	default: {
+		// Do nothing
+		log("Error: change_animation called, but animation tracker type not supported.");
+		break;
+	}
+	}
+}
+
+Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string entity_name, Animation_State starting_as, bool loops) {
 	Animation_Tracker result = {};
 
+	result.att = att;
 	result.entity_name = entity_name;
 	result.as = starting_as;
 	result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
@@ -285,7 +307,12 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
-	mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
+	if (at->flip_horizontally == false) {
+		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
+	}
+	else {
+		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL);
+	}
 }
 
 Type_Descriptor sprite_sheet_type_descriptors[] = {

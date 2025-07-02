@@ -27,7 +27,7 @@ void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectil
 	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);
 	result.rb.vel = vel_normalized;
 
-	result.at = create_animation_tracker(projectile_name, AS_No_Animation, true);
+	result.at = create_animation_tracker(ATT_Direction_2, projectile_name, AS_No_Animation, true);
 
 	result.w = data.w;
 	result.h = data.h;
