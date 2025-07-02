@@ -73,13 +73,12 @@ struct Animation_Tracker {
 };
 
 extern std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
-
 Sprite_Sheet* get_sprite_sheet(std::string name);
 Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows, int columns);
+
 Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string entity_name, Animation_State starting_as, bool loops);
-void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity);
-void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed);
-void update_animation_tracker(Animation_Tracker* at, float delta_time);
+void change_animation_tracker(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity);
+void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);
 
 void load_sprite_sheets();

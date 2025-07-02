@@ -216,7 +216,7 @@ void change_animation_direction_8(Animation_Tracker* at, std::string entity_name
 	}
 }
 
-void change_animation(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity) {
+void change_animation_tracker(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity) {
 	switch (at->att) {
 	case ATT_Direction_2: {
 		change_animation_direction_2(at, entity_name, new_as, aps, flip_horizontally);
@@ -252,7 +252,7 @@ Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::stri
 	return result;
 }
 
-void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed) {
+void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
 	size_t frame_count = ss->sprites.size();
@@ -271,7 +271,7 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
 			}
 			case APS_Speed_Based: {
 				// Speed Based
-				at->current_frame_time = 1.0f / (speed / 25.0f);
+				at->current_frame_time = 1.0f / (speed_based / 25.0f);
 				break;
 			}
 			default: {
@@ -295,10 +295,6 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
 			at->current_frame_time -= delta_time;
 		}
 	}
-}
-
-void update_animation_tracker(Animation_Tracker* at, float delta_time) {
-	update_animation_tracker(at, delta_time, NULL);
 }
 
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {

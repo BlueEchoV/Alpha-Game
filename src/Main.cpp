@@ -205,44 +205,44 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		if (!player->dead) {
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = 1.0f;
 			}
 			if (key_pressed_and_held(KEY_W)) {
-				change_animation(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = 1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = -1.0f;
 			}
 			if (key_pressed_and_held(KEY_S)) {
-				change_animation(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, true, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, true, { 0.0, 0.0 });
 				player_x_delta = -2.0f;
 			}
 			else if (key_pressed_and_held(KEY_A)) {
-				change_animation(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, true, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, true, { 0.0, 0.0 });
 				player_x_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, false, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, false, { 0.0, 0.0 });
 				player_x_delta = 2.0f;
 			}
 			else if (key_pressed_and_held(KEY_D)) {
-				change_animation(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, false, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, false, { 0.0, 0.0 });
 				player_x_delta = 1.0f;
 			}
 
 			if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
 				!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
-				change_animation(&player->at, player->at.entity_name, AS_Idle, APS_Fast, false, { 0.0, 0.0 });
+				change_animation_tracker(&player->at, player->at.entity_name, AS_Idle, APS_Fast, false, { 0.0, 0.0 });
 			}
 
 			if (player->weapon == nullptr) {
@@ -388,7 +388,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					update_unit(*unit, delta_time);
 				}
 
-				change_animation(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, false, unit->rb.vel);
+				change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, false, unit->rb.vel);
 				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
@@ -492,7 +492,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				continue;
 			}
 			if (u->dead) {
-				change_animation(&u->at, u->at.entity_name, AS_Death, u->at.aps, u->at.flip_horizontally, { 0.0f, 0.0f });
+				change_animation_tracker(&u->at, u->at.entity_name, AS_Death, u->at.aps, u->at.flip_horizontally, { 0.0f, 0.0f });
 			}
 
 			draw_unit(*u, game_data.camera.pos_ws);
