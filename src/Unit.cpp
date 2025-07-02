@@ -15,14 +15,14 @@ Unit_Data* get_unit_data(std::string unit_type) {
 	return &bad_unit_data;
 }
 
-void spawn_unit(Faction faction, std::string unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles, 
+void spawn_unit(Faction faction, std::string_view unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles, 
 	Player* target, V2 spawn_pos) {
 	Unit result = {};
 
 	result.faction = faction;
 	result.unit_name = unit_name;
 
-	Unit_Data* data = get_unit_data(unit_name);
+	Unit_Data* data = get_unit_data(std::string(unit_name));
 	result.health_bar = create_health_bar(
 		data->health, 
 		Globals::DEFAULT_HEALTH_BAR_WIDTH, 

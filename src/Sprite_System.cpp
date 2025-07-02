@@ -48,46 +48,20 @@ Sprite_Sheet* get_sprite_sheet(std::string name) {
 	}
 }
 
-std::string get_sprite_sheet_name(std::string entity_name, Animation_State as) {
-	std::string result = {};
-
+std::string get_sprite_sheet_name(const std::string_view entity_name, Animation_State as) {
 	switch (as) {
-	case AS_Idle: {
-		result = entity_name + "_idle";
-		break;
+	case AS_Idle:			return std::string(entity_name) + "_idle";
+	case AS_Walking:		return std::string(entity_name) + "_walking";
+	case AS_Running:		return std::string(entity_name) + "_running";
+	case AS_Attacking:		return std::string(entity_name) + "_attacking";
+	case AS_Death:			return std::string(entity_name) + "_death";
+	case AS_No_Animation:	return std::string(entity_name);
+	default: 
+		return "dummy_image";
 	}
-	case AS_Walking: {
-		result = entity_name + "_walking";
-		break;
-	}
-	case AS_Running: {
-		result = entity_name + "_running";
-		break;
-	}
-	case AS_Attacking: {
-		result = entity_name + "_attacking";
-		break;
-	}
-	case AS_Death: {
-		result = entity_name + "_death";
-		break;
-	}
-	case AS_No_Animation: {
-		result = entity_name;
-		break;
-	}
-	default: {
-		// Just return the dummy image if case is not found
-		result = "dummy_image";
-		break;
-	}
-	}
-
-	return result;
 }
 
-
-std::string get_sprite_sheet_name_direction_8(std::string entity_name, Facing_Direction fd, Animation_State as) {
+std::string get_sprite_sheet_name_direction_8(std::string& entity_name, Facing_Direction fd, Animation_State as) {
 	std::string result = {};
 
 	switch (as) {
@@ -179,7 +153,7 @@ Facing_Direction get_facing_direction_8(V2 vec) {
 	return result;
 }
 
-void change_animation_direction_2(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed animation_play_speed, bool flip_horizontally) {
+void change_animation_direction_2(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed animation_play_speed, bool flip_horizontally) {
 	if (at->as != new_as || entity_name != at->entity_name) {
 		at->entity_name = entity_name;
 		at->as = new_as;
@@ -194,7 +168,7 @@ void change_animation_direction_2(Animation_Tracker* at, std::string entity_name
 	at->flip_horizontally = flip_horizontally;
 }
 
-void change_animation_direction_8(Animation_Tracker* at, std::string entity_name, Animation_State new_as, 
+void change_animation_direction_8(Animation_Tracker* at, const std::string entity_name, Animation_State new_as, 
 	V2 velocity, Animation_Play_Speed aps) {
 	if (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y 
 		|| at->as != new_as 
@@ -216,7 +190,7 @@ void change_animation_direction_8(Animation_Tracker* at, std::string entity_name
 	}
 }
 
-void change_animation_tracker(Animation_Tracker* at, std::string entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity) {
+void change_animation_tracker(Animation_Tracker* at, std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity) {
 	switch (at->att) {
 	case ATT_Direction_2: {
 		change_animation_direction_2(at, entity_name, new_as, aps, flip_horizontally);
@@ -238,11 +212,11 @@ void change_animation_tracker(Animation_Tracker* at, std::string entity_name, An
 	}
 }
 
-Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string entity_name, Animation_State starting_as, bool loops) {
+Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string_view entity_name, Animation_State starting_as, bool loops) {
 	Animation_Tracker result = {};
 
 	result.att = att;
-	result.entity_name = entity_name;
+	result.entity_name = std::string(entity_name);
 	result.as = starting_as;
 	result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
 	result.current_frame_index = 0;

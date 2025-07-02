@@ -30,5 +30,5 @@ struct Player {
 	int damage;
 };
 
-Player create_player(std::string character_name, V2 spawn_pos_ws);
+Player create_player(std::string_view character_name, V2 spawn_pos_ws);
 void draw_player(Player& p, V2 camera_ws_pos);

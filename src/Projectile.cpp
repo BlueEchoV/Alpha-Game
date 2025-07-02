@@ -7,8 +7,8 @@ Projectile_Data bad_projectile_data = {
 	"arrow",	32, 32, 100
 };
 
-Projectile_Data get_projectile_data(std::string projectile_name) {
-	auto it = projectile_data_map.find(projectile_name);
+Projectile_Data get_projectile_data(std::string_view projectile_name) {
+	auto it = projectile_data_map.find(std::string(projectile_name));
 	if (it == projectile_data_map.end()) {
 		return bad_projectile_data;
 	}
@@ -16,12 +16,12 @@ Projectile_Data get_projectile_data(std::string projectile_name) {
 }
 
 void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
-	std::string projectile_name, int damage, V2 origin_ws, V2 target_ws) {
+	std::string_view projectile_name, int damage, V2 origin_ws, V2 target_ws) {
 
 	Projectile result = {};
 	result.damage = damage;
 
-	Projectile_Data data = get_projectile_data(projectile_name);
+	Projectile_Data data = get_projectile_data(std::string(projectile_name));
 
 	result.rb = create_rigid_body(origin_ws, data.speed);
 	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);
@@ -33,7 +33,7 @@ void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectil
 	result.h = data.h;
 	result.rb.angle = calculate_facing_direction(result.rb.vel);
 
-	Sprite_Sheet* sprite_sheet = get_sprite_sheet(projectile_name);
+	Sprite_Sheet* sprite_sheet = get_sprite_sheet(std::string(projectile_name));
 	float first_sprite_radius = sprite_sheet->sprites[0].image.sprite_radius;
 	V2 pos_ls = rotate_point_based_off_angle(result.rb.angle, 0, 0, first_sprite_radius * 0.8f, 0);
 

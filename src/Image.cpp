@@ -135,8 +135,8 @@ void load_images() {
 	images["bush"] = load_image("assets\\bush.png");
 }
 
-Image* get_image(std::string image_name) {
-	auto iterator = images.find(image_name);
+Image* get_image(std::string_view image_name) {
+	auto iterator = images.find(std::string(image_name));
 
 	if (iterator != images.end()) {
 		return &iterator->second;

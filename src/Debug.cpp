@@ -4,7 +4,7 @@ int debug_point_size = 6;
 Font_Type debug_font = FT_Basic;
 // The draw_at variable should be in world space. World space is technically UI space.
 void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
-	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string custom_text) {
+	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string_view custom_text) {
 
 	V2 coor_to_draw_final = coor_to_draw;
 	if (convert_coor_to_draw_to_cs) {
@@ -18,7 +18,7 @@ void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to
 	Font* font = get_font(debug_font); 
 	int y_offset = font->char_height + font->char_height / 2;
 
-	std::string str = custom_text + "x = " + std::to_string((int)coor_to_draw_final.x) + ", y = " 
+	std::string str = std::string(custom_text) + "x = " + std::to_string((int)coor_to_draw_final.x) + ", y = " 
 		+ std::to_string((int)coor_to_draw_final.y);
 
 	draw_quick_string(c, background, str.c_str(), (int)draw_at_final.x, (int)draw_at_final.y + y_offset);

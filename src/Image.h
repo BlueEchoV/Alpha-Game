@@ -52,7 +52,7 @@ Image load_image(const char* file_path);
 
 extern std::unordered_map<std::string , Image> images;
 void load_images();
-Image* get_image(std::string image_name);
+Image* get_image(std::string_view image_name);
 
 extern std::unordered_map<Font_Type, Font> fonts;
 void load_fonts();

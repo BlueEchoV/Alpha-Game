@@ -7,8 +7,8 @@ Player_Data bad_player_data = {
 
 std::unordered_map<std::string, Player_Data> player_data_map;
 
-Player_Data get_player_data(std::string character_name) {
-	auto it = player_data_map.find(character_name);
+Player_Data get_player_data(std::string_view character_name) {
+	auto it = player_data_map.find(std::string(character_name));
 	if (it != player_data_map.end()) {
 		return it->second;
 	}
@@ -16,7 +16,7 @@ Player_Data get_player_data(std::string character_name) {
 	return bad_player_data;
 };
 
-Player create_player(std::string character_name, V2 spawn_pos_ws) {
+Player create_player(std::string_view character_name, V2 spawn_pos_ws) {
 	Player result = {};
 
 	result.dead = false;

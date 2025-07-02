@@ -21,7 +21,7 @@ enum Debug_Image {
 };
 
 void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
-	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string custom_text);
+	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string_view custom_text);
 void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb);
 void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture, float delta_time);
 void debug_draw_stats(Font& font, MP_Texture* debug_texture);
