@@ -1,7 +1,7 @@
 #pragma 
 #include "Utility.h"
 #include "Game_Utility.h"
-#include "Sprite_Sheet.h"
+#include "Sprite_System.h"
 #include "Projectile.h"
 
 struct Weapon_Data {

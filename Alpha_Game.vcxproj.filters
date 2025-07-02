@@ -70,7 +70,7 @@
     <ClCompile Include="src\Renderer.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sprite_Sheet.cpp">
+    <ClCompile Include="src\Renderable.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Utility.cpp">
@@ -135,7 +135,7 @@
     <ClInclude Include="src\Renderer.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\Sprite_Sheet.h">
+    <ClInclude Include="src\Renderable.h">
       <Filter>Source Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\Utility.h">

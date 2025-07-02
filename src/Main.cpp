@@ -1,5 +1,5 @@
 #include "GL_Functions.h"
-#include "Sprite_Sheet.h"
+#include "Sprite_System.h"
 #include "Tile_Map.h"
 #include "Audio_xAudio2.h"
 #include "Audio_DirectSound.h"

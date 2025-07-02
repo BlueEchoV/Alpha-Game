@@ -1,4 +1,4 @@
-#include "Sprite_Sheet.h"
+#include "Sprite_System.h"
 
 Sprite create_sprite(Image image, MP_Rect src_rect) {
 	Sprite result = {};
