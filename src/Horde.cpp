@@ -1,7 +1,7 @@
 #include "Horde.h"
 
 Horde_Data bad_horde_data = {
-	// level		total_zombies		spawning_cd
+	// level		total_enemies		spawning_cd
 	   1,			20,					0.5f
 };
 
@@ -114,4 +114,14 @@ void draw_horde_spawn_region(Color_Type c, Horde& horde, Tile_Map& tile_map, V2 
 
 	mp_set_render_draw_color(c);
 	mp_render_draw_rect(&spawn_region_cs);
+}
+
+Type_Descriptor horde_data_type_descriptors[] = {
+	FIELD(Horde_Data, VT_Int, level),
+	FIELD(Horde_Data, VT_Int, total_to_spawn),
+	FIELD(Horde_Data, VT_Float, max_spawning_cd)
+};
+
+void load_horde_data_csv() {
+
 }
