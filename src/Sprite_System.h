@@ -2,14 +2,14 @@
 #include "Image.h"
 
 enum Facing_Direction {
-    FD_N,   // 0°
-    FD_NE,  // 45°
-    FD_E,   // 90°
-    FD_SE,  // 135°
-    FD_S,   // 180°
-    FD_SW,  // 225°
-    FD_W,   // 270°
-    FD_NW,  // 315°
+    FD_N,   // 0
+    FD_NE,  // 45
+    FD_E,   // 90
+    FD_SE,  // 135
+    FD_S,   // 180
+    FD_SW,  // 225
+    FD_W,   // 270
+    FD_NW,  // 315
     FD_NONE // Optional
 };
 
@@ -80,6 +80,9 @@ Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::stri
 void change_animation_tracker(Animation_Tracker* at, std::string& entity_name_view, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity);
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);
+
+// Just for drawing a 1x1 sprite sheet
+void draw_sprite_sheet_1x1();
 
 void load_sprite_sheets();
 void load_sprite_sheet_data_csv(CSV_Data* data);

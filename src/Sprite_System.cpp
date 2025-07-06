@@ -153,17 +153,22 @@ Facing_Direction get_facing_direction_8(V2 vec) {
 	return result;
 }
 
-void change_animation_direction_2(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed animation_play_speed, bool flip_horizontally) {
+void reset_animation_state(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps) {
+	at->entity_name = entity_name;
+	at->as = new_as;
+	at->selected_sprite_sheet = get_sprite_sheet_name_direction_8(at->entity_name, at->fd, new_as);
+	at->current_frame_index = 0;
+	// TODO: Change this to be apart of the csv file
+	at->aps = aps;
+	if (new_as == AS_Death) {
+		at->loops = false;
+	}
+}
+
+void change_animation_direction_2(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally) {
 	if (at->as != new_as || entity_name != at->entity_name) {
-		at->entity_name = entity_name;
-		at->as = new_as;
 		at->selected_sprite_sheet = get_sprite_sheet_name(at->entity_name, new_as);
-		at->current_frame_index = 0;
-		// TODO: Change this to be apart of the csv file
-		at->aps = animation_play_speed;
-		if (new_as == AS_Death) {
-			at->loops = false;
-		}
+		reset_animation_state(at, entity_name, new_as, aps);
 	}
 	at->flip_horizontally = flip_horizontally;
 }
@@ -177,15 +182,8 @@ void change_animation_direction_8(Animation_Tracker* at, const std::string entit
 		Facing_Direction new_fd = get_facing_direction_8(velocity);
 		if (at->fd != new_fd) {
 			at->fd = new_fd;
-			at->entity_name = entity_name;
-			at->as = new_as;
 			at->selected_sprite_sheet = get_sprite_sheet_name_direction_8(at->entity_name, at->fd, new_as);
-			at->current_frame_index = 0;
-			// TODO: Change this to be apart of the csv file
-			at->aps = aps;
-			if (new_as == AS_Death) {
-				at->loops = false;
-			}
+			reset_animation_state(at, entity_name, new_as, aps);
 		}
 	}
 }

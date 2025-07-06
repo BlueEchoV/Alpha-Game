@@ -70,20 +70,20 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_North, 2);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
-	//		It’s how many "pixels" (samples) you capture per second to draw the sound.
+	//		Itï¿½s how many "pixels" (samples) you capture per second to draw the sound.
     int samples_per_second = 48000;
-	// This is like the "color depth" of each pixel—how much data each sound pixel holds. Here, 
-	//		it’s 4 bytes total (2 bytes per uint16_t × 2 channels).
+	// This is like the "color depth" of each pixelï¿½how much data each sound pixel holds. Here, 
+	//		itï¿½s 4 bytes total (2 bytes per uint16_t ï¿½ 2 channels).
     int bytes_per_sample = sizeof(int16_t) * 2;
-	// This is the "canvas size" or total number of pixels in your sound image. It’s like saying 
+	// This is the "canvas size" or total number of pixels in your sound image. Itï¿½s like saying 
 	//		your video frame buffer holds 2 seconds of pixels at 48,000 pixels per second.
     int secondary_buffer_size = 2 * samples_per_second * bytes_per_sample;
-	// This is like the "pattern frequency" in your image—how often a repeating design (like a stripe) 
-	//		appears. In sound, it’s the pitch of the note.
+	// This is like the "pattern frequency" in your imageï¿½how often a repeating design (like a stripe) 
+	//		appears. In sound, itï¿½s the pitch of the note.
 	int tone_hz = 256;
 	// This is the "width" of one repeating pattern (one cycle) in your sound image, measured in pixels (samples).
 	// int square_wave_period = samples_per_second / tone_hz;
-	// This is like the "brightness" or "intensity" of your pixel color—how vivid the sound pixel is.
+	// This is like the "brightness" or "intensity" of your pixel colorï¿½how vivid the sound pixel is.
 	int16_t tone_volume = 3000;
 	uint32_t running_sample_index = 0;
 	int wave_period = samples_per_second / tone_hz;
