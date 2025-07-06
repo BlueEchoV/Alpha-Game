@@ -80,8 +80,8 @@ Horde create_horde(Faction faction, Horde_Type ht, Spawn_Direction spawn_directi
 	return result;
 }
 
-void spawn_and_update_horde(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, Horde& horde, Player& player, 
-	Tile_Map& tile_map, float delta_time) {
+void spawn_and_update_horde(const std::string& unit_name, std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, 
+	Horde& horde, Player& player, Tile_Map& tile_map, float delta_time) {
 	if (horde.begin_spawning) {
 		if (horde.total_spawned < horde.total_to_spawn) {
 			if (check_and_update_cooldown(horde.spawning_cd, delta_time)) {
@@ -93,7 +93,7 @@ void spawn_and_update_horde(std::vector<Handle>& unit_handles, Storage<Unit>& un
 					log("Random Position: x = %f, y = %f", random_pos_ws.x, random_pos_ws.y);
 					spawn_unit(
 						horde.faction,
-						"hellhound",
+						unit_name,
 						AS_Walking,
 						unit_storage,
 						unit_handles,

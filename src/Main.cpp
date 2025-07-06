@@ -432,8 +432,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 			}
 
-			spawn_and_update_horde(game_data.enemy_unit_handles, game_data.unit_storage, game_data.current_horde, game_data.player,
-				demo_tile_map, delta_time);
+			spawn_and_update_horde("hellhound", game_data.enemy_unit_handles, game_data.unit_storage, 
+				game_data.current_horde, game_data.player, demo_tile_map, delta_time);
 		}
 
 		// Render

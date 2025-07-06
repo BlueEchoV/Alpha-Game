@@ -48,7 +48,6 @@ void draw_tile(std::string tile_type, Camera camera, int tile_index_x, int tile_
 	mp_render_copy(image->texture, NULL, &dst);
 }
 
-
 void draw_perlin_tile(Camera camera, int tile_index_x, int tile_index_y, float noise_frequency) {
 	std::string type = "IT_Rock_32x32";
 
