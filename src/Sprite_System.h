@@ -81,8 +81,5 @@ void change_animation_tracker(Animation_Tracker* at, std::string& entity_name_vi
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);
 
-// Just for drawing a 1x1 sprite sheet
-void draw_sprite_sheet_1x1();
-
 void load_sprite_sheets();
-void load_sprite_sheet_data_csv(CSV_Data* data);
+void load_sprite_sheet_data_csv(CSV_Data* data); 

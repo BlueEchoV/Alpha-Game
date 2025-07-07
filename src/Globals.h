@@ -13,6 +13,7 @@ namespace Globals {
 	extern int resolution_x;
 	extern int resolution_y;
 	extern bool toggle_debug_images;
+	extern bool toggle_debug_unit_images;
 	extern bool debug_show_coordinates;
 	extern bool debug_show_stats;
 	extern bool debug_show_colliders;

@@ -291,6 +291,76 @@ void debug_draw_stats(Font& font, MP_Texture* debug_texture) {
 	mp_set_texture_alpha_mod(debug_texture, 255);
 }
 
+void debug_draw_animation_trackers(Font& font, float delta_time) {
+	const int animation_play_speed = 300;
+
+	static std::vector<Animation_Tracker> trackers = {
+		create_animation_tracker(ATT_Direction_8, "hellhound", AS_Walking, true),
+		create_animation_tracker(ATT_Direction_8, "gravebound_peasant", AS_Walking, true),
+		create_animation_tracker(ATT_Direction_8, "ravenous_skulk", AS_Walking, true)
+	};
+
+	static bool first_pass = true;
+	if (first_pass) {
+		for (Animation_Tracker& at : trackers) {
+				first_pass = false;
+				// NOTE:																								Pointing South
+				change_animation_tracker(&at, at.entity_name, AS_Walking, APS_Speed_Based, false, { 0.0f, -1.0 });
+		}
+	}
+
+	for (Animation_Tracker& at : trackers) {
+		update_animation_tracker(&at, delta_time, animation_play_speed);
+	}
+
+	MP_Renderer* renderer = Globals::renderer;
+
+	int width = 150;
+	int height = 150;
+
+	int starting_x = 50;
+	int starting_y = renderer->window_height - (50 + height);
+
+	int offset_x = 20 + width;
+	int offset_y = -50 - height;
+
+	int images_per_row = 5;
+	int string_size = 1;
+
+	int num = (int)trackers.size();
+
+	std::vector<MP_Rect> background_rects(num);
+	int background_padding = 6;
+
+	mp_set_render_draw_color(0, 0, 0, 255);
+	for (int i = 0; i < num; ++i) {
+
+		int x = starting_x + (i % images_per_row) * offset_x;
+		int y = starting_y + (i / images_per_row) * offset_y;
+
+		background_rects[i].x = x - background_padding;
+		background_rects[i].y = y - background_padding;
+		background_rects[i].w = width  + background_padding * 2;
+		background_rects[i].h = height + background_padding * 2
+							  + font.char_height * (string_size + 1) + 5;
+	}
+
+	mp_render_fill_rects(background_rects.data(),
+						 static_cast<int>(background_rects.size()));
+	// First rows
+	for (int i = 0; i < trackers.size(); i++) {
+		int x = (starting_x + (i % images_per_row) * offset_x);
+		int y = starting_y + (i / images_per_row) * offset_y;
+		int title_x = x + width / 2;
+		int title_y = y + (font.char_height * (string_size - 1)) + (height) + (font.char_height * 2) / 2;
+
+		MP_Rect rect = { x, y, width, height };
+
+		draw_string(font, trackers[i].entity_name.c_str(), CT_White, true, title_x, title_y, string_size, true);
+		draw_animation_tracker(&trackers[i], rect, 0);
+	}
+}
+
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
 	if (Globals::toggle_debug_images) {
 		debug_draw_mp_renderer_visualizations(font, debug_texture, delta_time);
@@ -300,6 +370,9 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 	}
 	if (Globals::debug_show_stats) {
 		debug_draw_stats(font, debug_texture);
+	}
+	if (Globals::toggle_debug_unit_images) {
+		debug_draw_animation_trackers(font, delta_time);
 	}
 }
 

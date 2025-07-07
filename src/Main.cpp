@@ -351,15 +351,18 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 		}
 		if (key_pressed(VK_F2)) {
-			Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
+			Globals::toggle_debug_unit_images = !Globals::toggle_debug_unit_images;
 		}
 		if (key_pressed(VK_F3)) {
+			Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
+		}
+		if (key_pressed(VK_F4)) {
 			Globals::debug_show_stats = !Globals::debug_show_stats;
 		} 
-		if (key_pressed(VK_F4)) {
+		if (key_pressed(VK_F5)) {
 			Globals::debug_show_colliders = !Globals::debug_show_colliders;
 		}
-		if (key_pressed(VK_F5)) {
+		if (key_pressed(VK_F6)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 			if (Globals::debug_show_coordinates != Globals::toggle_debug_images) {
 				Globals::debug_show_coordinates = !Globals::debug_show_coordinates;

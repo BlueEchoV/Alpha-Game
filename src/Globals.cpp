@@ -9,6 +9,7 @@ namespace Globals {
 	int resolution_y = 900;
 
 	bool toggle_debug_images = false;
+	bool toggle_debug_unit_images = true;
 	bool debug_show_coordinates = false;
 	bool debug_show_stats = false;
 	bool debug_show_colliders = false;

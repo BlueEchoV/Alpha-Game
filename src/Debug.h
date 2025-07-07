@@ -1,6 +1,6 @@
 #pragma once
 #include "Utility.h"
-#include "Image.h"
+#include "Sprite_System.h"
 #include "Rigidbody.h"
 #include "Game_Data.h"
 
@@ -25,4 +25,5 @@ void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to
 void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb);
 void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture, float delta_time);
 void debug_draw_stats(Font& font, MP_Texture* debug_texture);
+void debug_draw_animation_trackers(Font& font, float delta_time);
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
