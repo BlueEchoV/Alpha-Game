@@ -1,12 +1,16 @@
 ﻿#include "Renderer.h" 
 #include "GL_Functions.h"
 
+#define STB_PERLIN_IMPLEMENTATION
+#include <perlin.h>
+
 #define GL_REPEAT                         0x2901
 #define GL_MIRRORED_REPEAT                0x8370
 
 enum SHADER_PROGRAM {
 	SP_2D_DRAW,
-	SP_2D_TEXTURE
+	SP_2D_TEXTURE,
+	SP_2D_TILE_MAP
 };
 
 GLuint create_shader(const char* file_path, GLenum gl_shader_type) {
@@ -81,6 +85,9 @@ void load_shaders() {
 
 	GLuint sp_2d_texture = create_shader_program("shaders\\vs_2d_texture.txt", "shaders\\fs_2d_texture.txt");
 	shader_programs[SP_2D_TEXTURE] = sp_2d_texture;
+
+	GLuint sp_2d_tile_map = create_shader_program("shaders\\vs_2d_tile_map.txt", "shaders\\fs_2d_tile_map.txt");
+	shader_programs[SP_2D_TILE_MAP] = sp_2d_tile_map;
 }
 
 HWND init_windows(HINSTANCE hInstance) {
@@ -492,6 +499,8 @@ MP_Renderer* mp_create_renderer(HINSTANCE hInstance) {
 	glEnableVertexAttribArray(1);  
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coor));
 	glEnableVertexAttribArray(2);  
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv_noise));
+	glEnableVertexAttribArray(3);
 
 	// For transparency in textures
 	glEnable(GL_BLEND);
@@ -742,6 +751,124 @@ void gl_set_blend_mode(MP_BlendMode blend_mode) {
     }
 }
 
+MP_Texture* create_noise_texture(int width, int height) {
+	MP_Texture* result = mp_create_texture(0, 0, width, height, false);
+
+	int err = mp_lock_texture(result, NULL, &result->pixels, &result->pitch);
+	if (err) {
+		mp_destroy_texture(result);
+		result = nullptr;
+		return result;
+	}
+
+	int channels = 4;
+	for (int x = 0; x < width; x++) {
+		for (int y = 0; y < height; y++) {
+			// Range [-1, 1]
+			float nx = x * Globals::noise_frequency;
+            float ny = y * Globals::noise_frequency;
+            float perlin = stb_perlin_noise3(nx, ny, 0.0f, 0, 0, 0);  // returns -1 to 1
+            float noise = (perlin + 1.0f) / 2.0f;                     // map to 0–1
+
+			// Current index of the pixel
+			int current_pixel = (y * (result->pitch / channels) + x) * channels;
+
+			unsigned char* data = (unsigned char*)result->pixels;
+			data[current_pixel + 0] = (unsigned char)(255.0f * noise); // Red
+			data[current_pixel + 1] = (unsigned char)(255.0f * noise); // Green
+			data[current_pixel + 2] = (unsigned char)(255.0f * noise); // Blue
+			data[current_pixel + 3] = (unsigned char)255;			   // Alpha
+		}
+	}
+
+	mp_unlock_texture(result);
+
+	return result;
+}
+
+// The width is also the height
+void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, int baked_perlin_width_and_height) {
+    MP_Renderer* renderer = Globals::renderer;
+
+	// The -1 for the range of -63 to 64. It counts 0 as a negative number
+    int start_tile_x = ((int)camera.pos_ws.x / Globals::tile_w) - 1;
+    int start_tile_y = ((int)camera.pos_ws.y / Globals::tile_h) - 1;
+    int end_tile_x = ((int)camera.pos_ws.x + camera.w) / Globals::tile_w;
+    int end_tile_y = ((int)camera.pos_ws.y + camera.h) / Globals::tile_h;
+
+    int index_start = (int)renderer->indices.size();
+
+    for (int tile_x = start_tile_x; tile_x <= end_tile_x; ++tile_x) {
+        for (int tile_y = start_tile_y; tile_y <= end_tile_y; ++tile_y) {
+            int ws_x = tile_x * Globals::tile_w;
+            int ws_y = tile_y * Globals::tile_h;
+            int cs_x = ws_x - (int)camera.pos_ws.x;
+            int cs_y = ws_y - (int)camera.pos_ws.y;
+
+            V2 bl = { (float)cs_x, (float)cs_y };
+            V2 br = { (float)cs_x + Globals::tile_w, (float)cs_y };
+            V2 tr = { (float)cs_x + Globals::tile_w, (float)cs_y + Globals::tile_h };
+            V2 tl = { (float)cs_x, (float)cs_y + Globals::tile_h };
+
+            Vertex v1 = {}, v2 = {}, v3 = {}, v4 = {};
+            v1.pos = mp_pixel_to_ndc((int)bl.x, (int)bl.y, renderer->window_width, renderer->window_height);
+            v2.pos = mp_pixel_to_ndc((int)br.x, (int)br.y, renderer->window_width, renderer->window_height);
+            v3.pos = mp_pixel_to_ndc((int)tr.x, (int)tr.y, renderer->window_width, renderer->window_height);
+            v4.pos = mp_pixel_to_ndc((int)tl.x, (int)tl.y, renderer->window_width, renderer->window_height);
+
+			MP_Rect src = {};
+			src.x = 0;
+			src.y = 0;
+			src.w = Globals::tile_w;
+			src.h = Globals::tile_h;
+
+			// All tiles are the same. Later, I could make a atlas with all the different tile types and blend them
+			// all together
+			v1.texture_coor = mp_pixel_to_uv(src.x		  , src.y		 , Globals::tile_w, Globals::tile_h); // Bottom left
+			v2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y		 , Globals::tile_w, Globals::tile_h); // Bottom right
+			v3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, Globals::tile_w, Globals::tile_h); // Top right
+			v4.texture_coor = mp_pixel_to_uv(src.x		  , src.y + src.h, Globals::tile_w, Globals::tile_h); // Top left
+
+			// Tell the GPU which exact patch of the 512 × 512 baked-Perlin image each tile should read from.
+			float inv_noise_size = 1.0f / 512.0f;
+
+			int offset = baked_perlin_width_and_height;
+			int ws_x_offset = ws_x + offset;
+			int ws_y_offset = ws_y + offset;
+
+			v1.uv_noise = { ws_x_offset * inv_noise_size, ws_y_offset * inv_noise_size };
+			v2.uv_noise = { (ws_x_offset + Globals::tile_w) * inv_noise_size, ws_y_offset * inv_noise_size };
+			v3.uv_noise = { (ws_x_offset + Globals::tile_w) * inv_noise_size, (ws_y_offset + Globals::tile_h) * inv_noise_size };
+			v4.uv_noise = { ws_x_offset * inv_noise_size, (ws_y_offset + Globals::tile_h) * inv_noise_size };
+
+            int v_start = (int)renderer->vertices.size();
+
+            renderer->vertices.push_back(v1);
+            renderer->vertices.push_back(v2);
+            renderer->vertices.push_back(v3);
+            renderer->vertices.push_back(v4);
+
+            renderer->indices.push_back(v_start + 0);
+            renderer->indices.push_back(v_start + 1);
+            renderer->indices.push_back(v_start + 2);
+            renderer->indices.push_back(v_start + 2);
+            renderer->indices.push_back(v_start + 3);
+            renderer->indices.push_back(v_start + 0);
+        }
+    }
+
+    // Create the packet
+    Packet p = {};
+    p.type = PT_SEEMLESS_PERLIN_MAP;
+	p.packet_tile_map.texture_1 = texture_1;
+	p.packet_tile_map.texture_2 = texture_2;
+	p.packet_tile_map.noise_texture = create_noise_texture(baked_perlin_width_and_height, baked_perlin_width_and_height);
+    p.packet_tile_map.indices_array_index = index_start;
+    p.packet_tile_map.indices_count = (int)(renderer->indices.size() - index_start);
+
+    renderer->packets.push_back(p);
+}
+
 void mp_render_present() {
 	MP_Renderer* renderer = Globals::renderer;
 
@@ -795,6 +922,34 @@ void mp_render_present() {
 			// NOTE: Clears the window to the color set by glClearColor. It refreshes the color buffer, 
 			//		 preparing it for new drawing.
 			glClear(GL_COLOR_BUFFER_BIT);
+		}
+		else if (packet.type == PT_SEEMLESS_PERLIN_MAP) {
+			GLuint shader = shader_programs[SP_2D_TILE_MAP];
+			glUseProgram(shader);
+
+			// --- Bind Textures ---
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, packet.packet_tile_map.texture_1->gl_handle);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, packet.packet_tile_map.texture_2->gl_handle);
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, packet.packet_tile_map.noise_texture->gl_handle);
+
+			// Send Texture Uniforms
+			glUniform1i(glGetUniformLocation(shader, "tex_1"), 0);
+			glUniform1i(glGetUniformLocation(shader, "tex_2"), 1);
+			glUniform1i(glGetUniformLocation(shader, "noise_tex"), 2);
+
+			// OPTIONAL: Send UV scaling uniform to control Perlin frequency ---
+			float noise_scale = 0.1f; // try different values like 2.0f, 8.0f, etc.
+			glUniform1f(glGetUniformLocation(shader, "u_noise_scale"), noise_scale);
+
+			int index = packet.packet_tile_map.indices_array_index;
+			int count = packet.packet_tile_map.indices_count;
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
+
 		} else {
 			log("Error: Packet type isn't specified");
 			assert(false);
@@ -889,8 +1044,8 @@ int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t a) {
 //		   SDL_TEXTUREACCESS_STATIC	   → glTexImage2D			(for rarely changing textures)
 //		   SDL_TEXTUREACCESS_STREAMING → glTexSubImage2D		(for frequently updated textures)
 //		   SDL_TEXTUREACCESS_TARGET    → glFramebufferTexture2D (for render targets)
-MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h) {
-	REF(format);
+MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h, bool use_linear_filtering /* default = false */) {
+	REF(format); // unused
 
 	MP_Texture* result = new MP_Texture();
 	result->w = w;
@@ -899,31 +1054,29 @@ MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h) {
 	result->pixels = NULL;
 	result->access = access;
 
-	// Default values
 	mp_set_texture_blend_mode(result, MP_BLENDMODE_BLEND);
 	mp_set_texture_color_mod(result, 255, 255, 255);
 	mp_set_texture_alpha_mod(result, 255);
 
 	glGenTextures(1, &result->gl_handle);  
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, result->gl_handle);
 
-	// Set the texture wrapping/filtering options (on the currently bound texture object)
+	// Default wrapping
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// NOTE: A common mistake is to set one of the mipmap filtering options as the magnification 
-	// filter. This doesn't have any effect since mipmaps are primarily used for when textures
-	// get downscaled: texture magnification doesn't use mipmaps and giving it a mipmap filtering
-	// option will generate an OpenGL GL_INVALID_ENUM error code.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// Allocate empty data now
+	// Filtering
+	GLint filter = use_linear_filtering ? GL_LINEAR : GL_NEAREST;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+
+	// Texture allocation (all paths do the same here)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 	return result;
 }
+
 
 void mp_destroy_texture(MP_Texture* texture) {
 	if (texture->gl_handle != 0) {
@@ -937,6 +1090,11 @@ void mp_destroy_texture(MP_Texture* texture) {
 	delete texture;
 }
 
+
+// SDL_Texture *	texture	the texture to lock for access, which was created with SDL_TEXTUREACCESS_STREAMING.
+// const SDL_Rect *	rect	an SDL_Rect structure representing the area to lock for access; NULL to lock the entire texture.
+// void **	pixels	this is filled in with a pointer to the locked pixels, appropriately offset by the locked area.
+// int *	pitch	this is filled in with the pitch of the locked pixels; the pitch is the length of one row in bytes.
 // NOTE: Allocates a buffer on the CPU side
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch) {
 	if (texture == NULL) {

@@ -1,6 +1,6 @@
 #include "Image.h"
 
-Image load_image(const char* file_path) {
+Image load_image(const char* file_path, int access, bool use_linear_filtering) {
 	Image result = {};
 
 	// Might be necessary for open gl, testing soon
@@ -37,7 +37,7 @@ Image load_image(const char* file_path) {
 	result.w = width;
 	result.h = height;
 
-	result.texture = mp_create_texture(0, 0, result.w, result.h);
+	result.texture = mp_create_texture(0, access, result.w, result.h, use_linear_filtering);
 
 	void* pixels;
 	int pitch;
@@ -48,6 +48,10 @@ Image load_image(const char* file_path) {
 	mp_unlock_texture(result.texture);
 	
 	return result;
+}
+
+Image load_image(const char* file_path) {
+	return load_image(file_path, 0, false);
 }
 
 Font load_font(const char* file_path) {
@@ -82,7 +86,7 @@ Font load_font(const char* file_path) {
 	result.char_width = result.image.w / 18;
 	result.char_height = result.image.h / 7;
 
-	MP_Texture* temp = mp_create_texture(0, 0, width, height);
+	MP_Texture* temp = mp_create_texture(0, 0, width, height, false);
 
 	mp_set_texture_blend_mode(temp, MP_BLENDMODE_BLEND);
 
@@ -125,14 +129,15 @@ void load_images() {
 	images["IT_Top_Down_Player_Demo"] = load_image("assets\\top_down_player_demo.png");
 	images["IT_Arrow_1"] = load_image("assets\\arrow_1.png");
 	images["IT_Dummy_Tile_32x32"] = load_image("assets\\dummy_tile_32x32.png");
-	images["IT_Rock_32x32"] = load_image("assets\\rock_32x32.png");
-	images["IT_Grass_32x32"] = load_image("assets\\grass_32x32.png");
 	images["IT_Water_32x32"] = load_image("assets\\water_32x32.png");
 	images["temp_zombie_walk"] = load_image("assets\\temp_zombie_walk.png");
 	images["idle_temp_zombie"] = load_image("assets\\idle_temp_zombie.png");
 	images["tree"] = load_image("assets\\tree.png");
 	images["rock"] = load_image("assets\\rock.png");
 	images["bush"] = load_image("assets\\bush.png");
+
+	images["IT_Rock_32x32"] = load_image("assets\\rock_32x32.png", 0, true);
+	images["IT_Grass_32x32"] = load_image("assets\\grass_32x32.png", 0, true);
 }
 
 Image* get_image(std::string_view image_name) {

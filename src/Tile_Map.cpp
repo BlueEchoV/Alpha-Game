@@ -1,6 +1,5 @@
 #include "Tile_Map.h"
 
-#define STB_PERLIN_IMPLEMENTATION
 #include <perlin.h>
 
 V2 get_tile_pos_ws(int tile_index_x, int tile_index_y) {

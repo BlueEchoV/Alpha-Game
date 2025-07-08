@@ -1,0 +1,14 @@
+#version 330 core
+
+layout(location = 0) in vec3 v_pos;
+layout(location = 2) in vec2 v_uv;   	// the UV I just computed on the CPU
+layout(location = 3) in vec2 v_uv_noise;
+
+out vec2 f_uv; 
+out vec2 f_uv_noise;
+
+void main() {
+    gl_Position = vec4(v_pos, 1.0);
+    f_uv = v_uv;                      			// hand off to the fragment shader
+	f_uv_noise = v_uv_noise;         	// continuous across map
+}

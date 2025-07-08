@@ -5,6 +5,14 @@
 #include <unordered_map>
 #include <stdint.h>
 
+struct Camera {
+	V2 pos_ws;
+	int w, h;
+};
+
+Camera create_camera(V2 player_pos_ws);
+void update_camera(Camera& camera, V2 player_pos);
+
 typedef unsigned int GLuint;
 
 typedef enum MP_TextureAccess
@@ -65,7 +73,15 @@ struct MP_Texture {
 enum PACKET_TYPE {
 	PT_DRAW,
 	PT_TEXTURE,
-	PT_CLEAR
+	PT_CLEAR,
+	PT_SEEMLESS_PERLIN_MAP
+};
+
+struct Tile_Map {
+	int w;
+	int h;
+	// The world spawn position of the boundaries
+	int left_ws, top_ws, right_ws, bottom_ws;
 };
 
 struct Packet_Draw {
@@ -85,12 +101,21 @@ struct Packet_Clear {
 	Color_4F clear_color;
 };
 
+struct Packet_Tile_Map {
+	MP_Texture* texture_1; // Base Texture
+	MP_Texture* texture_2; // Blend Texture
+	MP_Texture* noise_texture;
+	int indices_array_index;
+	int indices_count;
+};
+
 struct Packet {
 	PACKET_TYPE type;
 
 	Packet_Draw packet_draw;
 	Packet_Texture packet_texture;
 	Packet_Clear packet_clear;
+	Packet_Tile_Map packet_tile_map;
 };
 
 struct Open_GL {
@@ -107,6 +132,8 @@ struct Vertex {
 	V3 pos;
 	Color_4F color;
 	V2 texture_coor;
+	// Tile Maps
+	V2 uv_noise;
 };
 
 struct Font;
@@ -152,7 +179,7 @@ void mp_set_texture_color_mod(MP_Texture* texture, Color_Type c);
 int mp_set_texture_alpha_mod(MP_Texture* texture, uint8_t alpha);
 int mp_get_texture_alpha_mod(MP_Texture* texture, uint8_t* alpha);
 
-MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h);
+MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h, bool use_linear_filtering /* default = false */);
 void mp_destroy_texture(MP_Texture* texture);
 void mp_render_copy(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect);
 int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
@@ -164,6 +191,8 @@ void mp_unlock_texture(MP_Texture* texture);
 void mp_render_set_viewport(const MP_Rect* rect);
 
 uint64_t mp_get_ticks_64();
+
+void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, int baked_perlin_width_and_height);
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);

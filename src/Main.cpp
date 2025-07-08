@@ -462,15 +462,23 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Camera camera = game_data.camera;
 
-		draw_entire_map(camera, demo_tile_map);
+		//IT_Rock_32x32
+		//IT_Grass_32x32
+
+		// draw_entire_map(camera, demo_tile_map);
+		
+		std::string grass_texture_name = "IT_Grass_32x32";
+		std::string rock_texture_name = "IT_Rock_32x32";
+
+		MP_Texture* grass_texture = get_image(grass_texture_name)->texture;
+		MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
+
+		mp_draw_tilemap_region(camera, grass_texture, rock_texture, 512);
 
 		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
-
-		Font* font = get_font(game_data.selected_font);
-		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);
 
 		for (Handle projectile: game_data.projectile_handles) {
 			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
@@ -507,9 +515,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		draw_player(game_data.player, game_data.camera.pos_ws);
 
+		Font* font = get_font(game_data.selected_font);
 		if (game_data.player.dead) {
 			draw_string(*font, "Game Over", CT_Red_Wine, true, Globals::resolution_x / 2,  Globals::resolution_y / 2, 5, true);
 		}
+
+		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);
 
 		mp_render_present();
 

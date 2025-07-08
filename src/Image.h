@@ -49,6 +49,7 @@ enum Font_Type {
 };
 
 Image load_image(const char* file_path);
+Image load_image(const char* file_path, int access, bool use_linear_filtering);
 
 extern std::unordered_map<std::string , Image> images;
 void load_images();

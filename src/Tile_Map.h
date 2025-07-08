@@ -15,13 +15,6 @@ struct Tile {
 	std::string texture_name;
 };
 
-struct Tile_Map {
-	int w;
-	int h;
-	// The world spawn position of the boundaries
-	int left_ws, top_ws, right_ws, bottom_ws;
-};
-
 V2 get_tile_pos_ws(int tile_index_x, int tile_index_y);
 V2 get_tile_pos_index(V2 pos_ws);
 // By default, the centers of the map are 0,0
