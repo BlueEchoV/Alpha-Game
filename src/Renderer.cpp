@@ -751,39 +751,46 @@ void gl_set_blend_mode(MP_BlendMode blend_mode) {
     }
 }
 
-MP_Texture* create_noise_texture(int width, int height) {
-	MP_Texture* result = mp_create_texture(0, 0, width, height, false);
+MP_Texture* create_noise_texture(int baked_perlin_width_and_height) {
+    int width = baked_perlin_width_and_height;
+    int height = baked_perlin_width_and_height;
 
-	int err = mp_lock_texture(result, NULL, &result->pixels, &result->pitch);
-	if (err) {
-		mp_destroy_texture(result);
-		result = nullptr;
-		return result;
-	}
+    MP_Texture* result = mp_create_texture(0, 0, width, height, false);
 
-	int channels = 4;
-	for (int x = 0; x < width; x++) {
-		for (int y = 0; y < height; y++) {
-			// Range [-1, 1]
-			float nx = x * Globals::noise_frequency;
-            float ny = y * Globals::noise_frequency;
-            float perlin = stb_perlin_noise3(nx, ny, 0.0f, 0, 0, 0);  // returns -1 to 1
-            float noise = (perlin + 1.0f) / 2.0f;                     // map to 0–1
+    int err = mp_lock_texture(result, NULL, &result->pixels, &result->pitch);
+    if (err) {
+        mp_destroy_texture(result);
+        return nullptr;
+    }
 
-			// Current index of the pixel
-			int current_pixel = (y * (result->pitch / channels) + x) * channels;
+    int channels = 4;
+    int wrap_period = 4;  // Number of noise periods across the texture (adjustable)
+    float temp_frequency = (float)wrap_period * 6;  // Scale coordinates to match wrap period
 
-			unsigned char* data = (unsigned char*)result->pixels;
-			data[current_pixel + 0] = (unsigned char)(255.0f * noise); // Red
-			data[current_pixel + 1] = (unsigned char)(255.0f * noise); // Green
-			data[current_pixel + 2] = (unsigned char)(255.0f * noise); // Blue
-			data[current_pixel + 3] = (unsigned char)255;			   // Alpha
-		}
-	}
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            float nx = (float)x / (float)width * temp_frequency;
+            float ny = (float)y / (float)height * temp_frequency;
+            float perlin = stb_perlin_noise3(nx, ny, 0.0f, wrap_period, wrap_period, 0);
+            float noise = (perlin + 1.0f) / 2.0f;  // Map [-1,1] to [0,1]
 
-	mp_unlock_texture(result);
+            int current_pixel = (y * (result->pitch / channels) + x) * channels;
+            unsigned char* data = (unsigned char*)result->pixels;
+            data[current_pixel + 0] = (unsigned char)(255.0f * noise); // R
+            data[current_pixel + 1] = (unsigned char)(255.0f * noise); // G
+            data[current_pixel + 2] = (unsigned char)(255.0f * noise); // B
+            data[current_pixel + 3] = 255;                             // A
+        }
+    }
 
-	return result;
+    mp_unlock_texture(result);
+
+    // Explicitly set texture wrapping to GL_REPEAT
+    glBindTexture(GL_TEXTURE_2D, result->gl_handle);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    return result;
 }
 
 // The width is also the height
@@ -832,7 +839,7 @@ void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* t
 			// Tell the GPU which exact patch of the 512 × 512 baked-Perlin image each tile should read from.
 			float inv_noise_size = 1.0f / 512.0f;
 
-			int offset = baked_perlin_width_and_height;
+			int offset = 0;
 			int ws_x_offset = ws_x + offset;
 			int ws_y_offset = ws_y + offset;
 
@@ -862,7 +869,7 @@ void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* t
     p.type = PT_SEEMLESS_PERLIN_MAP;
 	p.packet_tile_map.texture_1 = texture_1;
 	p.packet_tile_map.texture_2 = texture_2;
-	p.packet_tile_map.noise_texture = create_noise_texture(baked_perlin_width_and_height, baked_perlin_width_and_height);
+	p.packet_tile_map.noise_texture = create_noise_texture(baked_perlin_width_and_height);
     p.packet_tile_map.indices_array_index = index_start;
     p.packet_tile_map.indices_count = (int)(renderer->indices.size() - index_start);
 

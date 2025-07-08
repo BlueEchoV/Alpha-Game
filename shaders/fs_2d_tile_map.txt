@@ -13,7 +13,7 @@ void main() {
     vec4 texture_2  = texture(tex_2 , f_uv);   // “  ”
 
     float n    = texture(noise_tex, f_uv_noise * u_noise_scale).r;
-    float w    = smoothstep(0.3, 0.6, n);
+    float w    = smoothstep(0.4, 0.5, n);
 
     f_final_color = mix(texture_2, texture_1, w);          // pixel-wise blend
 }
