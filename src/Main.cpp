@@ -169,7 +169,16 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
+	MP_Texture* noise_texture = create_noise_texture(512);
 	Tile_Map demo_tile_map = create_tile_map(64, 64);
+
+	MP_Renderer* renderer = Globals::renderer;
+
+	MP_Rect viewport = { 0, 0, Globals::playground_area_w, Globals::playground_area_h };
+	mp_render_set_viewport(&viewport);
+
+	renderer->window_width= Globals::playground_area_w;
+	renderer->window_height = Globals::playground_area_h;
 
 	while (Globals::running) {
 		reset_is_pressed();
@@ -443,22 +452,23 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		// TODO: Move everything into here at some point
 		// render(game_data, delta_time);
-		MP_Renderer* renderer = Globals::renderer;
 
-		int window_width = 0;
-		int window_height = 0;
-		get_window_size(renderer->open_gl.window_handle, window_width, window_height);
-		MP_Rect viewport = { 0, 0, window_width, window_height};
-		mp_render_set_viewport(&viewport);
-
-		renderer->window_width= window_width;
-		renderer->window_height = window_height;
 
 		update_camera(game_data.camera, game_data.player.rb.pos_ws);
 
-		mp_set_render_draw_color(155, 155, 155, 255);
+		mp_set_render_draw_color(0, 0, 0, 255);
 
 		mp_render_clear();
+
+		if (Globals::viewport_needs_update) {
+			// renderer->window_width = Globals::entire_window_width;
+			// renderer->window_height = Globals::entire_window_height;
+
+			viewport = { 0, 0, Globals::client_area_w, Globals::client_area_h};
+			mp_render_set_viewport(&viewport);
+
+			Globals::viewport_needs_update = false;
+		}
 
 		Camera camera = game_data.camera;
 
@@ -473,7 +483,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		MP_Texture* grass_texture = get_image(grass_texture_name)->texture;
 		MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
 
-		mp_draw_tilemap_region(camera, grass_texture, rock_texture, 512);
+		mp_draw_tilemap_region(camera, grass_texture, rock_texture, noise_texture);
 
 		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);
 
@@ -517,7 +527,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Font* font = get_font(game_data.selected_font);
 		if (game_data.player.dead) {
-			draw_string(*font, "Game Over", CT_Red_Wine, true, Globals::resolution_x / 2,  Globals::resolution_y / 2, 5, true);
+			draw_string(*font, "Game Over", CT_Red_Wine, true, Globals::playground_area_w / 2,  Globals::playground_area_h / 2, 5, true);
 		}
 
 		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);

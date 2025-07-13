@@ -74,20 +74,15 @@ LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
 		break;
 	}
 	case WM_SIZE: {
-		switch (wparam) {
-		case SIZE_RESTORED:
-			// The window has been resized, but neither the 
-			break;
-		case SIZE_MINIMIZED:
-			// Handle when the window is minimized
-			break;
-		case SIZE_MAXIMIZED:
-			// Handle when the window is maximized
-			break;
-		default:
-			break;
+		// SIZE_MINIMIZED is for when the application is minimized 
+		// to the taskbar
+		// lparam contains the size of the new area. Only update 
+		// if it is greater than 0.
+		if (wparam != SIZE_MINIMIZED && HIWORD(lparam) > 0) {
+			Globals::client_area_w = LOWORD(lparam);
+			Globals::client_area_h = HIWORD(lparam);
+			Globals::viewport_needs_update = true;
 		}
-		break;
 	}
 	case WM_ACTIVATEAPP: {
 		OutputDebugStringA("WM_ACTIVATEAPP\n");

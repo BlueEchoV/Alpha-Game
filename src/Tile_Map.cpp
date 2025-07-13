@@ -78,7 +78,7 @@ void draw_perlin_tile(Camera camera, int tile_index_x, int tile_index_y, float n
 
 void draw_perlin_tile_map(Camera& camera, Tile_Map& tile_map) {
 	// Clear the background to black
-	MP_Rect rect = {0, 0, Globals::resolution_x, Globals::resolution_y };
+	MP_Rect rect = {0, 0, Globals::playground_area_w, Globals::playground_area_h};
 	mp_set_render_draw_color(CT_Black);
 	mp_render_fill_rect(&rect);
 
@@ -161,7 +161,7 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
 	// draw_perlin_tile_map(camera, tile_map);
 
 	// Clear the background to black
-	MP_Rect rect = {0, 0, Globals::resolution_x, Globals::resolution_y };
+	MP_Rect rect = {0, 0, Globals::playground_area_w, Globals::playground_area_h};
 	mp_set_render_draw_color(CT_Black);
 	mp_render_fill_rect(&rect);
 

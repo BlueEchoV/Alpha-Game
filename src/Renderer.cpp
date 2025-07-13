@@ -107,15 +107,21 @@ HWND init_windows(HINSTANCE hInstance) {
 			wnd_class.lpszClassName,	
 			"Alpha Game",
 			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-			200, // Where on my screen it is drawn
-			100, // ^^^^
-			Globals::resolution_x,
-			Globals::resolution_y,
+			CW_USEDEFAULT, // Where on my screen it is drawn
+			CW_USEDEFAULT, // ^^^^
+			Globals::entire_window_w,
+			Globals::entire_window_h,
 			0,
 			0,
 			hInstance,
 			0);
 	}
+
+	// Only set once
+	get_window_size(window_handle, Globals::playground_area_w, Globals::playground_area_h);
+
+	get_window_size(window_handle, Globals::client_area_w, Globals::client_area_h);
+	Globals::playground_area_target_aspect_ratio = (float)Globals::playground_area_w / (float)Globals::playground_area_h;
 
 	return window_handle;
 }
@@ -384,7 +390,27 @@ int mp_set_render_draw_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 }
 
 void mp_render_set_viewport(const MP_Rect* rect) {
-	glViewport(rect->x, rect->y, rect->w, rect->h);
+	// The current, updated aspect ratio
+    float win_aspect = (float)rect->w / rect->h;
+
+	MP_Rect viewport = {};
+	// Letterboxing
+	if (win_aspect > Globals::playground_area_target_aspect_ratio) {
+		// Window is wider than target: pad left/right
+		viewport.h = rect->h;
+		viewport.w = (int)((float)rect->h * Globals::playground_area_target_aspect_ratio);
+		viewport.x = (rect->w - viewport.w) / 2;
+		viewport.y = 0;
+	}
+	else {
+		// Window is taller than target: pad top/bottom
+		viewport.w = rect->w;
+		viewport.h = (int)((float)rect->w / Globals::playground_area_target_aspect_ratio);
+		viewport.x = 0;
+		viewport.y = (rect->h - viewport.h) / 2;
+	}
+
+    glViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 }
 
 Color_RGBA get_color_type(Color_Type c) {
@@ -765,7 +791,7 @@ MP_Texture* create_noise_texture(int baked_perlin_width_and_height) {
 
     int channels = 4;
     int wrap_period = 4;  // Number of noise periods across the texture (adjustable)
-    float temp_frequency = (float)wrap_period * 6;  // Scale coordinates to match wrap period
+    float temp_frequency = (float)wrap_period * 4;  // Scale coordinates to match wrap period
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
@@ -776,6 +802,10 @@ MP_Texture* create_noise_texture(int baked_perlin_width_and_height) {
 
             int current_pixel = (y * (result->pitch / channels) + x) * channels;
             unsigned char* data = (unsigned char*)result->pixels;
+			// This could be completely unnecessary though, because the perlin map is just 
+			// a grey scale. Maybe I could save memory by just using one byte of memory to 
+			// represent the color.:w
+
             data[current_pixel + 0] = (unsigned char)(255.0f * noise); // R
             data[current_pixel + 1] = (unsigned char)(255.0f * noise); // G
             data[current_pixel + 2] = (unsigned char)(255.0f * noise); // B
@@ -794,7 +824,7 @@ MP_Texture* create_noise_texture(int baked_perlin_width_and_height) {
 }
 
 // The width is also the height
-void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, int baked_perlin_width_and_height) {
+void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture) {
     MP_Renderer* renderer = Globals::renderer;
 
 	// The -1 for the range of -63 to 64. It counts 0 as a negative number
@@ -869,7 +899,7 @@ void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* t
     p.type = PT_SEEMLESS_PERLIN_MAP;
 	p.packet_tile_map.texture_1 = texture_1;
 	p.packet_tile_map.texture_2 = texture_2;
-	p.packet_tile_map.noise_texture = create_noise_texture(baked_perlin_width_and_height);
+	p.packet_tile_map.noise_texture = noise_texture;
     p.packet_tile_map.indices_array_index = index_start;
     p.packet_tile_map.indices_count = (int)(renderer->indices.size() - index_start);
 

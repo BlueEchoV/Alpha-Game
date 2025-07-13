@@ -3,11 +3,11 @@
 // Camera's position is relative to the player
 void update_camera(Camera& camera, V2 player_pos) {
 	// The camera is offset from the player
-	camera.pos_ws.x = (player_pos.x - (Globals::resolution_x / 2.0f));
-	camera.pos_ws.y = (player_pos.y - (Globals::resolution_y / 2.0f));
+	camera.pos_ws.x = (player_pos.x - (Globals::playground_area_w / 2.0f));
+	camera.pos_ws.y = (player_pos.y - (Globals::playground_area_h / 2.0f));
 
-	camera.w = Globals::resolution_x;
-	camera.h = Globals::resolution_y;
+	camera.w = Globals::playground_area_w;
+	camera.h = Globals::playground_area_h;
 }
 
 // NOTE: The camera is based off the player, and the player is draw relative to the camera.

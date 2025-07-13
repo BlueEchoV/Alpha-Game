@@ -258,7 +258,7 @@ void debug_draw_coordinates(Game_Data& game_data) {
 	// The mouse position is already in camera space
 	debug_draw_coor(game_data, mouse, false, mouse, false, CT_Green, true, "Mouse: ");
 	debug_draw_coor(game_data, game_data.player.rb.pos_ws, false, 
-		{(float)Globals::resolution_x / 2, (float)Globals::resolution_y / 2}, false,
+		{(float)Globals::playground_area_w / 2, (float)Globals::playground_area_h / 2}, false,
 		CT_Green, true, "Player WS Pos: ");
 }
 
@@ -267,8 +267,8 @@ void debug_draw_stats(Font& font, MP_Texture* debug_texture) {
 	int stats_border_padding = 50;
 	int stats_w = 300;
 	int stats_h = 600;
-	int stats_rect_x = Globals::resolution_x - (stats_w + stats_border_padding);
-	int stats_rect_y = Globals::resolution_y - (stats_h + stats_border_padding);
+	int stats_rect_x = Globals::playground_area_w - (stats_w + stats_border_padding);
+	int stats_rect_y = Globals::playground_area_h - (stats_h + stats_border_padding);
 	MP_Rect stats_rect = {stats_rect_x, stats_rect_y, stats_w, stats_h};
 	mp_set_render_draw_color(CT_Black);
 	mp_render_fill_rect(&stats_rect);

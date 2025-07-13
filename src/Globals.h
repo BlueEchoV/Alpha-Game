@@ -10,8 +10,21 @@ namespace Globals {
 
 	extern bool running;
 
-	extern int resolution_x;
-	extern int resolution_y;
+	// NOTE: This size INCLUDES the header bar of the window. The white bar 
+	// that contains the name of the game, the close X button, the minimize,
+	// etc.
+	extern int entire_window_w;
+	extern int entire_window_h;
+
+	extern int client_area_w;
+	extern int client_area_h;
+	// Actual game area. Never change this.
+	extern int playground_area_w;
+	extern int playground_area_h;
+	// For calculating the viewport
+	extern float playground_area_target_aspect_ratio;
+	extern bool viewport_needs_update;
+
 	extern bool toggle_debug_images;
 	extern bool toggle_debug_unit_images;
 	extern bool debug_show_coordinates;

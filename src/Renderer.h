@@ -148,6 +148,12 @@ struct MP_Renderer {
 	std::vector<Vertex> vertices;
 	std::vector<int> indices;
 
+	// NOTE: This value should NOT change 
+	// when the viewport it set. This is the 
+	// drawable region. Changing this would 
+	// change the playground area.
+	// NOTE: The total number of pixels my program
+	// has available for drawing.
 	int window_width;
 	int window_height;
 
@@ -192,7 +198,8 @@ void mp_render_set_viewport(const MP_Rect* rect);
 
 uint64_t mp_get_ticks_64();
 
-void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, int baked_perlin_width_and_height);
+MP_Texture* create_noise_texture(int baked_perlin_width_and_height);
+void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture);
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);

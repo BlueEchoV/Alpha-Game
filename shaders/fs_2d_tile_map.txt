@@ -3,17 +3,17 @@ in vec2 f_uv;
 in vec2 f_uv_noise;
 out vec4 f_final_color;
 
-uniform sampler2D tex_1;   // 32×32 grass image
-uniform sampler2D tex_2;    // 32×32 rock image
-uniform sampler2D noise_tex;    // 512×512 grayscale noise
-uniform float     u_noise_scale;   // zoom factor, e.g. 0.04
+uniform sampler2D tex_1; // 32×32 grass image
+uniform sampler2D tex_2; // 32×32 rock image
+uniform sampler2D noise_tex; // 512×512 grayscale noise
+uniform float u_noise_scale;
 
 void main() {
-    vec4 texture_1 = texture(tex_1, f_uv);   // sample full image
-    vec4 texture_2  = texture(tex_2 , f_uv);   // “  ”
+    vec4 texture_1 = texture(tex_1, f_uv); 
+    vec4 texture_2  = texture(tex_2 , f_uv);  
 
     float n    = texture(noise_tex, f_uv_noise * u_noise_scale).r;
-    float w    = smoothstep(0.4, 0.5, n);
+    float w    = smoothstep(0.4, 0.6, n);
 
-    f_final_color = mix(texture_2, texture_1, w);          // pixel-wise blend
+    f_final_color = mix(texture_2, texture_1, w); // pixel-wise blend
 }
