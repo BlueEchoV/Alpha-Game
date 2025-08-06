@@ -254,7 +254,7 @@ void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture
 
 void debug_draw_coordinates(Game_Data& game_data) {
 	MP_Renderer* renderer = Globals::renderer;
-	V2 mouse = get_mouse_position(renderer->open_gl.window_handle);
+	V2 mouse = get_viewport_mouse_position(renderer->open_gl.window_handle);
 	// The mouse position is already in camera space
 	debug_draw_coor(game_data, mouse, false, mouse, false, CT_Green, true, "Mouse: ");
 	debug_draw_coor(game_data, game_data.player.rb.pos_ws, false, 
@@ -367,6 +367,9 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 	}
 	if (Globals::debug_show_coordinates) {
 		debug_draw_coordinates(game_data);
+		V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
+		V2 player_cs_pos = convert_ws_to_cs(game_data.player.rb.pos_ws, game_data.camera.pos_ws);
+		mp_render_draw_line(player_cs_pos.x, player_cs_pos.y, mouse_cs_pos.x, mouse_cs_pos.y);
 	}
 	if (Globals::debug_show_stats) {
 		debug_draw_stats(font, debug_texture);

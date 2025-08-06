@@ -195,6 +195,7 @@ int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int
 void mp_unlock_texture(MP_Texture* texture);
 
 void mp_render_set_viewport(const MP_Rect* rect);
+V2 get_viewport_mouse_position(HWND hwnd);
 
 uint64_t mp_get_ticks_64();
 

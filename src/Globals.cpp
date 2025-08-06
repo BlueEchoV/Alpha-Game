@@ -5,7 +5,7 @@ namespace Globals {
 	
 	extern bool running = true;
 
-	// NOTE: THIS DETERMINS THE PLAYGROUND AREA
+	// NOTE: THIS DETERMINES THE PLAYGROUND AREA
 	extern int entire_window_w = 1600;
 	extern int entire_window_h = 900;
 
@@ -16,6 +16,13 @@ namespace Globals {
 	extern int playground_area_h = 0;
 	extern float playground_area_target_aspect_ratio = 0.0f;
 	extern bool viewport_needs_update = false;
+
+	extern int active_viewport_x = 0;
+	extern int active_viewport_y = 0;
+	extern int active_viewport_h = 0;
+	extern int active_viewport_w = 0;
+	extern float active_viewport_scale_x = 0;
+	extern float active_viewport_scale_y = 0;
 
 	bool toggle_debug_images = false;
 	bool toggle_debug_unit_images = true;

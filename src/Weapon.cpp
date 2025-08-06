@@ -49,7 +49,7 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 	case F_Player: {
 		if (this->can_fire) {
 			// Change this to fire weapon
-			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+			V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, camera.pos_ws);
 			spawn_projectile(projectile_handles, projectile_storage, this->projectile_name, this->damage, spawn_pos_ws, mouse_ws_pos);
 			Globals::debug_total_arrows++;

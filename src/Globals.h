@@ -3,7 +3,6 @@
 // struct MP_Renderer;
 
 struct MP_Renderer;
-
 namespace Globals {
 	// POTENTIAL RACE CONDITION IN MULTITHREADING
 	extern MP_Renderer* renderer;
@@ -24,6 +23,13 @@ namespace Globals {
 	// For calculating the viewport
 	extern float playground_area_target_aspect_ratio;
 	extern bool viewport_needs_update;
+
+	extern int active_viewport_x;
+	extern int active_viewport_y;
+	extern int active_viewport_h;
+	extern int active_viewport_w;
+	extern float active_viewport_scale_x;
+	extern float active_viewport_scale_y;
 
 	extern bool toggle_debug_images;
 	extern bool toggle_debug_unit_images;

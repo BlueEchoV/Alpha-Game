@@ -213,7 +213,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		float player_y_delta = 0.0f;
 
 		if (!player->dead) {
-			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+			V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
 			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, &player->torso.flip_horizontally, vel_normalized);
