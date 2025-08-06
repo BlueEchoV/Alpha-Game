@@ -63,7 +63,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.selected_font = FT_Basic;
 
-	game_data.player = create_player("player_1", { 0.0f, 0.0f });
+	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
 	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
@@ -213,45 +213,42 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		float player_y_delta = 0.0f;
 
 		if (!player->dead) {
+			V2 mouse_cs_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
+			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
+			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, &player->torso.flip_horizontally, vel_normalized);
+
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = 1.0f;
 			}
 			if (key_pressed_and_held(KEY_W)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = 1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = -1.0f;
 			}
 			if (key_pressed_and_held(KEY_S)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, &player->at.flip_horizontally, { 0.0, 0.0 });
 				player_y_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, true, { 0.0, 0.0 });
 				player_x_delta = -2.0f;
 			}
 			else if (key_pressed_and_held(KEY_A)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, true, { 0.0, 0.0 });
 				player_x_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Running, APS_Speed_Based, false, { 0.0, 0.0 });
 				player_x_delta = 2.0f;
 			}
 			else if (key_pressed_and_held(KEY_D)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Walking, APS_Speed_Based, false, { 0.0, 0.0 });
 				player_x_delta = 1.0f;
 			}
 
 			if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
 				!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
-				change_animation_tracker(&player->at, player->at.entity_name, AS_Idle, APS_Fast, false, { 0.0, 0.0 });
+				// change_animation_tracker(&player->torso, player->torso.entity_name, AS_Idle, APS_Fast, false, { 0.0, 0.0 });
 			}
 
 			if (player->weapon == nullptr) {
@@ -271,7 +268,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			player->weapon->update_weapon(delta_time);
-			update_animation_tracker(&player->at, delta_time, (float)player->rb.current_speed);
+			update_animation_tracker(&player->torso, delta_time, (float)player->rb.current_speed);
 		}
 
 		if (key_pressed(KEY_3)) {

@@ -17,7 +17,9 @@ struct Player {
 
 	Faction faction = F_Player;
 	std::string character_name;
-	Animation_Tracker at;
+
+	Animation_Tracker torso;
+	Animation_Tracker legs;
 
 	Rigid_Body rb;
 	Health_Bar health_bar;
@@ -32,3 +34,6 @@ struct Player {
 
 Player create_player(std::string_view character_name, V2 spawn_pos_ws);
 void draw_player(Player& p, V2 camera_ws_pos);
+
+// Torso - All 16 degrees
+// Legs - NW N NE  
