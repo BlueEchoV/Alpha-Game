@@ -125,13 +125,16 @@ float convert_radians_to_degrees(float radians) {
 	return radians * (180.0f / (float)M_PI);
 }
 
-V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin) {
+V2 calculate_origin_to_target_velocity(V2 target, V2 origin) {
 	V2 result = {};
 
 	result = target - origin;
-	result = normalize(result);
 
 	return result;
+}
+
+V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin) {
+	return normalize(calculate_origin_to_target_velocity(target, origin));
 }
 
 float calculate_facing_direction(V2 vec) {

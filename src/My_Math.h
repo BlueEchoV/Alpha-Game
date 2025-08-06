@@ -31,6 +31,7 @@ void clamp(float& clamp_value, float min, float max);
 float convert_degrees_to_radians(float degrees);
 float convert_radians_to_degrees(float radians);
 
+V2 calculate_origin_to_target_velocity(V2 target, V2 origin);
 V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin);
 float calculate_facing_direction(V2 vec);
 float calculate_distance_between(V2 vec_1, V2 vec_2);
