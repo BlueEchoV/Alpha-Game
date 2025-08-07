@@ -60,10 +60,10 @@ struct Sprite_Sheet {
 enum Animation_Tracker_Type {
 	ATT_Direction_2,
 	ATT_Direction_8,
+	ATT_Direction_8_Legs,
 	// For Player
 	ATT_Direction_16,
-	ATT_Direction_16_Torso,
-	ATT_Direction_16_Legs
+	ATT_Direction_16_Torso
 };
 
 struct Animation_Tracker {

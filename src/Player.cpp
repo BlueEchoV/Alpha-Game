@@ -27,6 +27,7 @@ Player create_player(std::string_view character_name, V2 spawn_pos_ws) {
 
 	// NOTE: AS_Idle is the default starting animation for the player
 	result.torso = create_animation_tracker(ATT_Direction_16_Torso, character_name, AS_Walking, true);
+	result.legs = create_animation_tracker(ATT_Direction_8_Legs, character_name, AS_Walking, true);
 
 	result.w = data.h;
 	result.h = data.w;
@@ -60,6 +61,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	V2 p_pos_cs = convert_ws_to_cs({ (float)p_draw_rect.x, (float)p_draw_rect.y }, camera_ws_pos);
 	p_draw_rect.x = (int)p_pos_cs.x; 
 	p_draw_rect.y = (int)p_pos_cs.y; 
+	draw_animation_tracker(&p.legs, p_draw_rect, 0);
 	draw_animation_tracker(&p.torso, p_draw_rect, 0);
 
 	V2 health_bar_cs_pos = p.rb.pos_ws;

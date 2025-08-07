@@ -124,6 +124,10 @@ std::string get_torso_facing_direction_sprite_sheet_name(std::string& entity_nam
 	return get_facing_direction_sprite_sheet_name(entity_name, fd, as) + "_torso";
 }
 
+std::string get_legs_facing_direction_sprite_sheet_name(std::string& entity_name, Facing_Direction fd, Animation_State as) {
+	return get_facing_direction_sprite_sheet_name(entity_name, fd, as) + "_legs";
+}
+
 Facing_Direction get_facing_direction_8(V2 vec) {
 	float angle = calculate_facing_direction(vec);
 
@@ -232,6 +236,20 @@ void change_animation_direction(Animation_Tracker* at, const std::string& entity
 		}
 		break;
 	}
+	case ATT_Direction_8_Legs: {
+		if (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y 
+			|| at->as != new_as 
+			|| entity_name != at->entity_name) {
+			at->last_velocity = velocity;
+			Facing_Direction new_fd = get_facing_direction_8(velocity);
+			if (at->fd != new_fd) {
+				at->fd = new_fd;
+				at->selected_sprite_sheet = get_legs_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
+				reset_animation_state(at, entity_name, new_as, aps);
+			}
+		}
+		break;
+	}
 	case ATT_Direction_16: {
 		if (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y 
 			|| at->as != new_as 
@@ -255,20 +273,6 @@ void change_animation_direction(Animation_Tracker* at, const std::string& entity
 			if (at->fd != new_fd) {
 				at->fd = new_fd;
 				at->selected_sprite_sheet = get_torso_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
-				reset_animation_state(at, entity_name, new_as, aps);
-			}
-		}
-		break;
-	}
-	case ATT_Direction_16_Legs: {
-		if (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y 
-			|| at->as != new_as 
-			|| entity_name != at->entity_name) {
-			at->last_velocity = velocity;
-			Facing_Direction new_fd = get_facing_direction_16(velocity);
-			if (at->fd != new_fd) {
-				at->fd = new_fd;
-				at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
 				reset_animation_state(at, entity_name, new_as, aps);
 			}
 		}

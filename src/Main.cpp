@@ -218,6 +218,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
 			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, &player->torso.flip_horizontally, vel_normalized);
 
+			change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, &player->legs.flip_horizontally, vel_normalized);
+
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
 				player_y_delta = 1.0f;
 			}
@@ -269,6 +271,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			player->weapon->update_weapon(delta_time);
 			update_animation_tracker(&player->torso, delta_time, (float)player->rb.current_speed);
+			update_animation_tracker(&player->legs, delta_time, (float)player->rb.current_speed);
 		}
 
 		if (key_pressed(KEY_3)) {
