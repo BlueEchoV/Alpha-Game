@@ -25,6 +25,7 @@ enum Facing_Direction {
 enum Animation_State {
 	AS_Idle,
 	AS_Walking,
+	AS_Walking_Forward,
 	AS_Walking_Backward,
 	AS_Running,
 	AS_Attacking,

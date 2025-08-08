@@ -256,12 +256,32 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				player_x_delta = 1.0f;
 			}
 
+			// Compute movement direction
+			V2 move_delta = {player_x_delta, player_y_delta};
+			float move_magnitude = sqrt(move_delta.x * move_delta.x + move_delta.y * move_delta.y);
+			V2 move_dir = {0.0f, 0.0f};
+			if (move_magnitude > 0.0f) {
+				move_dir.x = move_delta.x / move_magnitude;
+				move_dir.y = move_delta.y / move_magnitude;
+			}
+
+			// Determine if movement opposes aiming
+			float dot_product = vel_normalized.x * move_dir.x + vel_normalized.y * move_dir.y;
+			const float opposition_threshold = -0.5f;  // Adjust based on testing (e.g., -0.7 for stricter opposition)
+
+			// Select legs animation state and mode
+			Animation_State legs_state = AS_Walking_Forward;  // Default to forward
+			Animation_Mode legs_mode = AM_Static_First_Frame;  // Default for idle
+
 			if (player_moving) {
-				change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->legs.flip_horizontally, vel_normalized);
+				legs_mode = AM_Animate_Looping;
+				if (dot_product < opposition_threshold) {
+					legs_state = AS_Walking_Backward;
+				}
 			}
-			else {
-				change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, AM_Static_First_Frame, &player->legs.flip_horizontally, vel_normalized);
-			}
+
+			// Apply to legs, using aiming direction for facing consistency
+			change_animation_tracker(&player->legs, player->legs.entity_name, legs_state, APS_Speed_Based, legs_mode, &player->legs.flip_horizontally, vel_normalized);
 
 			if (player->weapon == nullptr) {
 				equip_weapon(player->weapon, "bow");

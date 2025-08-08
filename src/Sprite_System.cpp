@@ -50,12 +50,14 @@ Sprite_Sheet* get_sprite_sheet(std::string name) {
 
 std::string get_sprite_sheet_name(const std::string_view entity_name, Animation_State as) {
 	switch (as) {
-	case AS_Idle:			return std::string(entity_name) + "_idle";
-	case AS_Walking:		return std::string(entity_name) + "_walking";
-	case AS_Running:		return std::string(entity_name) + "_running";
-	case AS_Attacking:		return std::string(entity_name) + "_attacking";
-	case AS_Death:			return std::string(entity_name) + "_death";
-	case AS_No_Animation:	return std::string(entity_name);
+	case AS_Idle:				return std::string(entity_name) + "_idle";
+	case AS_Walking:			return std::string(entity_name) + "_walking";
+	case AS_Walking_Forward:	return std::string(entity_name) + "_walking_forward";
+	case AS_Walking_Backward:	return std::string(entity_name) + "_walking_backward";
+	case AS_Running:			return std::string(entity_name) + "_running";
+	case AS_Attacking:			return std::string(entity_name) + "_attacking";
+	case AS_Death:				return std::string(entity_name) + "_death";
+	case AS_No_Animation:		return std::string(entity_name);
 	default: 
 		return "dummy_image";
 	}
@@ -71,6 +73,14 @@ std::string get_facing_direction_sprite_sheet_name(const std::string& entity_nam
 	}
 	case AS_Walking: {
 		result = entity_name + "_walking";
+		break;
+	}
+	case AS_Walking_Forward: {
+		result = entity_name + "_walking_forward";
+		break;
+	}
+	case AS_Walking_Backward: {
+		result = entity_name + "_walking_backward";
 		break;
 	}
 	case AS_Running: {
