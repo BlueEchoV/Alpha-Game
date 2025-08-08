@@ -218,39 +218,49 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
 			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->torso.flip_horizontally, vel_normalized);
 
-			change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, AM_Static_First_Frame, &player->legs.flip_horizontally, vel_normalized);
+			bool player_moving = false;
 
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
+				player_moving = true;
 				player_y_delta = 1.0f;
 			}
 			if (key_pressed_and_held(KEY_W)) {
+				player_moving = true;
 				player_y_delta = 1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
+				player_moving = true;
 				player_y_delta = -1.0f;
 			}
 			if (key_pressed_and_held(KEY_S)) {
+				player_moving = true;
 				player_y_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
+				player_moving = true;
 				player_x_delta = -2.0f;
 			}
 			else if (key_pressed_and_held(KEY_A)) {
+				player_moving = true;
 				player_x_delta = -1.0f;
 			}
 
 			if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
+				player_moving = true;
 				player_x_delta = 2.0f;
 			}
 			else if (key_pressed_and_held(KEY_D)) {
+				player_moving = true;
 				player_x_delta = 1.0f;
 			}
 
-			if (!key_pressed_and_held(KEY_A) && !key_pressed_and_held(KEY_D) &&
-				!key_pressed_and_held(KEY_W) && !key_pressed_and_held(KEY_S)) {
-				// change_animation_tracker(&player->torso, player->torso.entity_name, AS_Idle, APS_Fast, false, { 0.0, 0.0 });
+			if (player_moving) {
+				change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->legs.flip_horizontally, vel_normalized);
+			}
+			else {
+				change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, AM_Static_First_Frame, &player->legs.flip_horizontally, vel_normalized);
 			}
 
 			if (player->weapon == nullptr) {

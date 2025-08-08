@@ -269,7 +269,7 @@ void change_animation_tracker(Animation_Tracker* at, const std::string& entity_n
     }
 
     // Reset state if any change occurred.
-    if (state_changed || velocity_changed || new_fd != at->fd) {
+    if (state_changed || new_fd != at->fd) {
 		at->entity_name = entity_name;
 		at->as = new_as;
 		at->current_frame_index = 0;
