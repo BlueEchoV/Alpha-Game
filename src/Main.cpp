@@ -216,9 +216,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
-			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, &player->torso.flip_horizontally, vel_normalized);
+			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->torso.flip_horizontally, vel_normalized);
 
-			change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, &player->legs.flip_horizontally, vel_normalized);
+			change_animation_tracker(&player->legs, player->legs.entity_name, AS_Walking, APS_Speed_Based, AM_Static_First_Frame, &player->legs.flip_horizontally, vel_normalized);
 
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
 				player_y_delta = 1.0f;
@@ -290,6 +290,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					F_Enemies,
 					"hellhound",
 					AS_Walking,
+					APS_Speed_Based,
+					AM_Animate_Looping,
 					game_data.unit_storage,
 					game_data.enemy_unit_handles,
 					&game_data.player,
@@ -400,7 +402,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					update_unit(*unit, delta_time);
 				}
 
-				change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, false, unit->rb.vel);
+				change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, AM_Animate_Looping,false, unit->rb.vel);
 				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
@@ -513,7 +515,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				continue;
 			}
 			if (u->dead) {
-				change_animation_tracker(&u->at, u->at.entity_name, AS_Death, u->at.aps, u->at.flip_horizontally, { 0.0f, 0.0f });
+				change_animation_tracker(&u->at, u->at.entity_name, AS_Death, u->at.aps, AM_Animate_Once, u->at.flip_horizontally, std::nullopt);
 			}
 
 			draw_unit(*u, game_data.camera.pos_ws);

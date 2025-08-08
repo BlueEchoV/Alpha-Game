@@ -95,6 +95,8 @@ void spawn_and_update_horde(const std::string& unit_name, std::vector<Handle>& u
 						horde.faction,
 						unit_name,
 						AS_Walking,
+						APS_Speed_Based,
+						AM_Animate_Looping,
 						unit_storage,
 						unit_handles,
 						&player,

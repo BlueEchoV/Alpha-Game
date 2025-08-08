@@ -26,8 +26,8 @@ Player create_player(std::string_view character_name, V2 spawn_pos_ws) {
 	Player_Data data = get_player_data(character_name);
 
 	// NOTE: AS_Idle is the default starting animation for the player
-	result.torso = create_animation_tracker(ATT_Direction_16_Torso, character_name, AS_Walking, true);
-	result.legs = create_animation_tracker(ATT_Direction_8_Legs, character_name, AS_Walking, true);
+	result.torso = create_animation_tracker(ATT_Direction_16_Torso, character_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, true);
+	result.legs = create_animation_tracker(ATT_Direction_8_Legs, character_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, true);
 
 	result.w = data.h;
 	result.h = data.w;

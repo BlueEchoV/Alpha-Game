@@ -15,8 +15,8 @@ Unit_Data* get_unit_data(std::string unit_type) {
 	return &bad_unit_data;
 }
 
-void spawn_unit(Faction faction, std::string_view unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles, 
-	Player* target, V2 spawn_pos) {
+void spawn_unit(Faction faction, std::string_view unit_name, Animation_State starting_as, Animation_Play_Speed starting_aps, Animation_Mode starting_am, 
+	Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
 	Unit result = {};
 
 	result.faction = faction;
@@ -29,8 +29,7 @@ void spawn_unit(Faction faction, std::string_view unit_name, Animation_State as,
 		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
 		data->h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
 	);
-	result.at = create_animation_tracker(ATT_Direction_8, unit_name, as, true);
-	change_animation_tracker(&result.at, result.at.entity_name, result.at.as, APS_Fast, false, result.rb.vel);
+	result.at = create_animation_tracker(ATT_Direction_8, unit_name, starting_as, starting_aps, starting_am, true);
 	result.rb = create_rigid_body(spawn_pos, data->speed);
 
 	result.w = data->w;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Image.h"
+#include <optional>  // For std::optional<V2>
 
 enum Facing_Direction {
 	FD_N,   // 0
@@ -21,13 +22,6 @@ enum Facing_Direction {
 	FD_NONE // Optional
 };
 
-enum Animation_Play_Speed {
-	APS_Slow,
-	APS_Fast,
-	APS_Speed_Based,
-	APS_No_Animation
-};
-
 enum Animation_State {
 	AS_Idle,
 	AS_Walking,
@@ -36,6 +30,20 @@ enum Animation_State {
 	AS_Attacking,
 	AS_Death,
 	AS_No_Animation
+};
+
+enum Animation_Play_Speed {
+	APS_Slow,
+	APS_Fast,
+	APS_Speed_Based,
+	APS_No_Animation
+};
+
+enum Animation_Mode {
+    AM_Animate_Looping,
+    AM_Animate_Once,
+    AM_Static_First_Frame,
+    AM_No_Animation
 };
 
 struct Sprite {
@@ -74,6 +82,7 @@ struct Animation_Tracker {
 	std::string selected_sprite_sheet;
 
 	Animation_State as;
+	Animation_Mode mode;
 	Animation_Play_Speed aps;
 	Facing_Direction fd; 
 	bool flip_horizontally = false;
@@ -87,9 +96,11 @@ extern std::unordered_map<std::string, Sprite_Sheet> sprite_sheet_map;
 Sprite_Sheet* get_sprite_sheet(std::string name);
 Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows, int columns);
 
-Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string_view entity_name, Animation_State starting_as, bool loops);
-void change_animation_tracker(Animation_Tracker* at, std::string& entity_name_view, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity);
+Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string_view entity_name,
+	Animation_State starting_as, Animation_Play_Speed starting_aps, Animation_Mode starting_mode, bool loops);
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based);
+void change_animation_tracker(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, Animation_Mode mode,
+	bool flip_horizontally, std::optional<V2> velocity_opt);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);
 
 void load_sprite_sheets();

@@ -295,17 +295,17 @@ void debug_draw_animation_trackers(Font& font, float delta_time) {
 	const int animation_play_speed = 300;
 
 	static std::vector<Animation_Tracker> trackers = {
-		create_animation_tracker(ATT_Direction_8, "hellhound", AS_Walking, true),
-		create_animation_tracker(ATT_Direction_8, "gravebound_peasant", AS_Walking, true),
-		create_animation_tracker(ATT_Direction_8, "ravenous_skulk", AS_Walking, true)
+		create_animation_tracker(ATT_Direction_8, "hellhound", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
+		create_animation_tracker(ATT_Direction_8, "gravebound_peasant", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
+		create_animation_tracker(ATT_Direction_8, "ravenous_skulk", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true)
 	};
 
 	static bool first_pass = true;
 	if (first_pass) {
 		for (Animation_Tracker& at : trackers) {
 				first_pass = false;
-				// NOTE:																								Pointing South
-				change_animation_tracker(&at, at.entity_name, AS_Walking, APS_Speed_Based, false, { 0.0f, -1.0 });
+				V2 pointing_south = {0.0f, -1.0f};
+				change_animation_tracker(&at, at.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, pointing_south);
 		}
 	}
 

@@ -46,8 +46,8 @@ struct Unit {
 	Handle handle;
 };
 
-void spawn_unit(Faction faction, std::string_view unit_name, Animation_State as, Storage<Unit>& storage, std::vector<Handle>& handles,
-	Player* target, V2 spawn_pos);
+void spawn_unit(Faction faction, std::string_view unit_name, Animation_State starting_as, Animation_Play_Speed starting_aps, Animation_Mode starting_am,
+	Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 

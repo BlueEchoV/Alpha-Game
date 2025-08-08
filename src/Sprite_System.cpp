@@ -61,7 +61,7 @@ std::string get_sprite_sheet_name(const std::string_view entity_name, Animation_
 	}
 }
 
-std::string get_facing_direction_sprite_sheet_name(std::string& entity_name, Facing_Direction fd, Animation_State as) {
+std::string get_facing_direction_sprite_sheet_name(const std::string& entity_name, Facing_Direction fd, Animation_State as) {
 	std::string result = {};
 
 	switch (as) {
@@ -120,11 +120,11 @@ std::string get_facing_direction_sprite_sheet_name(std::string& entity_name, Fac
 	return result;
 }
 
-std::string get_torso_facing_direction_sprite_sheet_name(std::string& entity_name, Facing_Direction fd, Animation_State as) {
+std::string get_torso_facing_direction_sprite_sheet_name(const std::string& entity_name, Facing_Direction fd, Animation_State as) {
 	return get_facing_direction_sprite_sheet_name(entity_name, fd, as) + "_torso";
 }
 
-std::string get_legs_facing_direction_sprite_sheet_name(std::string& entity_name, Facing_Direction fd, Animation_State as) {
+std::string get_legs_facing_direction_sprite_sheet_name(const std::string& entity_name, Facing_Direction fd, Animation_State as) {
 	return get_facing_direction_sprite_sheet_name(entity_name, fd, as) + "_legs";
 }
 
@@ -200,112 +200,97 @@ Facing_Direction get_facing_direction_16(V2 vec) {
 	return result;
 }
 
-void reset_animation_state(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps) {
-	at->entity_name = entity_name;
-	at->as = new_as;
-	at->current_frame_index = 0;
-	// TODO: Change this to be apart of the csv file
-	at->aps = aps;
-	if (new_as == AS_Death) {
-		at->loops = false;
-	}
-}
-
-bool check_animation_tracker_state(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as) {
-	if (at->as != new_as || 
-		entity_name != at->entity_name) {
+bool has_animation_state_changed(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Mode new_mode) {
+	if (entity_name != at->entity_name ||
+		at->as != new_as || 
+		at->mode != new_mode) {
 		return true;
 	}
 	return false;
 }
 
-bool check_animation_tracker_state(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, V2 velocity) {
-	if (check_animation_tracker_state(at, entity_name, new_as), 
-		velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y) {
-		return true;
-	}
-	return false;
+// Core function; refactored to reduce duplication.
+void change_animation_tracker(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, Animation_Mode mode, 
+	bool flip_horizontally, std::optional<V2> velocity_opt) {
+    if (!at) {
+        log("Error: Null Animation_Tracker provided.");
+        return;
+    }
+
+    bool state_changed = has_animation_state_changed(at, entity_name, new_as, mode);
+    V2 velocity = velocity_opt.value_or(V2{0.0f, 0.0f}); 
+
+    bool velocity_changed = (velocity_opt && (velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y));
+    if (!state_changed && !velocity_changed) {
+        return;  
+    }
+
+    // Update velocity if provided.
+    if (velocity_opt) {
+        at->last_velocity = velocity;
+    }
+
+    // Compute new facing direction based on type.
+    Facing_Direction new_fd = at->fd;  // Default to current.
+    switch (at->att) {
+        case ATT_Direction_2:
+            at->flip_horizontally = flip_horizontally;
+            at->selected_sprite_sheet = get_sprite_sheet_name(entity_name, new_as);
+            break;
+
+        case ATT_Direction_8:
+            new_fd = get_facing_direction_8(velocity);
+            at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
+            break;
+
+        case ATT_Direction_8_Legs:
+            new_fd = get_facing_direction_8(velocity);
+            at->selected_sprite_sheet = get_legs_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
+            break;
+
+        case ATT_Direction_16:
+            new_fd = get_facing_direction_16(velocity);
+            at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
+            break;
+
+        case ATT_Direction_16_Torso:
+            new_fd = get_facing_direction_16(velocity);
+            at->selected_sprite_sheet = get_torso_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
+            break;
+
+        default:
+            log("Error: Unhandled Animation_Tracker_Type in update_animation_direction.");
+            return;
+    }
+
+    // Update facing direction if changed.
+    if (new_fd != at->fd) {
+        at->fd = new_fd;
+    }
+
+    // Reset state if any change occurred.
+    if (state_changed || velocity_changed || new_fd != at->fd) {
+		at->entity_name = entity_name;
+		at->as = new_as;
+		at->current_frame_index = 0;
+		// TODO: Change this to be apart of the csv file
+		at->aps = aps;
+		at->mode = mode;
+		if (new_as == AS_Death) {
+			at->loops = false;
+		}
+    }
 }
 
-// Set velocity to NULL if not using
-void change_animation_direction(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity ) {
-	switch (at->att) {
-	case ATT_Direction_2: {
-		if (check_animation_tracker_state(at, entity_name, new_as)) {
-			at->selected_sprite_sheet = get_sprite_sheet_name(at->entity_name, new_as);
-			reset_animation_state(at, entity_name, new_as, aps);
-		}
-		at->flip_horizontally = flip_horizontally;
-		break;
-	}
-	case ATT_Direction_8: {
-		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
-			at->last_velocity = velocity;
-			Facing_Direction new_fd = get_facing_direction_8(velocity);
-			if (at->fd != new_fd) {
-				at->fd = new_fd;
-				at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
-				reset_animation_state(at, entity_name, new_as, aps);
-			}
-		}
-		break;
-	}
-	case ATT_Direction_8_Legs: {
-		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
-			at->last_velocity = velocity;
-			Facing_Direction new_fd = get_facing_direction_8(velocity);
-			if (at->fd != new_fd) {
-				at->fd = new_fd;
-				at->selected_sprite_sheet = get_legs_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
-				reset_animation_state(at, entity_name, new_as, aps);
-			}
-		}
-		break;
-	}
-	case ATT_Direction_16: {
-		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
-			at->last_velocity = velocity;
-			Facing_Direction new_fd = get_facing_direction_16(velocity);
-			if (at->fd != new_fd) {
-				at->fd = new_fd;
-				at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
-				reset_animation_state(at, entity_name, new_as, aps);
-			}
-		}
-		break;
-	}
-	case ATT_Direction_16_Torso: {
-		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
-			at->last_velocity = velocity;
-			Facing_Direction new_fd = get_facing_direction_16(velocity);
-			if (at->fd != new_fd) {
-				at->fd = new_fd;
-				at->selected_sprite_sheet = get_torso_facing_direction_sprite_sheet_name(at->entity_name, at->fd, new_as);
-				reset_animation_state(at, entity_name, new_as, aps);
-			}
-		}
-		break;
-	}
-	default: {
-		log("Error: Animation Tracker Type not specified. See change_animation_direction function");
-		return;
-	}
-	}
-
-}
-
-// This may be obsolete
-void change_animation_tracker(Animation_Tracker* at, std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, bool flip_horizontally, V2 velocity) {
-	// Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, V2 velocity, bool flip_horizontally) {
-	change_animation_direction(at, entity_name, new_as, aps, flip_horizontally, velocity);
-}
-
-Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string_view entity_name, Animation_State starting_as, bool loops) {
+Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::string_view entity_name, 
+	Animation_State starting_as, Animation_Play_Speed starting_aps, Animation_Mode starting_mode, bool loops) {
 	Animation_Tracker result = {};
 
 	result.att = att;
 	result.entity_name = std::string(entity_name);
 	result.as = starting_as;
+	result.aps = starting_aps;
+	result.mode = starting_mode;
 	result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
 	result.current_frame_index = 0;
 	result.current_frame_time = 0.0f;
@@ -315,48 +300,51 @@ Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::stri
 }
 
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based) {
-	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
+    Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
+    size_t frame_count = ss->sprites.size();
 
-	size_t frame_count = ss->sprites.size();
+    // Early exit for no animation or single-frame sheets
+    if (at->mode == AM_No_Animation || frame_count <= 1) {
+        at->current_frame_index = 0;  // Or keep current index if pausing is desired
+        return;
+    }
 
-	// Only update if there is more than 1 image present
-	if (frame_count > 1) {
-		if (0.0f >= at->current_frame_time) {
-			switch (at->aps) {
-			case APS_Slow: {
-				at->current_frame_time = 1.0f / Globals::slow_frames_per_sec;
-				break;
-			}
-			case APS_Fast: {
-				at->current_frame_time = 1.0f / Globals::fast_frames_per_sec;
-				break;
-			}
-			case APS_Speed_Based: {
-				// Speed Based
-				at->current_frame_time = 1.0f / (speed_based / 25.0f);
-				break;
-			}
-			default: {
-				// 1 is enough to recognize there is a bug
-				at->current_frame_time = 1.0f;
-			}
-			}
+    if (at->mode == AM_Static_First_Frame) {
+        at->current_frame_index = 0;
+        return;  // No timer updates needed
+    }
 
-			int index = at->current_frame_index;
-			if (at->loops == true) {
-				// Increment to next frame
-				at->current_frame_index = (index + 1) % frame_count;
-			}
-			else {
-				if (at->current_frame_index < frame_count - 1) {
-					at->current_frame_index++;
-				}
-			}
-		}
-		else {
-			at->current_frame_time -= delta_time;
-		}
-	}
+    // Handle animating modes
+    if (at->current_frame_time <= 0.0f) {
+        // Set frame time based on speed
+        switch (at->aps) {
+            case APS_Slow:
+                at->current_frame_time = 1.0f / Globals::slow_frames_per_sec;
+                break;
+            case APS_Fast:
+                at->current_frame_time = 1.0f / Globals::fast_frames_per_sec;
+                break;
+            case APS_Speed_Based:
+                at->current_frame_time = 1.0f / (speed_based / 25.0f);
+                break;
+            default:
+                at->current_frame_time = 1.0f;  // Fallback
+        }
+
+        // Advance frame
+        if (at->mode == AM_Animate_Looping) {
+            at->current_frame_index = (at->current_frame_index + 1) % frame_count;
+        } else if (at->mode == AM_Animate_Once) {
+            if (at->current_frame_index < frame_count - 1) {
+                at->current_frame_index++;
+            } else {
+                // Optionally transition to static or another mode
+                at->mode = AM_Static_First_Frame;
+            }
+        }
+    } else {
+        at->current_frame_time -= delta_time;
+    }
 }
 
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
