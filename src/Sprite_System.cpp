@@ -219,7 +219,7 @@ bool check_animation_tracker_state(Animation_Tracker* at, const std::string& ent
 	return false;
 }
 
-bool check_animation_tracker_state_velocity(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, V2 velocity) {
+bool check_animation_tracker_state(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, V2 velocity) {
 	if (check_animation_tracker_state(at, entity_name, new_as), 
 		velocity.x != at->last_velocity.x || velocity.y != at->last_velocity.y) {
 		return true;
@@ -239,7 +239,7 @@ void change_animation_direction(Animation_Tracker* at, const std::string& entity
 		break;
 	}
 	case ATT_Direction_8: {
-		if (check_animation_tracker_state_velocity(at, entity_name, new_as, velocity)) {
+		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
 			at->last_velocity = velocity;
 			Facing_Direction new_fd = get_facing_direction_8(velocity);
 			if (at->fd != new_fd) {
@@ -251,7 +251,7 @@ void change_animation_direction(Animation_Tracker* at, const std::string& entity
 		break;
 	}
 	case ATT_Direction_8_Legs: {
-		if (check_animation_tracker_state_velocity(at, entity_name, new_as, velocity)) {
+		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
 			at->last_velocity = velocity;
 			Facing_Direction new_fd = get_facing_direction_8(velocity);
 			if (at->fd != new_fd) {
@@ -263,7 +263,7 @@ void change_animation_direction(Animation_Tracker* at, const std::string& entity
 		break;
 	}
 	case ATT_Direction_16: {
-		if (check_animation_tracker_state_velocity(at, entity_name, new_as, velocity)) {
+		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
 			at->last_velocity = velocity;
 			Facing_Direction new_fd = get_facing_direction_16(velocity);
 			if (at->fd != new_fd) {
@@ -275,7 +275,7 @@ void change_animation_direction(Animation_Tracker* at, const std::string& entity
 		break;
 	}
 	case ATT_Direction_16_Torso: {
-		if (check_animation_tracker_state_velocity(at, entity_name, new_as, velocity)) {
+		if (check_animation_tracker_state(at, entity_name, new_as, velocity)) {
 			at->last_velocity = velocity;
 			Facing_Direction new_fd = get_facing_direction_16(velocity);
 			if (at->fd != new_fd) {
