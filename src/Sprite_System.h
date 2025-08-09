@@ -26,7 +26,6 @@ enum Animation_State {
 	AS_Idle,
 	AS_Walking,
 	AS_Walking_Forward,
-	AS_Walking_Backward,
 	AS_Running,
 	AS_Attacking,
 	AS_Death,
@@ -42,6 +41,7 @@ enum Animation_Play_Speed {
 
 enum Animation_Mode {
     AM_Animate_Looping,
+    AM_Animate_Looping_Reversed,
     AM_Animate_Once,
     AM_Static_First_Frame,
     AM_No_Animation

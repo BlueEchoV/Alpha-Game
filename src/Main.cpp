@@ -267,7 +267,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			// Determine if movement opposes aiming
 			float dot_product = vel_normalized.x * move_dir.x + vel_normalized.y * move_dir.y;
-			const float opposition_threshold = -0.5f;  // Adjust based on testing (e.g., -0.7 for stricter opposition)
+			// Dot product is between a range of 1 to -1. 1 is facing same direction. 0 is perpendicular. -1 is opposite to eachother.
+			const float opposition_threshold = -0.1f; 
 
 			// Select legs animation state and mode
 			Animation_State legs_state = AS_Walking_Forward;  // Default to forward
@@ -276,7 +277,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (player_moving) {
 				legs_mode = AM_Animate_Looping;
 				if (dot_product < opposition_threshold) {
-					legs_state = AS_Walking_Backward;
+					// Move backwards by looping backwards
+					legs_mode = AM_Animate_Looping_Reversed;
 				}
 			}
 

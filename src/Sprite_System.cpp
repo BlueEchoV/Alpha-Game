@@ -53,7 +53,6 @@ std::string get_sprite_sheet_name(const std::string_view entity_name, Animation_
 	case AS_Idle:				return std::string(entity_name) + "_idle";
 	case AS_Walking:			return std::string(entity_name) + "_walking";
 	case AS_Walking_Forward:	return std::string(entity_name) + "_walking_forward";
-	case AS_Walking_Backward:	return std::string(entity_name) + "_walking_backward";
 	case AS_Running:			return std::string(entity_name) + "_running";
 	case AS_Attacking:			return std::string(entity_name) + "_attacking";
 	case AS_Death:				return std::string(entity_name) + "_death";
@@ -77,10 +76,6 @@ std::string get_facing_direction_sprite_sheet_name(const std::string& entity_nam
 	}
 	case AS_Walking_Forward: {
 		result = entity_name + "_walking_forward";
-		break;
-	}
-	case AS_Walking_Backward: {
-		result = entity_name + "_walking_backward";
 		break;
 	}
 	case AS_Running: {
@@ -134,8 +129,8 @@ std::string get_torso_facing_direction_sprite_sheet_name(const std::string& enti
 	return get_facing_direction_sprite_sheet_name(entity_name, fd, as) + "_torso";
 }
 
-std::string get_legs_facing_direction_sprite_sheet_name(const std::string& entity_name, Facing_Direction fd, Animation_State as) {
-	return get_facing_direction_sprite_sheet_name(entity_name, fd, as) + "_legs";
+std::string get_legs_facing_direction_sprite_sheet_name(const std::string& entity_name, Facing_Direction fd_torso/*, V2 legs_moving_direction*/, Animation_State as) {
+	return get_facing_direction_sprite_sheet_name(entity_name, fd_torso, as) + "_legs";
 }
 
 Facing_Direction get_facing_direction_8(V2 vec) {
@@ -267,7 +262,6 @@ void change_animation_tracker(Animation_Tracker* at, const std::string& entity_n
             new_fd = get_facing_direction_16(velocity);
             at->selected_sprite_sheet = get_torso_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
             break;
-
         default:
             log("Error: Unhandled Animation_Tracker_Type in update_animation_direction.");
             return;
@@ -342,8 +336,10 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
         }
 
         // Advance frame
-        if (at->mode == AM_Animate_Looping) {
-            at->current_frame_index = (at->current_frame_index + 1) % frame_count;
+		if (at->mode == AM_Animate_Looping) {
+			at->current_frame_index = (at->current_frame_index + 1) % frame_count;
+		} else if (at->mode == AM_Animate_Looping_Reversed) {
+            at->current_frame_index = at->current_frame_index = (at->current_frame_index == 0 ? (int)frame_count - 1 : at->current_frame_index - 1) % (int)frame_count;
         } else if (at->mode == AM_Animate_Once) {
             if (at->current_frame_index < frame_count - 1) {
                 at->current_frame_index++;
