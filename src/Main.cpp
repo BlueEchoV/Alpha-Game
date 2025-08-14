@@ -219,7 +219,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->torso.flip_horizontally, vel_normalized);
 
 			bool player_moving = false;
-
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
 				player_moving = true;
 				player_y_delta = 1.0f;
@@ -228,7 +227,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				player_moving = true;
 				player_y_delta = 1.0f;
 			}
-
 			if (key_pressed_and_held(KEY_S) && key_pressed_and_held(VK_SHIFT)) {
 				player_moving = true;
 				player_y_delta = -1.0f;
@@ -237,7 +235,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				player_moving = true;
 				player_y_delta = -1.0f;
 			}
-
 			if (key_pressed_and_held(KEY_A) && key_pressed_and_held(VK_SHIFT)) {
 				player_moving = true;
 				player_x_delta = -2.0f;
@@ -246,7 +243,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				player_moving = true;
 				player_x_delta = -1.0f;
 			}
-
 			if (key_pressed_and_held(KEY_D) && key_pressed_and_held(VK_SHIFT)) {
 				player_moving = true;
 				player_x_delta = 2.0f;
@@ -258,32 +254,57 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			// Compute movement direction
 			V2 move_delta = {player_x_delta, player_y_delta};
+			// Length of movement
 			float move_magnitude = sqrt(move_delta.x * move_delta.x + move_delta.y * move_delta.y);
+
 			V2 move_dir = {0.0f, 0.0f};
+			// Normalize the movement
 			if (move_magnitude > 0.0f) {
 				move_dir.x = move_delta.x / move_magnitude;
 				move_dir.y = move_delta.y / move_magnitude;
 			}
 
 			// Determine if movement opposes aiming
-			float dot_product = vel_normalized.x * move_dir.x + vel_normalized.y * move_dir.y;
+			// float dot_product = vel_normalized.x * move_dir.x + vel_normalized.y * move_dir.y;
 			// Dot product is between a range of 1 to -1. 1 is facing same direction. 0 is perpendicular. -1 is opposite to eachother.
-			const float opposition_threshold = -0.1f; 
+			const float opposition_threshold = 0.0f;
 
 			// Select legs animation state and mode
-			Animation_State legs_state = AS_Walking_Forward;  // Default to forward
-			Animation_Mode legs_mode = AM_Static_First_Frame;  // Default for idle
+			Animation_State legs_state = AS_Walking_Forward; 
+			Animation_Mode legs_mode = AM_Static_First_Frame;
 
+			// Fallback to aim if not moving 
+			V2 legs_facing_dir = vel_normalized; 
 			if (player_moving) {
-				legs_mode = AM_Animate_Looping;
-				if (dot_product < opposition_threshold) {
-					// Move backwards by looping backwards
-					legs_mode = AM_Animate_Looping_Reversed;
-				}
-			}
+				// Compute perpendicular for right (rotate aim 90° clockwise) (new local variable). NOTE: X is in the Y place and negated for 90 degrees clockwise
+				V2 perp_dir = { vel_normalized.y, -vel_normalized.x };
 
-			// Apply to legs, using aiming direction for facing consistency
-			change_animation_tracker(&player->legs, player->legs.entity_name, legs_state, APS_Speed_Based, legs_mode, &player->legs.flip_horizontally, vel_normalized);
+				// Dot Product
+				float forward_comp = vel_normalized.x * move_dir.x + vel_normalized.y * move_dir.y;
+				float side_comp = perp_dir.x * move_dir.x + perp_dir.y * move_dir.y;
+				bool reversed = false;
+				if (forward_comp < opposition_threshold) {
+					reversed = true;
+					forward_comp = -forward_comp; // Make positive for reconstruction
+					side_comp = -side_comp;       // Flip side for mirror effect
+				}
+
+				// Reconstruct facing dir 
+				V2 forward_part = { vel_normalized.x * forward_comp, vel_normalized.y * forward_comp };
+				V2 side_part = { perp_dir.x * side_comp, perp_dir.y * side_comp };
+				V2 legs_facing = { forward_part.x + side_part.x, forward_part.y + side_part.y };
+				float mag = sqrt(legs_facing.x * legs_facing.x + legs_facing.y * legs_facing.y);
+				if (mag > 0.0f) {
+					legs_facing_dir.x = legs_facing.x / mag;
+					legs_facing_dir.y = legs_facing.y / mag;
+				}
+				legs_mode = reversed ? AM_Animate_Looping_Reversed : AM_Animate_Looping;
+			} else {
+				// Idle: static, facing aim (as in your current code)
+				legs_facing_dir = vel_normalized;
+			}
+			// Apply to legs, using legs_facing_dir instead of vel_normalized
+			change_animation_tracker(&player->legs, player->legs.entity_name, legs_state, APS_Speed_Based, legs_mode, &player->legs.flip_horizontally, legs_facing_dir);
 
 			if (player->weapon == nullptr) {
 				equip_weapon(player->weapon, "bow");
