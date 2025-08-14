@@ -61,6 +61,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	load_projectile_data_csv(&projectile_data_csv);
 	close_csv_data_file(&projectile_data_csv);
 
+	CSV_Data ability_data_csv = create_open_csv_data("data\\ability_data.csv");
+	open_csv_data_file(&ability_data_csv);
+	load_ability_data_csv(&ability_data_csv);
+	close_csv_data_file(&ability_data_csv);
+
 	game_data.selected_font = FT_Basic;
 
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
@@ -285,8 +290,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				bool reversed = false;
 				if (forward_comp < opposition_threshold) {
 					reversed = true;
-					forward_comp = -forward_comp; // Make positive for reconstruction
-					side_comp = -side_comp;       // Flip side for mirror effect
+					// Rotates the movement vector by 180° when you’re moving “behind” your aim.
+					forward_comp = -forward_comp;
+					side_comp = -side_comp; 
 				}
 
 				// Reconstruct facing dir 
@@ -300,7 +306,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 				legs_mode = reversed ? AM_Animate_Looping_Reversed : AM_Animate_Looping;
 			} else {
-				// Idle: static, facing aim (as in your current code)
+				// Idle: static, facing aim 
 				legs_facing_dir = vel_normalized;
 			}
 			// Apply to legs, using legs_facing_dir instead of vel_normalized

@@ -1,0 +1,4 @@
+ability_name,ability_type,damage_increase,projectile_speed_increase,fire_rate_increase,projectiles_per_sec,ability_duration_sec
+portable_ballista,passive,0.15,0.25,0,0,0
+bolt_saturation,basic,0,0,0.5,0,0
+storm_of_quarrels,ultimate,0,0,0,20,3

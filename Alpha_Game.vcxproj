@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Ability.cpp" />
     <ClCompile Include="src\Audio_DirectSound.cpp" />
     <ClCompile Include="src\Audio_xAudio2.cpp" />
     <ClCompile Include="src\Debug.cpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="src\Windows_Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Ability.h" />
     <ClInclude Include="src\Audio_DirectSound.h" />
     <ClInclude Include="src\Audio_xAudio2.h" />
     <ClInclude Include="src\Debug.h" />

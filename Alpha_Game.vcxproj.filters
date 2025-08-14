@@ -26,16 +26,13 @@
     <Filter Include="Source Files\Game\Gameplay">
       <UniqueIdentifier>{6e99a273-9bca-4af0-964d-28d0e56ebb99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Characters">
-      <UniqueIdentifier>{d5cfaef1-f71d-4428-a0c8-f400f2039408}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\Tile Map">
       <UniqueIdentifier>{9701c287-3e72-492c-8840-3a7c43f231e1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Game\Physics">
       <UniqueIdentifier>{044094a3-b5d5-42cc-b5e5-78a2b873e377}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Weapons">
+    <Filter Include="Source Files\Game\Arsenal">
       <UniqueIdentifier>{39515c38-dc22-48f6-bc22-3a55b6cf30ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -91,9 +88,6 @@
     <ClCompile Include="src\Unit.cpp">
       <Filter>Source Files\Game\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Player.cpp">
-      <Filter>Source Files\Game\Characters</Filter>
-    </ClCompile>
     <ClCompile Include="src\Tile_Map.cpp">
       <Filter>Source Files\Game\Tile Map</Filter>
     </ClCompile>
@@ -101,10 +95,16 @@
       <Filter>Source Files\Game\Physics</Filter>
     </ClCompile>
     <ClCompile Include="src\Weapon.cpp">
-      <Filter>Source Files\Game\Weapons</Filter>
+      <Filter>Source Files\Game\Arsenal</Filter>
     </ClCompile>
     <ClCompile Include="src\Projectile.cpp">
-      <Filter>Source Files\Game\Weapons</Filter>
+      <Filter>Source Files\Game\Arsenal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ability.cpp">
+      <Filter>Source Files\Game\Arsenal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Source Files\Game\Arsenal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,9 +156,6 @@
     <ClInclude Include="src\Unit.h">
       <Filter>Source Files\Game\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Player.h">
-      <Filter>Source Files\Game\Characters</Filter>
-    </ClInclude>
     <ClInclude Include="src\Tile_Map.h">
       <Filter>Source Files\Game\Tile Map</Filter>
     </ClInclude>
@@ -166,13 +163,19 @@
       <Filter>Source Files\Game\Physics</Filter>
     </ClInclude>
     <ClInclude Include="src\Weapon.h">
-      <Filter>Source Files\Game\Weapons</Filter>
+      <Filter>Source Files\Game\Arsenal</Filter>
     </ClInclude>
     <ClInclude Include="src\Projectile.h">
-      <Filter>Source Files\Game\Weapons</Filter>
+      <Filter>Source Files\Game\Arsenal</Filter>
     </ClInclude>
     <ClInclude Include="src\Perlin.h">
       <Filter>Source Files\Game\Tile Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ability.h">
+      <Filter>Source Files\Game\Arsenal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Player.h">
+      <Filter>Source Files\Game\Arsenal</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

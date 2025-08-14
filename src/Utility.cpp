@@ -163,7 +163,7 @@ void load_csv_data_file(CSV_Data* data, char* destination, std::span<Type_Descri
 		open_csv_data_file(data);
 	}
 
-	char buffer[100];
+	char buffer[300];
 	// Get the first line
 	if (fgets(buffer, sizeof(buffer), data->file) == NULL) {
 		return;

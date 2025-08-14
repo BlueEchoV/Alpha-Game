@@ -47,6 +47,5 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name);
 void unequip_weapon();
 void delete_weapon(Weapon*& weapon);
 
-
 void load_weapon_data_csv(CSV_Data* data);
 

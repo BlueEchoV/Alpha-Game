@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "Game_Utility.h"
 #include "Weapon.h"
+#include "Ability.h"
 #include "Tile_Map.h"
 
 struct Player_Data {
