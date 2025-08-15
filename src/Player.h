@@ -2,8 +2,9 @@
 #include "Utility.h"
 #include "Game_Utility.h"
 #include "Weapon.h"
-#include "Ability.h"
 #include "Tile_Map.h"
+
+struct Ability;
 
 struct Player_Data {
 	std::string character_name;
@@ -29,6 +30,10 @@ struct Player {
 
 	// Could this all be put into a 'weapon_kit' of some sort?
 	Weapon* weapon;
+
+	Ability* passive;
+	Ability* basic;
+	Ability* ultimate;
 
 	int damage;
 };

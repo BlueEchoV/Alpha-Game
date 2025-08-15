@@ -28,6 +28,7 @@ struct Weapon {
 	Image* image;
 	int w, h;
 	int attacks_per_second;
+	int base_damage;
 	int damage;
 	// bool can_stick
 

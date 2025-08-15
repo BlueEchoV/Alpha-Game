@@ -8,7 +8,7 @@
 #include <stb_image.h>
 #include <math.h>
 
-#include "Game_Data.h"
+//#include "Game_Data.h"
 #include "Debug.h"
 
 typedef int8_t s8;
@@ -314,6 +314,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			if (player->weapon == nullptr) {
 				equip_weapon(player->weapon, "bow");
+				player->passive = create_ability("portable_ballista");
 			}
 
 			if (key_pressed(KEY_1)) {
@@ -329,6 +330,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			player->weapon->update_weapon(delta_time);
+			player->passive->update_ability(player, delta_time);
+
 			update_animation_tracker(&player->torso, delta_time, (float)player->rb.current_speed);
 			update_animation_tracker(&player->legs, delta_time, (float)player->rb.current_speed);
 		}
@@ -390,8 +393,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			player_y_delta *= 0.707106781187f;
 		}
 
-		game_data.player.rb.pos_ws.x += player_x_delta;
-		game_data.player.rb.pos_ws.y += player_y_delta;
+		player->rb.vel = { player_x_delta, player_y_delta };
+		game_data.player.rb.pos_ws.x += player->rb.vel.x;
+		game_data.player.rb.pos_ws.y += player->rb.vel.y;
 
 		// Collision with the map
 		// TODO: Add these to the tilemap struct?

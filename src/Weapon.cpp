@@ -30,6 +30,7 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->projectile_name = current_weapon_data.projectile_name;
 	weapon->w = current_weapon_data.w;
 	weapon->h = current_weapon_data.h;
+	weapon->base_damage = current_weapon_data.damage;
 	weapon->damage = current_weapon_data.damage;
 	weapon->attacks_per_second = current_weapon_data.attacks_per_second;
 }
