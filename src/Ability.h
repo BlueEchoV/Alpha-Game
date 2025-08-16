@@ -23,6 +23,8 @@ struct Ability {
 	std::string name;
 	std::string type;
 
+	Player* player;
+
 	// Blood Knight
 
 	// Grim Arbelist
@@ -34,13 +36,14 @@ struct Ability {
 
 	// Destructor
 	// virtual ~Ability();
-	virtual void update_ability(Player* player, float delta_time) = 0;
+	virtual void update_ability(float delta_time) = 0;
 	virtual void activate_ability() = 0;
-	// virtual void draw_ability_indicators();
+	virtual void draw_ui(V2 camera_pos) = 0;
 	// virtual void draw_ability();
 };
 
-Ability* create_ability(const std::string& ability_name);
+Ability* equip_ability(Player* player, const std::string& ability_name);
+void equip_abilities(Player* player, const std::string& passive, const std::string& basic, const std::string& ultimate);
 void draw_ability_icon(Ability* ability);
 void free_ability_memory(Ability* ability);
 
@@ -51,8 +54,9 @@ struct Portable_Ballista : Ability {
 	float damage_buff_value = 0.0f;
 	// float attack_speed_buff_value;
 
-	void update_ability(Player* player, float delta_time) override;
+	void update_ability(float delta_time) override;
 	void activate_ability() override;
+	void draw_ui(V2 camera_pos) override;
 };
 
 #if 0
