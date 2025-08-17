@@ -2,6 +2,7 @@
 
 std::unordered_map<std::string, Projectile_Data> projectile_data_map;
 
+#if 0
 Projectile_Data bad_projectile_data = {
 	// name		w	h	speed
 	"arrow",	32, 32, 100
@@ -14,23 +15,22 @@ Projectile_Data get_projectile_data(std::string_view projectile_name) {
 	}
 	return it->second;
 }
+#endif
 
 void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
-	std::string_view projectile_name, int damage, V2 origin_ws, V2 target_ws) {
+	std::string_view projectile_name, int damage, int speed, int w, int h, V2 origin_ws, V2 target_ws) {
 
 	Projectile result = {};
 	result.damage = damage;
 
-	Projectile_Data data = get_projectile_data(std::string(projectile_name));
-
-	result.rb = create_rigid_body(origin_ws, data.speed);
+	result.rb = create_rigid_body(origin_ws, speed);
 	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);
 	result.rb.vel = vel_normalized;
 
 	result.at = create_animation_tracker(ATT_Direction_2, projectile_name, AS_No_Animation, APS_Speed_Based, AM_Animate_Looping, true);
 
-	result.w = data.w;
-	result.h = data.h;
+	result.w = w;
+	result.h = h;
 	result.rb.angle = calculate_facing_direction(result.rb.vel);
 
 	Sprite_Sheet* sprite_sheet = get_sprite_sheet(std::string(projectile_name));
@@ -60,11 +60,11 @@ void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile)
 	draw_animation_tracker(&projectile.at, dst, projectile.rb.angle);
 }
 
+/*
 Type_Descriptor projectile_data_type_descriptors[] = {
 	FIELD(Projectile_Data, VT_String, projectile_name),
 	FIELD(Projectile_Data, VT_Int, w),
-	FIELD(Projectile_Data, VT_Int, h),
-	FIELD(Projectile_Data, VT_Int, speed)
+	FIELD(Projectile_Data, VT_Int, h)
 };
 
 void load_projectile_data_csv(CSV_Data* data) {
@@ -80,4 +80,4 @@ void load_projectile_data_csv(CSV_Data* data) {
 		projectile_data_map[projectile_data_iterator.projectile_name] = projectile_data_iterator;
 	}
 }
-
+*/

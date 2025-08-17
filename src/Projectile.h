@@ -13,7 +13,6 @@ struct Projectile_Data {
 	std::string projectile_name;
 
 	int w, h;
-	int speed;
 };
 
 struct Projectile {
@@ -31,8 +30,8 @@ struct Projectile {
 
 // Damage based off weapon
 void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
-	std::string_view projectile_name, int damage, V2 origin_ws, V2 target_ws);
+	std::string_view projectile_name, int damage, int speed, int w, int h, V2 origin_ws, V2 target_ws);
 void update_projectile(Projectile& projectile, float delta_time);
 void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile);
 
-void load_projectile_data_csv(CSV_Data* data);
+// void load_projectile_data_csv(CSV_Data* data);

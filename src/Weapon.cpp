@@ -3,8 +3,8 @@
 std::unordered_map<std::string, Weapon_Data> weapon_data_map;
 
 Weapon_Data bad_weapon_data = {
-	// weapon_name	proj_name	w		h		damage		fire_rate
-	 "bow",			"arrow",	50,		50,		10,			4			
+	// weapon_name	weapon_w	weapon_h		damage		attack_speed	proj_name proj_speed	proj_w	proj_h
+	 "bow",			50,			50,				10,			4,				"arrow",  50,			100,	100	
 };
 
 Weapon_Data get_weapon_data(std::string weapon_name) {
@@ -27,12 +27,16 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 
 	Weapon_Data current_weapon_data = get_weapon_data(weapon_name);
 	weapon->weapon_name = current_weapon_data.weapon_name;
-	weapon->projectile_name = current_weapon_data.projectile_name;
-	weapon->w = current_weapon_data.w;
-	weapon->h = current_weapon_data.h;
+	weapon->weapon_w = current_weapon_data.weapon_w;
+	weapon->weapon_h = current_weapon_data.weapon_h;
 	weapon->base_damage = current_weapon_data.damage;
 	weapon->damage = current_weapon_data.damage;
 	weapon->attacks_per_second = current_weapon_data.attacks_per_second;
+
+	weapon->projectile_name = current_weapon_data.projectile_name;
+	weapon->projectile_w = current_weapon_data.projectile_w;
+	weapon->projectile_h = current_weapon_data.projectile_h;
+	weapon->projectile_speed = current_weapon_data.projectile_speed;
 }
 
 void unequip_weapon();
@@ -52,7 +56,8 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 			// Change this to fire weapon
 			V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, camera.pos_ws);
-			spawn_projectile(projectile_handles, projectile_storage, this->projectile_name, this->damage, spawn_pos_ws, mouse_ws_pos);
+			spawn_projectile(projectile_handles, projectile_storage, this->projectile_name, this->damage, 
+				this->projectile_speed, this->projectile_w, this->projectile_h, spawn_pos_ws, mouse_ws_pos);
 			Globals::debug_total_arrows++;
 			this->can_fire = false;
 		}
@@ -84,20 +89,16 @@ void Weapon::update_weapon(float delta_time) {
 	}
 }
 
-// This will have to be an offset based off where the player is looking
-void Weapon::draw_weapon(Animation_Tracker* at, V2 pos) {
-	MP_Rect dst = {(int)pos.x, (int)pos.y, this->w, this->h};
-
-	draw_animation_tracker(at, dst, 0);
-}
-
 Type_Descriptor weapon_data_type_descriptors[] = {
 	FIELD(Weapon_Data, VT_String, weapon_name),
-	FIELD(Weapon_Data, VT_String, projectile_name),
-	FIELD(Weapon_Data, VT_Int, w),
-	FIELD(Weapon_Data, VT_Int, h),
+	FIELD(Weapon_Data, VT_Int, weapon_w),
+	FIELD(Weapon_Data, VT_Int, weapon_h),
 	FIELD(Weapon_Data, VT_Int, damage),
-	FIELD(Weapon_Data, VT_Int, attacks_per_second)
+	FIELD(Weapon_Data, VT_Int, attacks_per_second),
+	FIELD(Weapon_Data, VT_String, projectile_name),
+	FIELD(Weapon_Data, VT_Int, projectile_w),
+	FIELD(Weapon_Data, VT_Int, projectile_h),
+	FIELD(Weapon_Data, VT_Int, projectile_speed)
 };
 
 void load_weapon_data_csv(CSV_Data* data) {

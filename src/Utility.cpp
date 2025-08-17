@@ -114,7 +114,7 @@ int count_csv_data_rows(CSV_Data* data) {
 	}
 	int result = 0;
 
-	char buffer[50];
+	char buffer[100];
 
 	// Ignore the first row
 	if (fgets(buffer, sizeof(buffer), data->file) == NULL) {

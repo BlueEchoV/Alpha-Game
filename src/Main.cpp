@@ -56,10 +56,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	load_weapon_data_csv(&weapon_data_csv);
 	close_csv_data_file(&weapon_data_csv);
 
+#if 0
 	CSV_Data projectile_data_csv = create_open_csv_data("data\\projectile_data.csv");
 	open_csv_data_file(&projectile_data_csv);
 	load_projectile_data_csv(&projectile_data_csv);
 	close_csv_data_file(&projectile_data_csv);
+#endif
 
 	CSV_Data ability_data_csv = create_open_csv_data("data\\ability_data.csv");
 	open_csv_data_file(&ability_data_csv);

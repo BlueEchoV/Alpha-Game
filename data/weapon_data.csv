@@ -1,4 +1,4 @@
-weapon_name,w,h,damage,attacks_per_second,projectile_name
-sword,20,20,300,4,slash
-bow,20,20,50,4,arrow
-pistol,20,20,50,2,bullet
+weapon_name,weapon_w,weapon_h,damage,attacks_per_second,projectile_name,projectile_w,projectile_h,projectile_speed
+sword,20,20,300,4,slash,100,100,100
+bow,20,20,50,4,arrow,25,25,400
+pistol,20,20,50,2,bullet,25,25,700
