@@ -53,4 +53,5 @@ namespace Globals {
 	const int DEFAULT_HEALTH_BAR_HEIGHT = 8;
 	const int DEFAULT_HEALTH_BAR_OUTLINE = 3;
 
+	const int ability_icon_w = 80;
 }

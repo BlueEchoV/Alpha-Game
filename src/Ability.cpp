@@ -12,6 +12,44 @@ Ability_Data get_ability_data(std::string ability_name) {
 	return it->second;
 }
 
+void draw_ability_icon(Ability_Type type, std::string ability_name) {
+	std::string image_name = ability_name;
+	V2 icon_pos = {};
+	icon_pos.x = ((float)Globals::playground_area_w / 2.0f) - (Globals::ability_icon_w / 2.0f);
+	icon_pos.y = Globals::ability_icon_w / 2;
+
+	switch (type) {
+	case AT_Passive: {
+		icon_pos.x -= (float)Globals::ability_icon_w * 1.25;
+		image_name += "_passive_icon";
+		break;
+	}
+	case AT_Basic: {
+		// Positioned in the center
+		image_name += "_basic_icon";
+		break;
+	}
+	case AT_Ultimate: {
+		icon_pos.x += (float)Globals::ability_icon_w * 1.25;
+		image_name += "_ultimate_icon";
+		break;
+	}
+	default: {
+		log("Error: Ability_Type not specified");
+		break;
+	}
+	}
+
+	MP_Rect dst_rect = {(int)icon_pos.x, (int)icon_pos.y, Globals::ability_icon_w, Globals::ability_icon_w};
+
+	// Image* image = get_image(image_name);
+	Sprite_Sheet* ss = get_sprite_sheet(image_name);
+	Image* image = &ss->sprites[0].image;
+	if (image != nullptr) {
+		mp_render_copy_ex(image->texture, NULL, &dst_rect, 0, NULL, SDL_FLIP_NONE);
+	}
+}
+
 // Portable Ballista: Standing still for 1 s grants +25 % bolt speed & +15 % dmg until you move.
 void Portable_Ballista::update_ability(float delta_time) {
 	// NOTE: Floating-point numbers aren't perfectly precise because they have limited bits to store very large or 
@@ -58,25 +96,37 @@ void Portable_Ballista::draw_ui(V2 camera_pos) {
 		V2 pos_cs = convert_ws_to_cs(player->rb.pos_ws, camera_pos);
 		draw_string(*font, "+15% damage", CT_Dark_Yellow, true, pos_cs.x, pos_cs.y + player->h / 2 + player->health_bar.h * 3, 1, true);
 	}
+	draw_ability_icon(AT_Passive, this->name);
 }
 
-#if 0
-void Bolt_Saturation::update_ability() {
-
+void Bolt_Saturation::update_ability(float delta_time) {
+	REF(delta_time);
+	draw_ability_icon(this->type, this->name);
 }
 
 void Bolt_Saturation::activate_ability() {
 
 }
 
-void Storm_Of_Quarrels::update_ability() {
+void Bolt_Saturation::draw_ui(V2 camera_pos) {
+	REF(camera_pos);
+	draw_ability_icon(this->type, this->name);
+}
+
+void Storm_Of_Quarrels::update_ability(float delta_time) {
+	REF(delta_time);
 
 }
 
 void Storm_Of_Quarrels::activate_ability() {
 
 }
-#endif
+
+void Storm_Of_Quarrels::draw_ui(V2 camera_pos) {
+	REF(camera_pos);
+	draw_ability_icon(this->type, this->name);
+}
+
 
 Ability* equip_ability(Player* player, const std::string& ability_name) {
 	Ability_Data ability_data = get_ability_data(ability_name);
@@ -84,23 +134,34 @@ Ability* equip_ability(Player* player, const std::string& ability_name) {
 	Ability* ability = nullptr;
 	if (ability_name == "portable_ballista") {
 		ability = new Portable_Ballista();
-	}
-#if 0
-	else if (ability_name == "bolt_saturation") {
+	} else if (ability_name == "bolt_saturation") {
 		ability = new Bolt_Saturation();
 	} else if (ability_name == "storm_of_quarrels") {
 		ability = new Storm_Of_Quarrels();
 	}
-#endif
+
 	else {
 		// Handle unknown: return nullptr or throw
 		log("create_ability : Ability Name Not Specified");
 		return nullptr;
 	}
 
+	if (ability_data.ability_type == "passive") {
+		ability->type = AT_Passive;
+	}
+	else if (ability_data.ability_type == "basic") {
+		ability->type = AT_Basic;
+	}
+	else if (ability_data.ability_type == "ultimate") {
+		ability->type = AT_Ultimate;
+	}
+	else {
+		ability->type = AT_Not_Specified;
+		log("Error: Ability Type not specified");
+	}
+
 	ability->player = player;
 	ability->name = ability_data.ability_name;
-	ability->type = ability_data.ability_type;
 
 	ability->damage_increase = ability_data.damage_increase;
 	ability->projectile_speed_increase = ability_data.projectile_speed_increase;

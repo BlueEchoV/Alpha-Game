@@ -316,7 +316,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			if (player->weapon == nullptr) {
 				equip_weapon(player->weapon, "bow");
-				player->passive = equip_ability(player, "portable_ballista");
+				equip_abilities(player, "portable_ballista", "bolt_saturation", "storm_of_quarrels");
 			}
 
 			if (key_pressed(KEY_1)) {
@@ -592,6 +592,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		draw_player(game_data.player, game_data.camera.pos_ws);
 		player->passive->draw_ui(game_data.camera.pos_ws);
+		player->basic->draw_ui(game_data.camera.pos_ws);
+		player->ultimate->draw_ui(game_data.camera.pos_ws);
+
 
 		Font* font = get_font(game_data.selected_font);
 		if (game_data.player.dead) {

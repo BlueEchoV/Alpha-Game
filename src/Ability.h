@@ -3,6 +3,13 @@
 #include "Utility.h"
 #include "Player.h"
 
+enum Ability_Type {
+	AT_Not_Specified,
+	AT_Passive,
+	AT_Basic,
+	AT_Ultimate
+};
+
 struct Ability_Data {
 	std::string ability_name;
 	std::string ability_type;
@@ -21,7 +28,7 @@ void load_ability_data_csv(CSV_Data* data);
 
 struct Ability {
 	std::string name;
-	std::string type;
+	Ability_Type type;
 
 	Player* player;
 
@@ -44,7 +51,6 @@ struct Ability {
 
 Ability* equip_ability(Player* player, const std::string& ability_name);
 void equip_abilities(Player* player, const std::string& passive, const std::string& basic, const std::string& ultimate);
-void draw_ability_icon(Ability* ability);
 void free_ability_memory(Ability* ability);
 
 struct Portable_Ballista : Ability {
@@ -59,14 +65,14 @@ struct Portable_Ballista : Ability {
 	void draw_ui(V2 camera_pos) override;
 };
 
-#if 0
 struct Bolt_Saturation : Ability {
-	void update_ability(Weapon* weapon) override;
+	void update_ability(float delta_time) override;
 	void activate_ability() override;
+	void draw_ui(V2 camera_pos) override;
 };
 
 struct Storm_Of_Quarrels: Ability {
-	void update_ability(Weapon* weapon) override;
+	void update_ability(float delta_time) override;
 	void activate_ability() override;
+	void draw_ui(V2 camera_pos) override;
 };
-#endif
