@@ -4,7 +4,7 @@ std::unordered_map<std::string, Ability_Data> ability_data_map;
 
 Ability_Data bad_ability_data = {};
 
-Ability_Data get_ability_data(std::string ability_name) {
+Ability_Data get_ability_data(const std::string& ability_name) {
 	auto it = ability_data_map.find(std::string(ability_name));
 	if (it == ability_data_map.end()) {
 		return bad_ability_data;
@@ -12,7 +12,7 @@ Ability_Data get_ability_data(std::string ability_name) {
 	return it->second;
 }
 
-void draw_ability_icon(Ability_Type type, std::string ability_name) {
+void draw_ability_icon(Ability_Type type, const std::string& ability_name) {
 	std::string image_name = ability_name;
 	V2 icon_pos = {};
 	icon_pos.x = ((float)Globals::playground_area_w / 2.0f) - (Globals::ability_icon_w / 2.0f);
@@ -56,7 +56,6 @@ void Portable_Ballista::update_ability(float delta_time) {
 	// very small numbers. This causes rounding errors, especially with decimals that can't be exactly 
 	// represented in binary (like 0.1).
 	bool is_still = player->rb.vel.x <= 0.001f && player->rb.vel.y <= 0.001f; 
-	Ability_Data data = get_ability_data(this->name);
 
 	bool reset_buffs = false;
 
@@ -77,7 +76,7 @@ void Portable_Ballista::update_ability(float delta_time) {
 		return;
 	}
 	if (this->stand_timer >= 1.0f && this->buff_active == false) {
-		this->damage_buff_value = player->weapon->base_damage * data.damage_increase;
+		this->damage_buff_value = player->weapon->base_damage * this->damage_increase;
 		player->weapon->damage += (int)this->damage_buff_value;
 		this->buff_active = true;
 		log("Activating Buff");
@@ -99,16 +98,18 @@ void Portable_Ballista::draw_ui(V2 camera_pos) {
 	draw_ability_icon(AT_Passive, this->name);
 }
 
-void Bolt_Saturation::update_ability(float delta_time) {
+void Hemorrhage_Burst::update_ability(float delta_time) {
 	REF(delta_time);
 	draw_ability_icon(this->type, this->name);
 }
 
-void Bolt_Saturation::activate_ability() {
+void Hemorrhage_Burst::activate_ability() {
+	Ability_Data data = get_ability_data(this->name);
 
+	this->damage_per_stack = data.damage_per_stack;
 }
 
-void Bolt_Saturation::draw_ui(V2 camera_pos) {
+void Hemorrhage_Burst::draw_ui(V2 camera_pos) {
 	REF(camera_pos);
 	draw_ability_icon(this->type, this->name);
 }
@@ -133,13 +134,22 @@ Ability* equip_ability(Player* player, const std::string& ability_name) {
 
 	Ability* ability = nullptr;
 	if (ability_name == "portable_ballista") {
-		ability = new Portable_Ballista();
-	} else if (ability_name == "bolt_saturation") {
-		ability = new Bolt_Saturation();
-	} else if (ability_name == "storm_of_quarrels") {
-		ability = new Storm_Of_Quarrels();
-	}
+		Portable_Ballista* pb = new Portable_Ballista();
+		pb->damage_increase = ability_data.damage_increase;
+		pb->fire_rate_increase = ability_data.fire_rate_increase;
+		ability = pb;
 
+	} else if (ability_name == "hemorrhage_burst") {
+		Hemorrhage_Burst* hb = new Hemorrhage_Burst();
+		hb->damage_per_stack = ability_data.damage_per_stack;
+		ability = hb;
+
+	} else if (ability_name == "storm_of_quarrels") {
+		Storm_Of_Quarrels* soq = new Storm_Of_Quarrels();
+		soq->projectiles_per_sec = ability_data.projectiles_per_sec;
+		soq->ability_duration_sec = ability_data.ability_duration_sec;
+		ability = soq;
+	}
 	else {
 		// Handle unknown: return nullptr or throw
 		log("create_ability : Ability Name Not Specified");
@@ -156,18 +166,12 @@ Ability* equip_ability(Player* player, const std::string& ability_name) {
 		ability->type = AT_Ultimate;
 	}
 	else {
-		ability->type = AT_Not_Specified;
 		log("Error: Ability Type not specified");
+		return nullptr;
 	}
 
 	ability->player = player;
 	ability->name = ability_data.ability_name;
-
-	ability->damage_increase = ability_data.damage_increase;
-	ability->projectile_speed_increase = ability_data.projectile_speed_increase;
-	ability->fire_rate_increase = ability_data.fire_rate_increase;
-	ability->projectiles_per_sec = ability_data.projectiles_per_sec;
-	ability->ability_duration_sec = ability_data.ability_duration_sec;
 
 	return ability;
 }
@@ -183,9 +187,10 @@ Type_Descriptor ability_data_type_descriptors[] = {
 	FIELD(Ability_Data, VT_String, ability_type),
 
 	// Grim Arbelist
+	FIELD(Ability_Data, VT_Float, cooldown),
 	FIELD(Ability_Data, VT_Float, damage_increase),
-	FIELD(Ability_Data, VT_Float, projectile_speed_increase),
 	FIELD(Ability_Data, VT_Float, fire_rate_increase),
+	FIELD(Ability_Data, VT_Float, damage_per_stack),
 	FIELD(Ability_Data, VT_Int, projectiles_per_sec),
 	FIELD(Ability_Data, VT_Float, ability_duration_sec)
 };

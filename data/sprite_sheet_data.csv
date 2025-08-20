@@ -6,7 +6,7 @@ assets\,player_1_running,.png,1,8
 assets\,zombie_woman_idle,.png,1,6
 assets\,zombie_woman_running,.png,1,10
 assets\,zombie_woman_death,.png,1,5
-assets\,arrow,.png,1,1
+assets\,bolt,.png,1,1
 assets\,bullet,.png,1,1
 assets\,tree,.png,1,1
 assets\,rock,.png,1,1
@@ -53,4 +53,5 @@ assets\grim_arbelist\walking\legs\forward\,grim_arbelist_walking_forward_w_legs,
 assets\grim_arbelist\walking\legs\forward\,grim_arbelist_walking_forward_nw_legs,.png,1,24
 assets\grim_arbelist\ability_icons\,portable_ballista_passive_icon,.png,1,1
 assets\grim_arbelist\ability_icons\,bolt_saturation_basic_icon,.png,1,1
+assets\grim_arbelist\ability_icons\,hemorrhage_burst_basic_icon,.png,1,1
 assets\grim_arbelist\ability_icons\,storm_of_quarrels_ultimate_icon,.png,1,1

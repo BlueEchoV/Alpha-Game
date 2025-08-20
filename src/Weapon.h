@@ -11,7 +11,9 @@ struct Weapon_Data {
 	int weapon_w;
 	int weapon_h;
 	int damage;
-	int attacks_per_second;
+	int attacks_per_sec;
+	int max_ammo;
+	int reload_per_sec;
 
 	std::string projectile_name;
 	int projectile_speed;
@@ -30,13 +32,17 @@ struct Weapon {
 	int weapon_w;
 	int weapon_h;
 
-	int attacks_per_second;
+	int max_ammo;
+	int ammo;
 	int base_damage;
 	int damage;
 	// bool can_stick
 
+	int attacks_per_sec;
+	int reload_per_sec;
 	bool can_fire = true;
 	float fire_cooldown;
+	float reload_cooldown;
 
 	// PROJECTILES
 	int projectile_w;
@@ -44,14 +50,22 @@ struct Weapon {
 	int projectile_speed;
 	std::string projectile_name;
 
-	void fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage, 
+	void fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
 		Camera camera, V2 spawn_pos_ws, Faction faction);
 	void update_weapon(float delta_time);
+	void draw_ui(V2 pos);
 	// virtual void reload(); // Reloading animation? // This could be tedious
 };
 
+struct Sword : Weapon {
+
+};
+
+struct Crossbow : Weapon {
+
+};
+
 void equip_weapon(Weapon*& weapon, std::string weapon_name);
-void unequip_weapon();
 void delete_weapon(Weapon*& weapon);
 
 // Draw weapon UI (Ammo and whatnot)

@@ -127,7 +127,6 @@ void load_images() {
 	images["IT_Player_Rugged_Male"] = load_image("assets\\player_rugged_male.png");
 	images["idle_zombie_male"] = load_image("assets\\idle_zombie_male.png");
 	images["IT_Top_Down_Player_Demo"] = load_image("assets\\top_down_player_demo.png");
-	images["IT_Arrow_1"] = load_image("assets\\arrow_1.png");
 	images["IT_Dummy_Tile_32x32"] = load_image("assets\\dummy_tile_32x32.png");
 	images["IT_Water_32x32"] = load_image("assets\\water_32x32.png");
 	images["temp_zombie_walk"] = load_image("assets\\temp_zombie_walk.png");

@@ -315,12 +315,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			change_animation_tracker(&player->legs, player->legs.entity_name, legs_state, APS_Speed_Based, legs_mode, &player->legs.flip_horizontally, legs_facing_dir);
 
 			if (player->weapon == nullptr) {
-				equip_weapon(player->weapon, "bow");
-				equip_abilities(player, "portable_ballista", "bolt_saturation", "storm_of_quarrels");
+				equip_weapon(player->weapon, "crossbow");
+				equip_abilities(player, "portable_ballista", "hemorrhage_burst", "storm_of_quarrels");
 			}
 
 			if (key_pressed(KEY_1)) {
-				equip_weapon(player->weapon, "bow");
+				equip_weapon(player->weapon, "crossbow");
 			}
 			if (key_pressed(KEY_2)) {
 				equip_weapon(player->weapon, "pistol");
@@ -336,6 +336,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 			update_animation_tracker(&player->torso, delta_time, (float)player->rb.current_speed);
 			update_animation_tracker(&player->legs, delta_time, (float)player->rb.current_speed);
+
+			if (key_pressed(KEY_Q)) {
+				player->basic->activate_ability();
+			}
 		}
 
 		if (key_pressed(KEY_3)) {
@@ -374,7 +378,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_West, 2);
 		}
 
-		if (key_pressed(KEY_E)) {
+		if (key_pressed(KEY_T)) {
 			for (Handle handle : game_data.enemy_unit_handles) {
 				Unit* enemy_unit = get_entity_pointer_from_handle(game_data.unit_storage, handle);
 				if (enemy_unit != NULL) {
@@ -595,6 +599,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		player->basic->draw_ui(game_data.camera.pos_ws);
 		player->ultimate->draw_ui(game_data.camera.pos_ws);
 
+		player->weapon->draw_ui({ (float)Globals::playground_area_w / 2.0f, (float)Globals::playground_area_h / 2.0f });
 
 		Font* font = get_font(game_data.selected_font);
 		if (game_data.player.dead) {
