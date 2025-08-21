@@ -52,40 +52,67 @@ Health_Bar create_health_bar(int hp, int w, int h, int offset) {
 	return result;
 }
 
+// The origin is the center 
+// The width and height input is the total weight of the outline. The outlines go inward.
+// The function outlines the area with four rectangles
+void draw_outline_box(Color_Type c, MP_Rect* rect, int outline_thickness, bool exclude_outline_from_w_and_h, bool center) {
+	mp_set_render_draw_color(c);
+
+	MP_Rect final_rect = *rect;
+	if (center) {
+		final_rect.x -= final_rect.w / 2;
+		final_rect.y -= final_rect.h / 2;
+	}
+
+	// Default origin is bottom left and includes outline in the box
+	MP_Rect n = {};
+	n.x = final_rect.x;
+	n.y = (final_rect.y + final_rect.h) - outline_thickness;
+	n.w = final_rect.w;
+	n.h = outline_thickness;
+
+	MP_Rect s = {};
+	s.x = final_rect.x;
+	s.y = final_rect.y;
+	s.w = final_rect.w;
+	s.h = outline_thickness;
+
+	MP_Rect e = {};
+	e.x = (final_rect.x + final_rect.w) - outline_thickness;
+	e.y = final_rect.y;
+	e.w = outline_thickness;
+	e.h = final_rect.h;
+
+	MP_Rect w = {};
+	w.x = final_rect.x;
+	w.y = final_rect.y;
+	w.w = outline_thickness;
+	w.h = final_rect.h;
+
+	if (exclude_outline_from_w_and_h) {
+		n.y += outline_thickness;
+
+		s.y -= outline_thickness;
+
+		e.x += outline_thickness;
+		e.y -= outline_thickness;
+		e.h += outline_thickness * 2;
+
+		w.x -= outline_thickness;
+		w.y -= outline_thickness;
+		w.h += outline_thickness * 2;
+	}
+
+	mp_render_fill_rect(&s);
+	mp_render_fill_rect(&n);
+	mp_render_fill_rect(&w);
+	mp_render_fill_rect(&e);
+}
+
 void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos) {
 	// EXAMPLE: Hp = 500 / 1000
 	float hp_percent = (float)health_bar.current_hp / (float)health_bar.max_hp;
 	clamp(hp_percent, 0.0f, 1.0f);
-
-	// Outline
-	mp_set_render_draw_color(CT_Black);
-	MP_Rect outline_rect_bottom = {};
-	outline_rect_bottom.x = ((int)pos.x - health_bar.w / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	outline_rect_bottom.y = ((int)pos.y - health_bar.h / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	outline_rect_bottom.w = health_bar.w + (Globals::DEFAULT_HEALTH_BAR_OUTLINE * 2);
-	outline_rect_bottom.h = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	mp_render_fill_rect(&outline_rect_bottom);
-
-	MP_Rect outline_rect_top = {};
-	outline_rect_top.x = ((int)pos.x - health_bar.w / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	outline_rect_top.y = ((int)pos.y + health_bar.h / 2);
-	outline_rect_top.w = health_bar.w + (Globals::DEFAULT_HEALTH_BAR_OUTLINE * 2);
-	outline_rect_top.h = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	mp_render_fill_rect(&outline_rect_top);
-
-	MP_Rect outline_rect_left = {};
-	outline_rect_left.x = ((int)pos.x - health_bar.w / 2) - Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	outline_rect_left.y = ((int)pos.y - health_bar.h / 2);
-	outline_rect_left.w = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	outline_rect_left.h = health_bar.h;
-	mp_render_fill_rect(&outline_rect_left);
-
-	MP_Rect outline_rect_right = {};
-	outline_rect_right.x = ((int)pos.x + health_bar.w / 2);
-	outline_rect_right.y = ((int)pos.y - health_bar.h / 2);
-	outline_rect_right.w = Globals::DEFAULT_HEALTH_BAR_OUTLINE;
-	outline_rect_right.h = health_bar.h;
-	mp_render_fill_rect(&outline_rect_right);
 
 	// Green section
 	MP_Rect green_rect = {};
@@ -105,6 +132,13 @@ void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos) {
 	red_rect.h = health_bar.h;
 	mp_set_render_draw_color(CT_Dark_Grey);
 	mp_render_fill_rect(&red_rect);
+
+	MP_Rect final_outline_rect = {};
+	final_outline_rect.x = (int)pos.x;
+	final_outline_rect.y = (int)pos.y;
+	final_outline_rect.w = health_bar.w;
+	final_outline_rect.h = health_bar.h;
+	draw_outline_box(CT_Black, &final_outline_rect, 1, true , true);
 }
 
 void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {

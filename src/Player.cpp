@@ -68,6 +68,7 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	health_bar_cs_pos.y += p.health_bar.offset;
 	health_bar_cs_pos = convert_ws_to_cs(health_bar_cs_pos, camera_ws_pos);
 	draw_faction_health_bar(p.faction, p.health_bar, health_bar_cs_pos);
+	p.weapon->draw_ui(health_bar_cs_pos);
 
 	if (Globals::debug_show_colliders) {
 		draw_colliders(&p.rb, camera_ws_pos);

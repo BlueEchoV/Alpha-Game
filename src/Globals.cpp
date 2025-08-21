@@ -40,5 +40,4 @@ namespace Globals {
 	extern float slow_frames_per_sec = 8;
 	extern float fast_frames_per_sec = 16;
 	extern float travel_speed_based_frames_per_second;
-
 }

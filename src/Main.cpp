@@ -271,6 +271,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				move_dir.y = move_delta.y / move_magnitude;
 			}
 
+			if (key_pressed(KEY_3)) {
+				game_data.player.weapon->max_ammo = 10;
+			}
+
 			// Determine if movement opposes aiming
 			// float dot_product = vel_normalized.x * move_dir.x + vel_normalized.y * move_dir.y;
 			// Dot product is between a range of 1 to -1. 1 is facing same direction. 0 is perpendicular. -1 is opposite to eachother.
@@ -598,8 +602,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		player->passive->draw_ui(game_data.camera.pos_ws);
 		player->basic->draw_ui(game_data.camera.pos_ws);
 		player->ultimate->draw_ui(game_data.camera.pos_ws);
-
-		player->weapon->draw_ui({ (float)Globals::playground_area_w / 2.0f, (float)Globals::playground_area_h / 2.0f });
 
 		Font* font = get_font(game_data.selected_font);
 		if (game_data.player.dead) {

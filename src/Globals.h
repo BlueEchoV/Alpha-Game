@@ -51,7 +51,8 @@ namespace Globals {
 	const int MAX_COLLIDERS = 100;
 	const int DEFAULT_HEALTH_BAR_WIDTH = 60;
 	const int DEFAULT_HEALTH_BAR_HEIGHT = 8;
-	const int DEFAULT_HEALTH_BAR_OUTLINE = 3;
+	const int DEFAULT_RESOURCE_BAR_OUTLINE = 1;
+	const int DEFAULT_RESOURCE_BAR_H = 4;
 
 	const int ability_icon_w = 70;
 }

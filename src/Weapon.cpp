@@ -37,6 +37,9 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->attacks_per_sec = current_weapon_data.attacks_per_sec;
 	weapon->reload_per_sec = current_weapon_data.reload_per_sec;
 	weapon->max_ammo = current_weapon_data.max_ammo;
+	if (weapon->max_ammo > 0) {
+		weapon->uses_ammo = true;
+	}
 	weapon->ammo = 0;
 
 	weapon->projectile_name = current_weapon_data.projectile_name;
@@ -73,6 +76,7 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 
 	if (this->can_fire && this->ammo > 0) {
 		this->ammo--;
+		// printf("Subtracting ammo. Current: %i", this->ammo);
 		// Change this to fire weapon
 		V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, camera.pos_ws);
@@ -95,6 +99,7 @@ void Weapon::update_weapon(float delta_time) {
 
 	if (this->reload_per_sec > 0.0f) {
 		if (this->reload_cooldown <= 0.0f && this->ammo < this->max_ammo) {
+			// printf("Adding ammo. Current: %i", this->ammo);
 			this->ammo++;
 			this->reload_cooldown = 1.0f / this->reload_per_sec;
 		}
@@ -104,11 +109,51 @@ void Weapon::update_weapon(float delta_time) {
 	}
 }
 
-void Weapon::draw_ui(V2 pos) {
-	Font* font = get_font(FT_Basic);
+// Draw it relative to the health bar
+void Weapon::draw_ui(V2 hb_pos_cs) {
+	// Font* font = get_font(FT_Basic);
 
-	std::string ammo_str = std::to_string(this->ammo);
-	draw_string(*font, ammo_str.c_str(), CT_Orange, true, pos.x, pos.y, 3, true);
+	MP_Rect rect = {};
+	// Draw the ammo bar
+	if (this->uses_ammo) {
+		int total_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
+		REF(total_health_bar_w);
+		int inner_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH;
+		// This includes the outline around the health bar
+		int total_health_bar_h = Globals::DEFAULT_HEALTH_BAR_HEIGHT + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
+		std::string ammo_str = std::to_string(this->ammo);
+
+		int ammo_rect_h = Globals::DEFAULT_RESOURCE_BAR_H;
+		int ammo_rect_w = inner_health_bar_w / this->max_ammo;
+
+		int starting_x = (int)hb_pos_cs.x - (inner_health_bar_w / 2);
+		int starting_y = (int)hb_pos_cs.y - (total_health_bar_h / 2) - ammo_rect_h;
+		for (int i = 0; i < this->max_ammo; i++) {
+			rect.x = starting_x + (ammo_rect_w * i);
+			rect.y = starting_y;
+			rect.w = ammo_rect_w;
+			rect.h = ammo_rect_h;
+
+			// Draw the filled colored rect
+			if (i < this->ammo) {
+				if (((float)this->ammo / (float)this->max_ammo) > 0.67f) {
+					mp_set_render_draw_color(CT_Green);
+				}
+				else if (((float)this->ammo / (float)this->max_ammo) > 0.34f) {
+					mp_set_render_draw_color(CT_Orange);
+				}
+				else {
+					mp_set_render_draw_color(CT_Red);
+				}
+				mp_render_fill_rect(&rect);
+			}
+			draw_outline_box(CT_Black, &rect, Globals::DEFAULT_RESOURCE_BAR_OUTLINE, false, false);
+		}
+	}
+	// Draw the attack speed bar
+	else {
+
+	}
 }
 
 Type_Descriptor weapon_data_type_descriptors[] = {
