@@ -272,7 +272,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			if (key_pressed(KEY_3)) {
-				game_data.player.weapon->max_ammo = 10;
+				player->weapon->update_ammo_size(1);
+			} 
+			if (key_pressed(KEY_4)) {
+				player->weapon->update_ammo_size(2);
 			}
 
 			// Determine if movement opposes aiming
@@ -323,13 +326,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				equip_abilities(player, "portable_ballista", "hemorrhage_burst", "storm_of_quarrels");
 			}
 
-			if (key_pressed(KEY_1)) {
-				equip_weapon(player->weapon, "crossbow");
-			}
-			if (key_pressed(KEY_2)) {
-				equip_weapon(player->weapon, "pistol");
-			}
-
 			if (key_pressed_and_held(VK_SPACE)) {
 				player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage,
 					game_data.camera, game_data.player.rb.pos_ws, F_Player);
@@ -344,13 +340,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (key_pressed(KEY_Q)) {
 				player->basic->activate_ability();
 			}
-		}
-
-		if (key_pressed(KEY_3)) {
-			player->health_bar.current_hp -= 5;
-		}
-		if (key_pressed(KEY_4)) {
-			player->health_bar.current_hp += 5;
 		}
 
 		if (current_debug_spawning_delay <= 0.0f) {

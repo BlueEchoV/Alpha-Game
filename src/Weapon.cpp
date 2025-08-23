@@ -75,6 +75,8 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 	}
 
 	if (this->can_fire && this->ammo > 0) {
+		std::string current_ammo = std::to_string(this->ammo);
+		log(current_ammo.c_str());
 		this->ammo--;
 		// printf("Subtracting ammo. Current: %i", this->ammo);
 		// Change this to fire weapon
@@ -84,24 +86,45 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 			this->projectile_speed, this->projectile_w, this->projectile_h, spawn_pos_ws, mouse_ws_pos);
 		Globals::debug_total_arrows++;
 		this->can_fire = false;
-		this->fire_cooldown = 1.0f / (float)this->attacks_per_sec;
+		this->fire_cooldown = 1.0f / this->attacks_per_sec;
+		if (this->reload_progress >= (1.0f / this->reload_per_sec)) { 
+			this->reload_progress -= 1.0f / this->reload_per_sec;
+		}
 	}
 }
 
 void Weapon::update_weapon(float delta_time) {
 	if (this->fire_cooldown <= 0.0f) {
-		if (this->ammo < this->max_ammo || this->ammo > 0.0f && this->can_fire == false) {
+		if (this->ammo < this->max_ammo || this->ammo > 0 && this->can_fire == false) {
 			this->can_fire = true;
 		} 	
 	} else {
 		this->fire_cooldown -= delta_time;
 	}
 
+	// Uses ammo
 	if (this->reload_per_sec > 0.0f) {
-		if (this->reload_cooldown <= 0.0f && this->ammo < this->max_ammo) {
-			// printf("Adding ammo. Current: %i", this->ammo);
-			this->ammo++;
-			this->reload_cooldown = 1.0f / this->reload_per_sec;
+		float one_round_reload_time = (1.0f / this->reload_per_sec);
+		float total_clip_reload_time = (float)this->max_ammo * one_round_reload_time;
+
+		this->reload_progress += delta_time;
+		if (this->reload_progress > total_clip_reload_time) {
+			this->reload_progress = total_clip_reload_time;
+		}
+		clamp(this->reload_progress, 0.0f, total_clip_reload_time);
+
+		if (this->reload_cooldown <= 0.0f) {
+			// Make sure it's within the range
+			if (this->reload_progress >= one_round_reload_time && this->reload_progress <= total_clip_reload_time) {
+				ammo++;
+			}
+
+			if (this->ammo <= this->max_ammo) {
+				this->reload_cooldown = 1.0f / this->reload_per_sec;
+			}
+			else {
+				this->reload_cooldown = 0.0f;
+			}
 		}
 		else {
 			this->reload_cooldown -= delta_time;
@@ -109,11 +132,15 @@ void Weapon::update_weapon(float delta_time) {
 	}
 }
 
+void Weapon::update_ammo_size(int new_size) {
+	this->max_ammo = new_size;
+	this->ammo = 0;
+}
+
 // Draw it relative to the health bar
 void Weapon::draw_ui(V2 hb_pos_cs) {
 	// Font* font = get_font(FT_Basic);
 
-	MP_Rect rect = {};
 	// Draw the ammo bar
 	if (this->uses_ammo) {
 		int total_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
@@ -121,33 +148,42 @@ void Weapon::draw_ui(V2 hb_pos_cs) {
 		int inner_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH;
 		// This includes the outline around the health bar
 		int total_health_bar_h = Globals::DEFAULT_HEALTH_BAR_HEIGHT + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
-		std::string ammo_str = std::to_string(this->ammo);
 
 		int ammo_rect_h = Globals::DEFAULT_RESOURCE_BAR_H;
 		int ammo_rect_w = inner_health_bar_w / this->max_ammo;
 
 		int starting_x = (int)hb_pos_cs.x - (inner_health_bar_w / 2);
 		int starting_y = (int)hb_pos_cs.y - (total_health_bar_h / 2) - ammo_rect_h;
-		for (int i = 0; i < this->max_ammo; i++) {
-			rect.x = starting_x + (ammo_rect_w * i);
-			rect.y = starting_y;
-			rect.w = ammo_rect_w;
-			rect.h = ammo_rect_h;
 
-			// Draw the filled colored rect
-			if (i < this->ammo) {
-				if (((float)this->ammo / (float)this->max_ammo) > 0.67f) {
-					mp_set_render_draw_color(CT_Green);
-				}
-				else if (((float)this->ammo / (float)this->max_ammo) > 0.34f) {
-					mp_set_render_draw_color(CT_Orange);
-				}
-				else {
-					mp_set_render_draw_color(CT_Red);
-				}
-				mp_render_fill_rect(&rect);
-			}
-			draw_outline_box(CT_Black, &rect, Globals::DEFAULT_RESOURCE_BAR_OUTLINE, false, false);
+		MP_Rect fill_rect = {};
+		fill_rect.x = starting_x;
+		fill_rect.y = starting_y;
+
+		float one_round_reload_time = (1.0f / this->reload_per_sec);
+		float total_clip_reload_time = (float)this->max_ammo * one_round_reload_time;
+
+		fill_rect.w = (int)(((float)ammo_rect_w * (float)this->max_ammo) * (this->reload_progress / total_clip_reload_time));
+		fill_rect.h = ammo_rect_h;
+
+		if (((float)this->ammo / (float)this->max_ammo) > 0.60f) {
+			mp_set_render_draw_color(CT_Green);
+		}
+		else if (((float)this->ammo / (float)this->max_ammo) > 0.30f) {
+			mp_set_render_draw_color(CT_Orange);
+		}
+		else {
+			mp_set_render_draw_color(CT_Red);
+		}
+		mp_render_fill_rect(&fill_rect);
+
+		for (int i = 0; i < this->max_ammo; i++) {
+			MP_Rect outline_rect = {};
+			outline_rect.x = starting_x + (ammo_rect_w * i);
+			outline_rect.y = starting_y;
+			outline_rect.w = ammo_rect_w;
+			outline_rect.h = ammo_rect_h;
+
+			draw_outline_box(CT_Black, &outline_rect, Globals::DEFAULT_RESOURCE_BAR_OUTLINE, false, false);
 		}
 	}
 	// Draw the attack speed bar
