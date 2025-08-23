@@ -5,7 +5,7 @@
 
 #include "Ability.h"
 #include "Unit.h"
-#include "Horde.h"
+#include "Night_Wave.h"
 
 struct Game_Data {
 	Camera camera;
@@ -18,7 +18,7 @@ struct Game_Data {
 	std::vector<Handle> enemy_unit_handles;
 	std::vector<Handle> projectile_handles;
 
-	Horde current_horde;
+	Night_Wave current_night_wave;
 
 	Font_Type selected_font;
 };

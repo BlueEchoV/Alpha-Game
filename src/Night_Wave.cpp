@@ -1,50 +1,50 @@
-#include "Horde.h"
+#include "Night_Wave.h"
 
-Horde_Data bad_horde_data = {
+Night_Wave_Data bad_night_wave_data = {
 	// level		total_enemies		spawning_cd
 	   1,			20,					0.5f
 };
 
-std::unordered_map<std::string, Horde_Data> horde_data_map;
+std::unordered_map<std::string, Night_Wave_Data> horde_data_map;
 
-Horde_Data get_horde_data(Horde_Type horde_type) {
-	Horde_Data result = {};
+Night_Wave_Data get_horde_data(Night_Wave_Type night_wave_type) {
+	Night_Wave_Data result = {};
 
-	if (horde_type == HT_Not_Specified) {
-		return bad_horde_data;
+	if (night_wave_type == NWT_Not_Specified) {
+		return bad_night_wave_data;
 	}
-	return bad_horde_data;
+	return bad_night_wave_data;
 };
 
-MP_Rect get_spawn_region_ws(Horde& horde, Tile_Map& tile_map) {
+MP_Rect get_spawn_region_ws(Night_Wave& night_wave, Tile_Map& tile_map) {
 	MP_Rect result = {};
 
-	switch (horde.spawn_direction) {
+	switch (night_wave.spawn_direction) {
 	case SD_North: {
 		result.x = -(tile_map.w / 2);
 		result.y = tile_map.h / 2;
 		result.w = tile_map.w;
-		result.h = horde.spawn_region_size_in_tiles;
+		result.h = night_wave.spawn_region_size_in_tiles;
 		break;
 	}
 	case SD_South: {
 		result.x = -(tile_map.w / 2);
-		result.y = -(tile_map.h / 2) - horde.spawn_region_size_in_tiles;
+		result.y = -(tile_map.h / 2) - night_wave.spawn_region_size_in_tiles;
 		result.w = tile_map.w;
-		result.h = horde.spawn_region_size_in_tiles;
+		result.h = night_wave.spawn_region_size_in_tiles;
 		break;
 	}
 	case SD_East: {
 		result.x = tile_map.w - (tile_map.w / 2);
 		result.y = -(tile_map.h / 2);
-		result.w = horde.spawn_region_size_in_tiles;
+		result.w = night_wave.spawn_region_size_in_tiles;
 		result.h = tile_map.h;
 		break;
 	}
 	case SD_West: {
-		result.x = -(tile_map.w / 2) - horde.spawn_region_size_in_tiles;
+		result.x = -(tile_map.w / 2) - night_wave.spawn_region_size_in_tiles;
 		result.y = -(tile_map.h / 2);
-		result.w = horde.spawn_region_size_in_tiles;
+		result.w = night_wave.spawn_region_size_in_tiles;
 		result.h = tile_map.h;
 		break;
 	}
@@ -63,10 +63,10 @@ MP_Rect get_spawn_region_ws(Horde& horde, Tile_Map& tile_map) {
 }
 
 // Call this at the end of every day?
-Horde create_horde(Faction faction, Horde_Type ht, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles) {
-	Horde result = {};
+Night_Wave create_night_wave(Faction faction, Night_Wave_Type nwt, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles) {
+	Night_Wave result = {};
 
-	Horde_Data data = get_horde_data(ht);
+	Night_Wave_Data data = get_horde_data(nwt);
 
 	result.faction = faction;
 	result.level = data.level;
@@ -80,18 +80,18 @@ Horde create_horde(Faction faction, Horde_Type ht, Spawn_Direction spawn_directi
 	return result;
 }
 
-void spawn_and_update_horde(const std::string& unit_name, std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage,
-	Horde& horde, Player& player, Tile_Map& tile_map, float delta_time) {
-	if (horde.begin_spawning) {
-		if (horde.total_spawned < horde.total_to_spawn) {
-			if (check_and_update_cooldown(horde.spawning_cd, delta_time)) {
-				if (horde.faction == F_Enemies) {
+void spawn_and_update_night_wave(const std::string& unit_name, std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage,
+	Night_Wave& night_wave, Player& player, Tile_Map& tile_map, float delta_time) {
+	if (night_wave.begin_spawning) {
+		if (night_wave.total_spawned < night_wave.total_to_spawn) {
+			if (check_and_update_cooldown(night_wave.spawning_cd, delta_time)) {
+				if (night_wave.faction == F_Enemies) {
 					V2 random_pos_ws = {};
-					MP_Rect spawn_region_ws = get_spawn_region_ws(horde, tile_map);
+					MP_Rect spawn_region_ws = get_spawn_region_ws(night_wave, tile_map);
 					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
 					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.h));
 					spawn_unit(
-						horde.faction,
+						night_wave.faction,
 						unit_name,
 						AS_Walking,
 						APS_Fast,
@@ -108,8 +108,8 @@ void spawn_and_update_horde(const std::string& unit_name, std::vector<Handle>& u
 }
 
 // NOTE: Draw diagnal lines? Or dotted lines?
-void draw_horde_spawn_region(Color_Type c, Horde& horde, Tile_Map& tile_map, V2 camera_pos) {
-	MP_Rect spawn_region_ws = get_spawn_region_ws(horde, tile_map);
+void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map& tile_map, V2 camera_pos) {
+	MP_Rect spawn_region_ws = get_spawn_region_ws(night_wave, tile_map);
 	V2 pos_cs = convert_ws_to_cs({(float)spawn_region_ws.x, (float)spawn_region_ws.y}, camera_pos);
 	MP_Rect spawn_region_cs = { (int)pos_cs.x, (int)pos_cs.y, spawn_region_ws.w, spawn_region_ws.h };
 
@@ -118,9 +118,9 @@ void draw_horde_spawn_region(Color_Type c, Horde& horde, Tile_Map& tile_map, V2 
 }
 
 Type_Descriptor horde_data_type_descriptors[] = {
-	FIELD(Horde_Data, VT_Int, level),
-	FIELD(Horde_Data, VT_Int, total_to_spawn),
-	FIELD(Horde_Data, VT_Float, max_spawning_cd)
+	FIELD(Night_Wave_Data, VT_Int, level),
+	FIELD(Night_Wave_Data, VT_Int, total_to_spawn),
+	FIELD(Night_Wave_Data, VT_Float, max_spawning_cd)
 };
 
 void load_horde_data_csv() {

@@ -71,10 +71,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.selected_font = FT_Basic;
 
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
-	game_data.player.health_bar.current_hp -= 50;
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_North, 2);
+	game_data.current_night_wave = create_night_wave(F_Enemies, NWT_Not_Specified, SD_North, 2);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -365,10 +364,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		if (key_pressed(KEY_R)) {
-			game_data.current_horde.begin_spawning = true;
+			game_data.current_night_wave.begin_spawning = true;
 		}
 		if (key_pressed(KEY_T)) {
-			game_data.current_horde = create_horde(F_Enemies, HT_Not_Specified, SD_West, 2);
+			game_data.current_night_wave = create_night_wave(F_Enemies, NWT_Not_Specified, SD_West, 2);
 		}
 
 		if (key_pressed(KEY_T)) {
@@ -509,8 +508,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 			}
 
-			spawn_and_update_horde("gravebound_peasant", game_data.enemy_unit_handles, game_data.unit_storage, 
-				game_data.current_horde, game_data.player, demo_tile_map, delta_time);
+			spawn_and_update_night_wave("gravebound_peasant", game_data.enemy_unit_handles, game_data.unit_storage, 
+				game_data.current_night_wave, game_data.player, demo_tile_map, delta_time);
 		}
 
 		// Render
@@ -550,7 +549,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		mp_draw_tilemap_region(camera, grass_texture, rock_texture, noise_texture);
 
-		draw_horde_spawn_region(CT_Red, game_data.current_horde, demo_tile_map, game_data.camera.pos_ws);
+		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, demo_tile_map, game_data.camera.pos_ws);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);

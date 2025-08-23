@@ -79,7 +79,7 @@
     <ClCompile Include="src\Game_Data.cpp">
       <Filter>Source Files\Game\Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="src\Horde.cpp">
+    <ClCompile Include="src\Night_Wave.cpp">
       <Filter>Source Files\Game\Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="src\Entity_Manager.cpp">
@@ -147,7 +147,7 @@
     <ClInclude Include="src\Game_Data.h">
       <Filter>Source Files\Game\Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="src\Horde.h">
+    <ClInclude Include="src\Night_Wave.h">
       <Filter>Source Files\Game\Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="src\Entity_Manager.h">
