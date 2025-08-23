@@ -42,7 +42,7 @@ void spawn_unit(Faction faction, std::string_view unit_name, Animation_State sta
 
 	result.can_attack = true;
 	result.damage = data->damage;
-	result.attack_cd.max = (1000.0f / data->attacks_per_sec);
+	result.attack_cd.max = (1.0f / data->attacks_per_sec);
 	result.attack_cd.current = result.attack_cd.max;
 	result.target = target;
 	result.handle = create_handle(storage);

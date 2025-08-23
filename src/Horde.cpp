@@ -90,7 +90,6 @@ void spawn_and_update_horde(const std::string& unit_name, std::vector<Handle>& u
 					MP_Rect spawn_region_ws = get_spawn_region_ws(horde, tile_map);
 					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
 					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.h));
-					log("Random Position: x = %f, y = %f", random_pos_ws.x, random_pos_ws.y);
 					spawn_unit(
 						horde.faction,
 						unit_name,

@@ -500,6 +500,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 				if (unit->can_attack) {
 					if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
+						log("Player getting hit");
 						player->health_bar.current_hp -= unit->damage;
 					if (player->health_bar.current_hp <= 0) {
 							player->dead = true;

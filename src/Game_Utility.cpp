@@ -36,6 +36,9 @@ bool check_and_update_cooldown(Cooldown& cd, float delta_time) {
 	}
 	else {
 		cd.current -= delta_time;
+		if (cd.current < 0.0f) {
+			cd.current = 0.0f;
+		}
 		return false;
 	}
 }

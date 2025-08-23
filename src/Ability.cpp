@@ -72,14 +72,12 @@ void Portable_Ballista::update_ability(float delta_time) {
 	if (reset_buffs) {
 		player->weapon->damage -= (int)this->damage_buff_value;
 		this->buff_active = false;
-		log("Disabling Buff");
 		return;
 	}
 	if (this->stand_timer >= 1.0f && this->buff_active == false) {
 		this->damage_buff_value = player->weapon->base_damage * this->damage_increase;
 		player->weapon->damage += (int)this->damage_buff_value;
 		this->buff_active = true;
-		log("Activating Buff");
 	}
 }
 
