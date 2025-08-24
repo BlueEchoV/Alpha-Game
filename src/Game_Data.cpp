@@ -29,6 +29,6 @@ void destroy_game_data(Game_Data& game_data) {
 	REF(game_data);
 	// delete game_data.player->weapon;
 	// delete game_data.player;
-	// delete game_data.current_horde;
+	// delete game_data.current_night_wave;
 	// delete player abilities
 };

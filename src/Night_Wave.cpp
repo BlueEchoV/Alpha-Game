@@ -5,9 +5,9 @@ Night_Wave_Data bad_night_wave_data = {
 	   1,			20,					0.5f
 };
 
-std::unordered_map<std::string, Night_Wave_Data> horde_data_map;
+std::unordered_map<std::string, Night_Wave_Data> night_wave_data;
 
-Night_Wave_Data get_horde_data(Night_Wave_Type night_wave_type) {
+Night_Wave_Data get_night_wave_data(Night_Wave_Type night_wave_type) {
 	Night_Wave_Data result = {};
 
 	if (night_wave_type == NWT_Not_Specified) {
@@ -66,7 +66,7 @@ MP_Rect get_spawn_region_ws(Night_Wave& night_wave, Tile_Map& tile_map) {
 Night_Wave create_night_wave(Faction faction, Night_Wave_Type nwt, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles) {
 	Night_Wave result = {};
 
-	Night_Wave_Data data = get_horde_data(nwt);
+	Night_Wave_Data data = get_night_wave_data(nwt);
 
 	result.faction = faction;
 	result.level = data.level;
@@ -117,7 +117,7 @@ void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map
 	mp_render_draw_rect(&spawn_region_cs);
 }
 
-Type_Descriptor horde_data_type_descriptors[] = {
+Type_Descriptor night_wave_data_type_descriptors[] = {
 	FIELD(Night_Wave_Data, VT_Int, level),
 	FIELD(Night_Wave_Data, VT_Int, total_to_spawn),
 	FIELD(Night_Wave_Data, VT_Float, max_spawning_cd)

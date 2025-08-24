@@ -37,9 +37,6 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->attacks_per_sec = current_weapon_data.attacks_per_sec;
 	weapon->reload_per_sec = current_weapon_data.reload_per_sec;
 	weapon->max_ammo = current_weapon_data.max_ammo;
-	if (weapon->max_ammo > 0) {
-		weapon->uses_ammo = true;
-	}
 	weapon->ammo = 0;
 
 	weapon->projectile_name = current_weapon_data.projectile_name;
@@ -142,7 +139,7 @@ void Weapon::draw_ui(V2 hb_pos_cs) {
 	// Font* font = get_font(FT_Basic);
 
 	// Draw the ammo bar
-	if (this->uses_ammo) {
+	if (this->max_ammo > 0) {
 		int total_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
 		REF(total_health_bar_w);
 		int inner_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH;
