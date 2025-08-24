@@ -271,10 +271,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			if (key_pressed(KEY_3)) {
-				player->weapon->update_ammo_size(1);
+				player->weapon->update_max_ammo_size(1);
 			} 
 			if (key_pressed(KEY_4)) {
-				player->weapon->update_ammo_size(2);
+				player->weapon->update_max_ammo_size(2);
 			}
 
 			// Determine if movement opposes aiming

@@ -17,6 +17,18 @@ Weapon_Data get_weapon_data(std::string weapon_name) {
 	return it->second;
 };
 
+
+void Weapon::update_reload_interval(int new_reload_speed) {
+	this->reload_interval = (1.0f / new_reload_speed);
+	this->reload_intervals_to_full = (float)this->max_ammo * this->reload_interval;
+}
+
+void Weapon::update_max_ammo_size(int new_size) {
+	this->max_ammo = new_size;
+	this->ammo = 0;
+	this->reload_intervals_to_full = (float)this->max_ammo * this->reload_interval;
+}
+
 // Pass the pointer as a reference so we can modify the actual address it pointing at
 void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	if (weapon == NULL) {
@@ -36,8 +48,8 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->damage = current_weapon_data.damage;
 	weapon->attacks_per_sec = current_weapon_data.attacks_per_sec;
 	weapon->reload_per_sec = current_weapon_data.reload_per_sec;
-	weapon->max_ammo = current_weapon_data.max_ammo;
-	weapon->ammo = 0;
+	weapon->update_max_ammo_size(current_weapon_data.max_ammo);
+	weapon->update_reload_interval(current_weapon_data.reload_per_sec);
 
 	weapon->projectile_name = current_weapon_data.projectile_name;
 	weapon->projectile_w = current_weapon_data.projectile_w;
@@ -71,11 +83,8 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 	}
 	}
 
-	if (this->can_fire && this->ammo > 0) {
-		std::string current_ammo = std::to_string(this->ammo);
-		log(current_ammo.c_str());
-		this->ammo--;
-		// printf("Subtracting ammo. Current: %i", this->ammo);
+	// UES PROGRESS TIME INSTEAD
+	if (this->can_fire && this->ammo > 0 && this->ammo <= this->max_ammo && this->reload_progress >= (1.0f / (float)this->reload_per_sec)) { 
 		// Change this to fire weapon
 		V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, camera.pos_ws);
@@ -84,15 +93,21 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 		Globals::debug_total_arrows++;
 		this->can_fire = false;
 		this->fire_cooldown = 1.0f / this->attacks_per_sec;
-		if (this->reload_progress >= (1.0f / this->reload_per_sec)) { 
-			this->reload_progress -= 1.0f / this->reload_per_sec;
-		}
+
+		this->ammo--;
+		this->reload_progress -= 1.0f / this->reload_per_sec;
+		std::string str = "ammo--: " + std::to_string(this->ammo);
+		log(str.c_str());
+		std::string str_2 = "this->reload_progress: " + std::to_string(this->reload_progress);
+		log(str_2.c_str());
+		std::string str_3 = "this->reload_intervals_to_full: " + std::to_string(this->reload_intervals_to_full);
+		log(str_3.c_str());
 	}
 }
 
 void Weapon::update_weapon(float delta_time) {
 	if (this->fire_cooldown <= 0.0f) {
-		if (this->ammo < this->max_ammo || this->ammo > 0 && this->can_fire == false) {
+		if (this->ammo <= this->max_ammo && this->ammo > 0) {
 			this->can_fire = true;
 		} 	
 	} else {
@@ -101,26 +116,18 @@ void Weapon::update_weapon(float delta_time) {
 
 	// Uses ammo
 	if (this->reload_per_sec > 0.0f) {
-		float one_round_reload_time = (1.0f / this->reload_per_sec);
-		float total_clip_reload_time = (float)this->max_ammo * one_round_reload_time;
-
 		this->reload_progress += delta_time;
-		if (this->reload_progress > total_clip_reload_time) {
-			this->reload_progress = total_clip_reload_time;
-		}
-		clamp(this->reload_progress, 0.0f, total_clip_reload_time);
+		clamp(this->reload_progress, 0.0f, this->reload_intervals_to_full);
 
 		if (this->reload_cooldown <= 0.0f) {
 			// Make sure it's within the range
-			if (this->reload_progress >= one_round_reload_time && this->reload_progress <= total_clip_reload_time) {
-				ammo++;
-			}
-
-			if (this->ammo <= this->max_ammo) {
-				this->reload_cooldown = 1.0f / this->reload_per_sec;
-			}
-			else {
-				this->reload_cooldown = 0.0f;
+			if (this->reload_progress >= this->reload_interval && this->reload_progress <= this->reload_intervals_to_full) {
+				if (this->ammo < this->max_ammo) {
+					this->reload_cooldown = 1.0f / this->reload_per_sec;
+					ammo++;
+					std::string str = "ammo++    " + std::to_string(this->ammo);
+					log(str.c_str());
+				}
 			}
 		}
 		else {
@@ -128,20 +135,12 @@ void Weapon::update_weapon(float delta_time) {
 		}
 	}
 }
-
-void Weapon::update_ammo_size(int new_size) {
-	this->max_ammo = new_size;
-	this->ammo = 0;
-}
-
 // Draw it relative to the health bar
 void Weapon::draw_ui(V2 hb_pos_cs) {
 	// Font* font = get_font(FT_Basic);
 
 	// Draw the ammo bar
 	if (this->max_ammo > 0) {
-		int total_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
-		REF(total_health_bar_w);
 		int inner_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH;
 		// This includes the outline around the health bar
 		int total_health_bar_h = Globals::DEFAULT_HEALTH_BAR_HEIGHT + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
@@ -156,10 +155,7 @@ void Weapon::draw_ui(V2 hb_pos_cs) {
 		fill_rect.x = starting_x;
 		fill_rect.y = starting_y;
 
-		float one_round_reload_time = (1.0f / this->reload_per_sec);
-		float total_clip_reload_time = (float)this->max_ammo * one_round_reload_time;
-
-		fill_rect.w = (int)(((float)ammo_rect_w * (float)this->max_ammo) * (this->reload_progress / total_clip_reload_time));
+		fill_rect.w = (int)((float)inner_health_bar_w * ((float)this->ammo / (float)this->max_ammo));
 		fill_rect.h = ammo_rect_h;
 
 		if (((float)this->ammo / (float)this->max_ammo) > 0.60f) {

@@ -34,6 +34,8 @@ struct Weapon {
 
 	bool uses_ammo;
 	int max_ammo;
+	float reload_interval;
+	float reload_intervals_to_full;
 	int ammo;
 	int base_damage;
 	int damage;
@@ -55,7 +57,8 @@ struct Weapon {
 	void fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
 		Camera camera, V2 spawn_pos_ws, Faction faction);
 	void update_weapon(float delta_time);
-	void update_ammo_size(int new_size);
+	void update_max_ammo_size(int new_size);
+	void update_reload_interval(int new_reload_per_sec);
 	void draw_ui(V2 hb_pos_cs);
 	// virtual void reload(); // Reloading animation? // This could be tedious
 };
