@@ -200,7 +200,7 @@ V2 get_viewport_mouse_position(HWND hwnd);
 uint64_t mp_get_ticks_64();
 
 MP_Texture* create_noise_texture(int baked_perlin_width_and_height);
-void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture);
+void mp_draw_blended_perlin_tile_map_around_player(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture);
 
 MP_Renderer* mp_create_renderer(HINSTANCE hInstance);
 // void MP_DestroyRenderer(SDL_Renderer* renderer);

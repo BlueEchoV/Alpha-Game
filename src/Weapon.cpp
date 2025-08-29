@@ -96,12 +96,12 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 
 		this->ammo--;
 		this->reload_progress -= 1.0f / this->reload_per_sec;
-		std::string str = "ammo--: " + std::to_string(this->ammo);
-		log(str.c_str());
-		std::string str_2 = "this->reload_progress: " + std::to_string(this->reload_progress);
-		log(str_2.c_str());
-		std::string str_3 = "this->reload_intervals_to_full: " + std::to_string(this->reload_intervals_to_full);
-		log(str_3.c_str());
+		// std::string str = "ammo--: " + std::to_string(this->ammo);
+		// log(str.c_str());
+		// std::string str_2 = "this->reload_progress: " + std::to_string(this->reload_progress);
+		// log(str_2.c_str());
+		// std::string str_3 = "this->reload_intervals_to_full: " + std::to_string(this->reload_intervals_to_full);
+		// log(str_3.c_str());
 	}
 }
 
@@ -125,8 +125,8 @@ void Weapon::update_weapon(float delta_time) {
 				if (this->ammo < this->max_ammo) {
 					this->reload_cooldown = 1.0f / this->reload_per_sec;
 					ammo++;
-					std::string str = "ammo++    " + std::to_string(this->ammo);
-					log(str.c_str());
+					// std::string str = "ammo++    " + std::to_string(this->ammo);
+					// log(str.c_str());
 				}
 			}
 		}

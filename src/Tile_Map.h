@@ -21,6 +21,6 @@ V2 get_tile_pos_index(V2 pos_ws);
 Tile_Map create_tile_map(int w, int h);
 // Check tilemap collision
 // bool check_player_collision_with_tile_map();
-void draw_entire_map(Camera& camera, Tile_Map& tile_map);
+void draw_entire_map(Camera& camera, Tile_Map& tile_map, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture);
 
 // void load_tile_map_csv();

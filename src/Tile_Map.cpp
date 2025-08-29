@@ -154,7 +154,7 @@ void draw_environment_entity(Camera camera, int tile_index_x, int tile_index_y, 
 }
 
 // The entire map is techinically an offset of the player
-void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
+void draw_entire_map(Camera& camera, Tile_Map& tile_map, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture) {
 	// Only render tiles in the view of the player
 	// Currently in world space
 	// Draw the tiles around the player
@@ -164,6 +164,9 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
 	MP_Rect rect = {0, 0, Globals::playground_area_w, Globals::playground_area_h};
 	mp_set_render_draw_color(CT_Black);
 	mp_render_fill_rect(&rect);
+
+	// Draws around the player
+	mp_draw_blended_perlin_tile_map_around_player(camera, texture_1, texture_2, noise_texture);
 
 	// Truncates by default
 	// The -1 for the range of -63 to 64. It counts 0 as a negative number
@@ -182,16 +185,12 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map) {
 			float perlin_y = tile_y * Globals::noise_frequency;
 			float perlin = stb_perlin_noise3(perlin_x, perlin_y, 0, 0, 0, 0);
 
-			std::string tile_type = "";
 			Environment_Entity ee_type = EE_Empty;
 			if (perlin > 0.0f) {
 				ee_type = EE_Bush;
-				tile_type = "IT_Grass_32x32";
 			} else {
 				ee_type = EE_Rock;
-				tile_type = "IT_Rock_32x32";
 			}
-			draw_tile(tile_type, camera, tile_x, tile_y);
 
 			// Center the world on 0, 0
 			if (tile_x < -((tile_map.w / 2)) || 

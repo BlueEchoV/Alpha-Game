@@ -845,7 +845,7 @@ MP_Texture* create_noise_texture(int baked_perlin_width_and_height) {
 }
 
 // The width is also the height
-void mp_draw_tilemap_region(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture) {
+void mp_draw_blended_perlin_tile_map_around_player(Camera& camera, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture) {
     MP_Renderer* renderer = Globals::renderer;
 
 	// The -1 for the range of -63 to 64. It counts 0 as a negative number

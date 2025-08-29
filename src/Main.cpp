@@ -547,7 +547,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		MP_Texture* grass_texture = get_image(grass_texture_name)->texture;
 		MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
 
-		mp_draw_tilemap_region(camera, grass_texture, rock_texture, noise_texture);
+		draw_entire_map(camera, demo_tile_map, grass_texture, rock_texture, noise_texture);
 
 		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, demo_tile_map, game_data.camera.pos_ws);
 
