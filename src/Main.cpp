@@ -182,7 +182,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
 	MP_Texture* noise_texture = create_noise_texture(512);
 
-	game_data.world = create_world(64, 64, grass_texture, rock_texture, noise_texture);
+	game_data.world = create_world(40, 40, grass_texture, rock_texture, noise_texture);
 
 	MP_Renderer* renderer = Globals::renderer;
 
@@ -225,6 +225,19 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		float player_y_delta = 0.0f;
 
 		if (!player->dead) {
+			if (key_pressed(KEY_4)) {
+				game_data.current_night_wave.spawn_direction = SD_North;
+			}
+			else if (key_pressed(KEY_5)) {
+				game_data.current_night_wave.spawn_direction = SD_South;
+			}
+			else if (key_pressed(KEY_6)) {
+				game_data.current_night_wave.spawn_direction = SD_West;
+			}
+			else if (key_pressed(KEY_7)) {
+				game_data.current_night_wave.spawn_direction = SD_East;
+			}
+
 			V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
@@ -274,13 +287,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (move_magnitude > 0.0f) {
 				move_dir.x = move_delta.x / move_magnitude;
 				move_dir.y = move_delta.y / move_magnitude;
-			}
-
-			if (key_pressed(KEY_3)) {
-				player->weapon->update_max_ammo_size(1);
-			} 
-			if (key_pressed(KEY_4)) {
-				player->weapon->update_max_ammo_size(2);
 			}
 
 			// Determine if movement opposes aiming

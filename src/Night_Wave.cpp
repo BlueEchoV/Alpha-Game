@@ -31,9 +31,9 @@ MP_Rect get_spawn_region_in_pixels_ws(Night_Wave& night_wave, Tile_Map& map) {
 	}
 	case SD_South: {
 		result.x = -(map.w_in_pixels / 2) + spawn_region_size_in_pixels;
-		result.y = -(map.h_in_pixels / 2 + spawn_region_size_in_pixels);
+		result.y = -(map.h_in_pixels / 2);
 		result.w = map.w_in_pixels - spawn_region_size_in_pixels * 2;
-		result.h = night_wave.spawn_region_size_in_tiles;
+		result.h = spawn_region_size_in_pixels;
 		break;
 	}
 	case SD_East: {
@@ -47,7 +47,7 @@ MP_Rect get_spawn_region_in_pixels_ws(Night_Wave& night_wave, Tile_Map& map) {
 		result.x = -(map.w_in_pixels / 2) + night_wave.spawn_region_size_in_tiles;
 		result.y = -(map.h_in_pixels / 2) + spawn_region_size_in_pixels;
 		result.w = spawn_region_size_in_pixels;
-		result.h = map.h_in_pixels;
+		result.h = map.h_in_pixels - spawn_region_size_in_pixels * 2;
 		break;
 	}
 	default: {
