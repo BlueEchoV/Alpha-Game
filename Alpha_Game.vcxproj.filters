@@ -26,14 +26,14 @@
     <Filter Include="Source Files\Game\Gameplay">
       <UniqueIdentifier>{6e99a273-9bca-4af0-964d-28d0e56ebb99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Tile Map">
-      <UniqueIdentifier>{9701c287-3e72-492c-8840-3a7c43f231e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\Physics">
       <UniqueIdentifier>{044094a3-b5d5-42cc-b5e5-78a2b873e377}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Game\Arsenal">
       <UniqueIdentifier>{39515c38-dc22-48f6-bc22-3a55b6cf30ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\World">
+      <UniqueIdentifier>{9701c287-3e72-492c-8840-3a7c43f231e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,8 +88,8 @@
     <ClCompile Include="src\Unit.cpp">
       <Filter>Source Files\Game\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tile_Map.cpp">
-      <Filter>Source Files\Game\Tile Map</Filter>
+    <ClCompile Include="src\World.cpp">
+      <Filter>Source Files\Game\World</Filter>
     </ClCompile>
     <ClCompile Include="src\Rigidbody.cpp">
       <Filter>Source Files\Game\Physics</Filter>
@@ -156,8 +156,8 @@
     <ClInclude Include="src\Unit.h">
       <Filter>Source Files\Game\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tile_Map.h">
-      <Filter>Source Files\Game\Tile Map</Filter>
+    <ClInclude Include="src\World.h">
+      <Filter>Source Files\Game\World</Filter>
     </ClInclude>
     <ClInclude Include="src\Rigidbody.h">
       <Filter>Source Files\Game\Physics</Filter>
@@ -169,7 +169,7 @@
       <Filter>Source Files\Game\Arsenal</Filter>
     </ClInclude>
     <ClInclude Include="src\Perlin.h">
-      <Filter>Source Files\Game\Tile Map</Filter>
+      <Filter>Source Files\Game\World</Filter>
     </ClInclude>
     <ClInclude Include="src\Ability.h">
       <Filter>Source Files\Game\Arsenal</Filter>

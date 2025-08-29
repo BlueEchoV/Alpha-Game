@@ -1,4 +1,4 @@
-#include "Tile_Map.h"
+#include "World.h"
 
 #include <perlin.h>
 
@@ -11,23 +11,37 @@ V2 get_tile_pos_index(V2 pos_ws) {
 }
 
 // All tilemaps are centered around 0, 0 ws position
-Tile_Map create_tile_map(int w, int h) {
+Tile_Map create_tile_map(int w_in_tiles, int h_in_tiles) {
 	Tile_Map result = {};
 
-	result.w = w;
-	result.h = h;
+	result.w_in_tiles = w_in_tiles;
+	result.h_in_tiles = h_in_tiles;
 
-	assert(w % 2 == 0);
-	assert(h % 2 == 0);
+	result.w_in_pixels = result.w_in_tiles * Globals::tile_w;
+	result.h_in_pixels = result.h_in_tiles * Globals::tile_h;
+
+	assert(w_in_tiles % 2 == 0);
+	assert(h_in_tiles % 2 == 0);
 
 	// NOTE: If the width or height is odd, this gets weird
-	result.left_ws = -((result.w * Globals::tile_w) / 2);
+	result.left_ws = -((result.w_in_pixels) / 2);
 	// Account for the additional tile (origin is bottom left corner
-	result.top_ws = (result.h * Globals::tile_h) / 2;
+	result.top_ws = (result.h_in_pixels) / 2;
 	// Account for the additional tile (origin is bottom left corner
-	result.right_ws = (result.w * Globals::tile_w) / 2;
-	result.bottom_ws = -((result.h * Globals::tile_h) / 2);
+	result.right_ws = (result.w_in_pixels) / 2;
+	result.bottom_ws = -((result.h_in_pixels) / 2);
 
+	return result;
+}
+
+World create_world(int w, int h, MP_Texture* tex_1, MP_Texture* tex_2, MP_Texture* noise_tex) {
+	World result = {};
+
+	result.map = create_tile_map(w, h);
+	result.tex_1 = tex_1;
+	result.tex_2 = tex_2;
+	result.noise_tex = noise_tex;
+	
 	return result;
 }
 
@@ -96,10 +110,10 @@ void draw_perlin_tile_map(Camera& camera, Tile_Map& tile_map) {
 	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
 		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
 			// Center the world on 0, 0
-			if (tile_x < -((tile_map.w / 2)) || 
-				tile_x >  (tile_map.w / 2) || 
-				tile_y < -((tile_map.h / 2)) ||
-				tile_y >  (tile_map.h / 2)) {
+			if (tile_x < -((tile_map.w_in_tiles / 2)) || 
+				tile_x >  (tile_map.w_in_tiles / 2) || 
+				tile_y < -((tile_map.h_in_tiles / 2)) ||
+				tile_y >  (tile_map.h_in_tiles / 2)) {
 				continue;
 			}
 			draw_perlin_tile(camera, tile_x, tile_y, Globals::noise_frequency);
@@ -154,7 +168,7 @@ void draw_environment_entity(Camera camera, int tile_index_x, int tile_index_y, 
 }
 
 // The entire map is techinically an offset of the player
-void draw_entire_map(Camera& camera, Tile_Map& tile_map, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture) {
+void draw_entire_world(Camera& camera, World& world) {	
 	// Only render tiles in the view of the player
 	// Currently in world space
 	// Draw the tiles around the player
@@ -166,7 +180,7 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map, MP_Texture* texture_1, 
 	mp_render_fill_rect(&rect);
 
 	// Draws around the player
-	mp_draw_blended_perlin_tile_map_around_player(camera, texture_1, texture_2, noise_texture);
+	mp_draw_blended_perlin_tile_map_around_player(camera, world.tex_1, world.tex_2, world.noise_tex);
 
 	// Truncates by default
 	// The -1 for the range of -63 to 64. It counts 0 as a negative number
@@ -193,11 +207,11 @@ void draw_entire_map(Camera& camera, Tile_Map& tile_map, MP_Texture* texture_1, 
 			}
 
 			// Center the world on 0, 0
-			if (tile_x < -((tile_map.w / 2)) || 
+			if (tile_x < -((world.map.w_in_tiles / 2)) || 
 				// The -1 is to account for the range -64 to +63
-				tile_x >  (tile_map.w / 2) - 1 || 
-				tile_y < -((tile_map.h / 2)) ||
-				tile_y >  (tile_map.h / 2) - 1) {
+				tile_x >  (world.map.w_in_tiles / 2) - 1 || 
+				tile_y < -((world.map.h_in_tiles / 2)) ||
+				tile_y >  (world.map.h_in_tiles / 2) - 1) {
 				draw_environment_entity(camera, tile_x, tile_y, ee_type);
 			}
 		}

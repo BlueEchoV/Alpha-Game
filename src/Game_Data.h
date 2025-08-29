@@ -19,6 +19,7 @@ struct Game_Data {
 	std::vector<Handle> projectile_handles;
 
 	Night_Wave current_night_wave;
+	World world;
 
 	Font_Type selected_font;
 };

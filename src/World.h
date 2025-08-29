@@ -15,12 +15,22 @@ struct Tile {
 	std::string texture_name;
 };
 
+struct World {
+	Tile_Map map;
+
+	MP_Texture* tex_1;
+	MP_Texture* tex_2;
+	MP_Texture* noise_tex;
+};
+
 V2 get_tile_pos_ws(int tile_index_x, int tile_index_y);
 V2 get_tile_pos_index(V2 pos_ws);
 // By default, the centers of the map are 0,0
-Tile_Map create_tile_map(int w, int h);
+Tile_Map create_tile_map(int w_in_tiles, int h_in_tiles);
+
+World create_world(int w, int h, MP_Texture* tex_1, MP_Texture* tex_2, MP_Texture* noise_tex);
 // Check tilemap collision
 // bool check_player_collision_with_tile_map();
-void draw_entire_map(Camera& camera, Tile_Map& tile_map, MP_Texture* texture_1, MP_Texture* texture_2, MP_Texture* noise_texture);
+void draw_entire_world(Camera& camera, World& world);
 
 // void load_tile_map_csv();

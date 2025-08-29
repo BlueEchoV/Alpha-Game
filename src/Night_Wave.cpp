@@ -16,36 +16,38 @@ Night_Wave_Data get_night_wave_data(Night_Wave_Type night_wave_type) {
 	return bad_night_wave_data;
 };
 
-MP_Rect get_spawn_region_ws(Night_Wave& night_wave, Tile_Map& tile_map) {
+MP_Rect get_spawn_region_in_pixels_ws(Night_Wave& night_wave, Tile_Map& map) {
 	MP_Rect result = {};
+
+	int spawn_region_size_in_pixels = night_wave.spawn_region_size_in_tiles * Globals::tile_w;
 
 	switch (night_wave.spawn_direction) {
 	case SD_North: {
-		result.x = -(tile_map.w / 2);
-		result.y = tile_map.h / 2;
-		result.w = tile_map.w;
-		result.h = night_wave.spawn_region_size_in_tiles;
+		result.x = -(map.w_in_pixels / 2) + spawn_region_size_in_pixels;
+		result.y = map.h_in_pixels / 2 - spawn_region_size_in_pixels;
+		result.w = map.w_in_pixels - spawn_region_size_in_pixels * 2;
+		result.h = spawn_region_size_in_pixels;
 		break;
 	}
 	case SD_South: {
-		result.x = -(tile_map.w / 2);
-		result.y = -(tile_map.h / 2) - night_wave.spawn_region_size_in_tiles;
-		result.w = tile_map.w;
+		result.x = -(map.w_in_pixels / 2) + spawn_region_size_in_pixels;
+		result.y = -(map.h_in_pixels / 2 + spawn_region_size_in_pixels);
+		result.w = map.w_in_pixels - spawn_region_size_in_pixels * 2;
 		result.h = night_wave.spawn_region_size_in_tiles;
 		break;
 	}
 	case SD_East: {
-		result.x = tile_map.w - (tile_map.w / 2);
-		result.y = -(tile_map.h / 2);
-		result.w = night_wave.spawn_region_size_in_tiles;
-		result.h = tile_map.h;
+		result.x = (map.w_in_pixels / 2) - spawn_region_size_in_pixels;
+		result.y = -(map.h_in_pixels / 2) + spawn_region_size_in_pixels;
+		result.w = spawn_region_size_in_pixels;
+		result.h = map.h_in_pixels - spawn_region_size_in_pixels * 2;
 		break;
 	}
 	case SD_West: {
-		result.x = -(tile_map.w / 2) - night_wave.spawn_region_size_in_tiles;
-		result.y = -(tile_map.h / 2);
-		result.w = night_wave.spawn_region_size_in_tiles;
-		result.h = tile_map.h;
+		result.x = -(map.w_in_pixels / 2) + night_wave.spawn_region_size_in_tiles;
+		result.y = -(map.h_in_pixels / 2) + spawn_region_size_in_pixels;
+		result.w = spawn_region_size_in_pixels;
+		result.h = map.h_in_pixels;
 		break;
 	}
 	default: {
@@ -54,11 +56,6 @@ MP_Rect get_spawn_region_ws(Night_Wave& night_wave, Tile_Map& tile_map) {
 	}
 	}
 
-	V2 pos_ws = get_tile_pos_ws(result.x, result.y);
-	result.x = (int)pos_ws.x;
-	result.y = (int)pos_ws.y;
-	result.w = result.w * Globals::tile_w;
-	result.h = result.h * Globals::tile_h;
 	return result;
 }
 
@@ -87,7 +84,7 @@ void spawn_and_update_night_wave(const std::string& unit_name, std::vector<Handl
 			if (check_and_update_cooldown(night_wave.spawning_cd, delta_time)) {
 				if (night_wave.faction == F_Enemies) {
 					V2 random_pos_ws = {};
-					MP_Rect spawn_region_ws = get_spawn_region_ws(night_wave, tile_map);
+					MP_Rect spawn_region_ws = get_spawn_region_in_pixels_ws(night_wave, tile_map);
 					random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
 					random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.h));
 					spawn_unit(
@@ -109,7 +106,7 @@ void spawn_and_update_night_wave(const std::string& unit_name, std::vector<Handl
 
 // NOTE: Draw diagnal lines? Or dotted lines?
 void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map& tile_map, V2 camera_pos) {
-	MP_Rect spawn_region_ws = get_spawn_region_ws(night_wave, tile_map);
+	MP_Rect spawn_region_ws = get_spawn_region_in_pixels_ws(night_wave, tile_map);
 	V2 pos_cs = convert_ws_to_cs({(float)spawn_region_ws.x, (float)spawn_region_ws.y}, camera_pos);
 	MP_Rect spawn_region_cs = { (int)pos_cs.x, (int)pos_cs.y, spawn_region_ws.w, spawn_region_ws.h };
 

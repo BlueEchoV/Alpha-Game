@@ -1,6 +1,6 @@
 #include "GL_Functions.h"
 #include "Sprite_System.h"
-#include "Tile_Map.h"
+#include "World.h"
 #include "Audio_xAudio2.h"
 #include "Audio_DirectSound.h"
 
@@ -175,8 +175,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
+	std::string grass_texture_name = "IT_Grass_32x32";
+	std::string rock_texture_name = "IT_Rock_32x32";
+
+	MP_Texture* grass_texture = get_image(grass_texture_name)->texture;
+	MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
 	MP_Texture* noise_texture = create_noise_texture(512);
-	Tile_Map demo_tile_map = create_tile_map(64, 64);
+
+	game_data.world = create_world(64, 64, grass_texture, rock_texture, noise_texture);
 
 	MP_Renderer* renderer = Globals::renderer;
 
@@ -399,17 +405,17 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// TODO: Add these to the tilemap struct?
 		// TODO: DONT FORGET TO ACCOUNT FOR THE APPROPRIATE RANGE (-32 to 31)
 		V2* p_pos = &game_data.player.rb.pos_ws;
-		if (p_pos->x < (float)demo_tile_map.left_ws) {
-			p_pos->x = (float)demo_tile_map.left_ws;
+		if (p_pos->x < (float)game_data.world.map.left_ws) {
+			p_pos->x = (float)game_data.world.map.left_ws;
 		}
-		if (p_pos->x > (float)demo_tile_map.right_ws) {
-			p_pos->x = (float)demo_tile_map.right_ws;
+		if (p_pos->x > (float)game_data.world.map.right_ws) {
+			p_pos->x = (float)game_data.world.map.right_ws;
 		}
-		if (p_pos->y < (float)demo_tile_map.bottom_ws) {
-			p_pos->y = (float)demo_tile_map.bottom_ws;
+		if (p_pos->y < (float)game_data.world.map.bottom_ws) {
+			p_pos->y = (float)game_data.world.map.bottom_ws;
 		}
-		if (p_pos->y > (float)demo_tile_map.top_ws) {
-			p_pos->y = (float)demo_tile_map.top_ws;
+		if (p_pos->y > (float)game_data.world.map.top_ws) {
+			p_pos->y = (float)game_data.world.map.top_ws;
 		}
 
 		if (key_pressed_and_held(VK_SHIFT)) {
@@ -509,7 +515,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			spawn_and_update_night_wave("gravebound_peasant", game_data.enemy_unit_handles, game_data.unit_storage, 
-				game_data.current_night_wave, game_data.player, demo_tile_map, delta_time);
+				game_data.current_night_wave, game_data.player, game_data.world.map, delta_time);
 		}
 
 		// Render
@@ -539,17 +545,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		//IT_Rock_32x32
 		//IT_Grass_32x32
 
-		// draw_entire_map(camera, demo_tile_map);
-		
-		std::string grass_texture_name = "IT_Grass_32x32";
-		std::string rock_texture_name = "IT_Rock_32x32";
+		// draw_entire_map(camera, game_data.map);
 
-		MP_Texture* grass_texture = get_image(grass_texture_name)->texture;
-		MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
-
-		draw_entire_map(camera, demo_tile_map, grass_texture, rock_texture, noise_texture);
-
-		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, demo_tile_map, game_data.camera.pos_ws);
+		draw_entire_world(camera, game_data.world);
+		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, game_data.world.map, game_data.camera.pos_ws);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);

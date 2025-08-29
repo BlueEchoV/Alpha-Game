@@ -78,9 +78,16 @@ enum PACKET_TYPE {
 };
 
 struct Tile_Map {
-	int w;
-	int h;
-	// The world spawn position of the boundaries
+	// Add w and h in pixels AND tiles
+	int w_in_tiles;
+	int h_in_tiles;
+
+	// In pixels
+	int w_in_pixels;
+	int h_in_pixels;
+
+
+	// In pixels
 	int left_ws, top_ws, right_ws, bottom_ws;
 };
 
