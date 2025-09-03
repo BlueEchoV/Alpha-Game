@@ -74,7 +74,8 @@ enum PACKET_TYPE {
 	PT_DRAW,
 	PT_TEXTURE,
 	PT_CLEAR,
-	PT_SEEMLESS_PERLIN_MAP
+	PT_SEEMLESS_PERLIN_MAP,
+	PT_TEXTURE_OUTLINE
 };
 
 struct Tile_Map {
@@ -116,6 +117,14 @@ struct Packet_Tile_Map {
 	int indices_count;
 };
 
+struct Packet_Texture_Outline {
+    MP_Texture* texture;
+    int indices_array_index;
+    int indices_count;
+    Color_4F outline_color;  // RGBA for outline (alpha for opacity if needed)
+    float outline_thickness;  // e.g., 1.0 to 5.0 pixels, normalized later
+};
+
 struct Packet {
 	PACKET_TYPE type;
 
@@ -123,6 +132,7 @@ struct Packet {
 	Packet_Texture packet_texture;
 	Packet_Clear packet_clear;
 	Packet_Tile_Map packet_tile_map;
+	Packet_Texture_Outline packet_texture_outline;
 };
 
 struct Open_GL {
@@ -171,6 +181,8 @@ struct MP_Renderer {
 HDC init_open_gl(HWND window);
 void load_shaders();
 
+Color_RGBA get_color_type(Color_Type c);
+
 void mp_set_render_draw_color(Color_Type c);
 int mp_set_render_draw_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 // int mp_get_render_draw_color(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a);
@@ -197,6 +209,11 @@ void mp_destroy_texture(MP_Texture* texture);
 void mp_render_copy(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect);
 int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
 				      const float angle, const MP_Point* center, const MP_RendererFlip flip);
+
+void mp_render_copy_outlined(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, 
+	Color_4F outline_color, float outline_thickness);
+int mp_render_copy_outlined_ex(MP_Texture * texture, const MP_Rect * src_rect, const MP_Rect * dst_rect, 
+	const float angle, const MP_Point * center, const MP_RendererFlip flip, Color_4F outline_color, float outline_thickness);
 
 int mp_lock_texture(MP_Texture* texture, const MP_Rect* rect, void** pixels, int* pitch);
 void mp_unlock_texture(MP_Texture* texture);

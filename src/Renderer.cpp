@@ -10,7 +10,8 @@
 enum SHADER_PROGRAM {
 	SP_2D_DRAW,
 	SP_2D_TEXTURE,
-	SP_2D_TILE_MAP
+	SP_2D_TILE_MAP, 
+	SP_2D_TEXTURE_OUTLINE
 };
 
 GLuint create_shader(const char* file_path, GLenum gl_shader_type) {
@@ -88,6 +89,9 @@ void load_shaders() {
 
 	GLuint sp_2d_tile_map = create_shader_program("shaders\\vs_2d_tile_map.txt", "shaders\\fs_2d_tile_map.txt");
 	shader_programs[SP_2D_TILE_MAP] = sp_2d_tile_map;
+
+	GLuint sp_2d_texture_outline = create_shader_program("shaders\\vs_2d_texture_outline.txt", "shaders\\fs_2d_texture_outline.txt");
+	shader_programs[SP_2D_TEXTURE_OUTLINE] = sp_2d_texture_outline;
 }
 
 HWND init_windows(HINSTANCE hInstance) {
@@ -765,6 +769,160 @@ int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rec
 	return 0;
 }
 
+void mp_render_copy_outlined(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, Color_4F outline_color, float outline_thickness) {
+    MP_Renderer* renderer = Globals::renderer;
+    Packet result;
+    result.type = PT_TEXTURE_OUTLINE;
+    result.packet_texture_outline.texture = texture;
+    result.packet_texture_outline.outline_color = outline_color;
+    result.packet_texture_outline.outline_thickness = outline_thickness;  // Normalize to texture size
+
+    // Vertex setup (identical to mp_render_copy for positions, colors, tex coords)
+    Vertex vertex_1 = {}, vertex_2 = {}, vertex_3 = {}, vertex_4 = {};
+    MP_Rect dst = (dst_rect == NULL) ? MP_Rect{0, 0, renderer->window_width, renderer->window_height} : *dst_rect;
+    int window_w = renderer->window_width;
+    int window_h = renderer->window_height;
+
+    vertex_1.pos = mp_pixel_to_ndc(dst.x, dst.y, window_w, window_h);  // Bottom left
+    vertex_2.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y, window_w, window_h);
+    vertex_3.pos = mp_pixel_to_ndc(dst.x + dst.w, dst.y + dst.h, window_w, window_h);
+    vertex_4.pos = mp_pixel_to_ndc(dst.x, dst.y + dst.h, window_w, window_h);
+
+    MP_Rect src = (src_rect == NULL) ? MP_Rect{0, 0, texture->w, texture->h} : *src_rect;
+    vertex_1.texture_coor = mp_pixel_to_uv(src.x, src.y, texture->w, texture->h);
+    vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y, texture->w, texture->h);
+    vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h);
+    vertex_4.texture_coor = mp_pixel_to_uv(src.x, src.y + src.h, texture->w, texture->h);
+
+    Color_4F m = texture->mod;
+    vertex_1.color = {m.r, m.g, m.b, m.a};
+    vertex_2.color = {m.r, m.g, m.b, m.a};
+    vertex_3.color = {m.r, m.g, m.b, m.a};
+    vertex_4.color = {m.r, m.g, m.b, m.a};
+
+    int vbo_starting_index = (int)renderer->vertices.size();
+    renderer->vertices.push_back(vertex_1);
+    renderer->vertices.push_back(vertex_2);
+    renderer->vertices.push_back(vertex_3);
+    renderer->vertices.push_back(vertex_4);
+
+    result.packet_texture_outline.indices_array_index = (int)renderer->indices.size();
+    int current_indices = (int)renderer->indices.size();
+    renderer->indices.push_back(vbo_starting_index + 0);
+    renderer->indices.push_back(vbo_starting_index + 1);
+    renderer->indices.push_back(vbo_starting_index + 2);
+    renderer->indices.push_back(vbo_starting_index + 2);
+    renderer->indices.push_back(vbo_starting_index + 3);
+    renderer->indices.push_back(vbo_starting_index + 0);
+    result.packet_texture_outline.indices_count = (int)renderer->indices.size() - current_indices;
+
+    renderer->packets.push_back(result);
+}
+
+int mp_render_copy_outlined_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect,
+                               const float angle, const MP_Point* center, const MP_RendererFlip flip,
+                               Color_4F outline_color, float outline_thickness) {
+    MP_Renderer* renderer = Globals::renderer;
+    Packet result;
+    result.type = PT_TEXTURE_OUTLINE;
+    result.packet_texture_outline.texture = texture;
+    result.packet_texture_outline.outline_color = outline_color;
+    result.packet_texture_outline.outline_thickness = outline_thickness;  // Pass raw thickness (in pixels)
+
+    // Vertex setup, similar to mp_render_copy_ex but for outlined rendering
+    Vertex vertex_1 = {}, vertex_2 = {}, vertex_3 = {}, vertex_4 = {};
+    MP_Rect dst = {};
+    int window_w = renderer->window_width;
+    int window_h = renderer->window_height;
+    if (dst_rect == NULL) {
+        dst.x = 0;
+        dst.y = 0;
+        dst.w = window_w;
+        dst.h = window_h;
+    } else {
+        dst = *dst_rect;
+    }
+
+    MP_Point c = {};
+    if (center == NULL) {
+        c.x = (dst.w / 2) + dst.x;
+        c.y = (dst.h / 2) + dst.y;
+    } else {
+        c = *center;
+    }
+
+    V2 bottom_left = { (float)dst.x, (float)dst.y };
+    V2 bottom_right = { (float)dst.x + (float)dst.w, (float)dst.y };
+    V2 top_right = { (float)dst.x + (float)dst.w, (float)dst.y + (float)dst.h };
+    V2 top_left = { (float)dst.x, (float)dst.y + (float)dst.h };
+
+    if (angle != 0) {
+        bottom_left = rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, bottom_left.x, bottom_left.y);
+        bottom_right = rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, bottom_right.x, bottom_right.y);
+        top_right = rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, top_right.x, top_right.y);
+        top_left = rotate_point_based_off_angle(angle, (float)c.x, (float)c.y, top_left.x, top_left.y);
+    }
+
+    // NOTE: My coordinate system draws from the bottom left
+    vertex_1.pos = mp_pixel_to_ndc((int)bottom_left.x, (int)bottom_left.y, window_w, window_h);
+    vertex_2.pos = mp_pixel_to_ndc((int)bottom_right.x, (int)bottom_right.y, window_w, window_h);
+    vertex_3.pos = mp_pixel_to_ndc((int)top_right.x, (int)top_right.y, window_w, window_h);
+    vertex_4.pos = mp_pixel_to_ndc((int)top_left.x, (int)top_left.y, window_w, window_h);
+
+    MP_Rect src = {};
+    if (src_rect == NULL) {
+        src.x = 0;
+        src.y = 0;
+        src.w = texture->w;
+        src.h = texture->h;
+    } else {
+        src = *src_rect;
+    }
+
+    // Apply flipping to texture coordinates
+    if (flip == SDL_FLIP_HORIZONTAL) {
+        vertex_1.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y, texture->w, texture->h);  // Bottom right
+        vertex_2.texture_coor = mp_pixel_to_uv(src.x, src.y, texture->w, texture->h);  // Bottom left
+        vertex_3.texture_coor = mp_pixel_to_uv(src.x, src.y + src.h, texture->w, texture->h);  // Top left
+        vertex_4.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h);  // Top right
+    } else if (flip == SDL_FLIP_VERTICAL) {
+        vertex_1.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h);  // Top right
+        vertex_2.texture_coor = mp_pixel_to_uv(src.x, src.y + src.h, texture->w, texture->h);  // Top left
+        vertex_3.texture_coor = mp_pixel_to_uv(src.x, src.y, texture->w, texture->h);  // Bottom left
+        vertex_4.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y, texture->w, texture->h);  // Bottom right
+    } else {  // SDL_FLIP_NONE
+        vertex_1.texture_coor = mp_pixel_to_uv(src.x, src.y, texture->w, texture->h);  // Bottom left
+        vertex_2.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y, texture->w, texture->h);  // Bottom right
+        vertex_3.texture_coor = mp_pixel_to_uv(src.x + src.w, src.y + src.h, texture->w, texture->h);  // Top right
+        vertex_4.texture_coor = mp_pixel_to_uv(src.x, src.y + src.h, texture->w, texture->h);  // Top left
+    }
+
+    Color_4F m = texture->mod;
+    vertex_1.color = { m.r, m.g, m.b, m.a };
+    vertex_2.color = { m.r, m.g, m.b, m.a };
+    vertex_3.color = { m.r, m.g, m.b, m.a };
+    vertex_4.color = { m.r, m.g, m.b, m.a };
+
+    int vbo_starting_index = (int)renderer->vertices.size();
+    renderer->vertices.push_back(vertex_1);
+    renderer->vertices.push_back(vertex_2);
+    renderer->vertices.push_back(vertex_3);
+    renderer->vertices.push_back(vertex_4);
+
+    result.packet_texture_outline.indices_array_index = (int)renderer->indices.size();
+    int current_indices = (int)renderer->indices.size();
+    renderer->indices.push_back(vbo_starting_index + 0);
+    renderer->indices.push_back(vbo_starting_index + 1);
+    renderer->indices.push_back(vbo_starting_index + 2);
+    renderer->indices.push_back(vbo_starting_index + 2);
+    renderer->indices.push_back(vbo_starting_index + 3);
+    renderer->indices.push_back(vbo_starting_index + 0);
+    result.packet_texture_outline.indices_count = (int)renderer->indices.size() - current_indices;
+
+    renderer->packets.push_back(result);
+    return 0;
+}
+
 void gl_set_blend_mode(MP_BlendMode blend_mode) {
     switch (blend_mode) {
         case MP_BLENDMODE_NONE:
@@ -1008,7 +1166,27 @@ void mp_render_present() {
 			int count = packet.packet_tile_map.indices_count;
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
 
-		} else {
+		} 
+		else if (packet.type == PT_TEXTURE_OUTLINE) {
+			GLuint shader = shader_programs[SP_2D_TEXTURE_OUTLINE];
+			glUseProgram(shader);
+
+			// Bind texture
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, packet.packet_texture_outline.texture->gl_handle);
+			glUniform1i(glGetUniformLocation(shader, "texture_sampler"), 0);
+
+			// Pass uniforms
+			Color_4F oc = packet.packet_texture_outline.outline_color;
+			glUniform3f(glGetUniformLocation(shader, "outline_color"), oc.r, oc.g, oc.b);
+			glUniform1f(glGetUniformLocation(shader, "outline_thickness"), packet.packet_texture_outline.outline_thickness);
+			glUniform2f(glGetUniformLocation(shader, "tex_size"), (float)packet.packet_texture_outline.texture->w, (float)packet.packet_texture_outline.texture->h);
+
+			int index = packet.packet_texture_outline.indices_array_index;
+			int count = packet.packet_texture_outline.indices_count;
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
+		}
+		else {
 			log("Error: Packet type isn't specified");
 			assert(false);
 		}

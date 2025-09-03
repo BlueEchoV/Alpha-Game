@@ -50,6 +50,7 @@ void spawn_unit(Faction faction, std::string_view unit_name, Animation_State sta
 	Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos);
 void update_unit(Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
+void draw_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, float outline_thickness);
 
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 

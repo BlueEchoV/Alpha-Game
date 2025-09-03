@@ -68,6 +68,16 @@
     <ClInclude Include="src\Weapon.h" />
     <ClInclude Include="src\Windows_Platform.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\fs_2d_draw.txt" />
+    <Text Include="shaders\fs_2d_texture.txt" />
+    <Text Include="shaders\fs_2d_texture_outline.txt" />
+    <Text Include="shaders\fs_2d_tile_map.txt" />
+    <Text Include="shaders\vs_2d_draw.txt" />
+    <Text Include="shaders\vs_2d_texture.txt" />
+    <Text Include="shaders\vs_2d_texture_outline.txt" />
+    <Text Include="shaders\vs_2d_tile_map.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

@@ -24,11 +24,13 @@ glBindBufferFunc glBindBuffer = nullptr;
 glBufferDataFunc glBufferData = nullptr;
 glDeleteBuffersFunc glDeleteBuffers = nullptr;
 glGetUniformLocationFunc glGetUniformLocation = nullptr;
-glUniform1fFunc glUniform1f = nullptr;
 glUniformMatrix4fvFunc glUniformMatrix4fv = nullptr;
 wglCreateContextAttribsARBFunc wglCreateContextAttribsARB = nullptr;
 glActiveTextureFunc glActiveTexture = nullptr;
 glUniform1iFunc glUniform1i = nullptr;
+glUniform1fFunc glUniform1f = nullptr;
+glUniform2fFunc glUniform2f = nullptr;
+glUniform3fFunc glUniform3f = nullptr;
 glBufferSubDataFunc glBufferSubData = nullptr;
 glGenerateMipmapFunc glGenerateMipmap = nullptr;
 
@@ -62,8 +64,10 @@ void load_open_gl_functions() {
 	glDeleteBuffers = (glDeleteBuffersFunc)wglGetProcAddress("glDeleteBuffers");
 
 	glGetUniformLocation = (glGetUniformLocationFunc)wglGetProcAddress("glGetUniformLocation");
-	glUniform1f = (glUniform1fFunc)wglGetProcAddress("glUniform1f");
 	glUniform1i = (glUniform1iFunc)wglGetProcAddress("glUniform1i");
+	glUniform1f = (glUniform1fFunc)wglGetProcAddress("glUniform1f");
+	glUniform2f = (glUniform2fFunc)wglGetProcAddress("glUniform2f");
+	glUniform3f = (glUniform3fFunc)wglGetProcAddress("glUniform3f");
 	glUniformMatrix4fv = (glUniformMatrix4fvFunc)wglGetProcAddress("glUniformMatrix4fv");
 	glActiveTexture = (glActiveTextureFunc)wglGetProcAddress("glActiveTexture");
 	

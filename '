@@ -577,16 +577,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		std::sort(game_data.enemy_unit_handles.begin(), game_data.enemy_unit_handles.end(), [&](Handle& a, Handle& b) {
+		std::sort(game_data.enemy_unit_handles.begin(), game_data.enemy_unit_handles.end(), [&](Handle& a, Handle& b) { 
 			Unit* enemy_1 = get_entity_pointer_from_handle(game_data.unit_storage, a);
 			Unit* enemy_2 = get_entity_pointer_from_handle(game_data.unit_storage, b);
 
-			if (enemy_1 == nullptr && enemy_2 == nullptr) {
-				return false;
-			}
-			else {
-				return enemy_1->rb.pos_ws.y > enemy_2->rb.pos_ws.y;
-			}
+			return enemy_1->rb.pos_ws.y > enemy_2->rb.pos_ws.y;
 			}
 		);
 
@@ -600,7 +595,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				change_animation_tracker(&u->at, u->at.entity_name, AS_Death, u->at.aps, AM_Animate_Once, u->at.flip_horizontally, std::nullopt);
 			}
 
-			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.75f);
+			draw_unit(*u, game_data.camera.pos_ws);
+
+			GLenum err;
+			while ((err = glGetError()) != GL_NO_ERROR) {
+				log(std::to_string(err).c_str());  // e.g., 1282 for GL_INVALID_OPERATION
+			}
+
 
 			if (Globals::debug_show_colliders && u->dead == false) {
 				draw_colliders(&u->rb, game_data.camera.pos_ws);

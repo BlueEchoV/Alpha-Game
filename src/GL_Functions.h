@@ -130,6 +130,15 @@ extern glActiveTextureFunc glActiveTexture;
 typedef void(*glUniform1iFunc)(GLint location, GLint v0);
 extern glUniform1iFunc glUniform1i;
 
+typedef void(*glUniform1fFunc)(GLint location, GLfloat v0);
+extern glUniform1fFunc glUniform1f;
+
+typedef void(*glUniform2fFunc)(GLint location, GLfloat v0, GLfloat v1);
+extern glUniform2fFunc glUniform2f;
+
+typedef void(*glUniform3fFunc)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+extern glUniform3fFunc glUniform3f;
+
 typedef void(*glGenerateMipmapFunc)(GLenum target);
 extern glGenerateMipmapFunc glGenerateMipmap;
 

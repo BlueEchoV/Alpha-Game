@@ -103,6 +103,7 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
 void change_animation_tracker(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, Animation_Mode mode,
 	bool flip_horizontally, std::optional<V2> velocity_opt);
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle);
+void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float angle, Color_Type ct, float outline_thickness);
 
 void load_sprite_sheets();
 void load_sprite_sheet_data_csv(CSV_Data* data); 

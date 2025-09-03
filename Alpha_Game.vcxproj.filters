@@ -35,6 +35,9 @@
     <Filter Include="Source Files\Game\World">
       <UniqueIdentifier>{9701c287-3e72-492c-8840-3a7c43f231e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{0c5ce9b8-4450-475c-85ba-96b9ce7413d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -177,5 +180,31 @@
     <ClInclude Include="src\Player.h">
       <Filter>Source Files\Game\Arsenal</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shaders\fs_2d_draw.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\fs_2d_texture.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\fs_2d_texture_outline.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\fs_2d_tile_map.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\vs_2d_draw.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\vs_2d_texture.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\vs_2d_texture_outline.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
+    <Text Include="shaders\vs_2d_tile_map.txt">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

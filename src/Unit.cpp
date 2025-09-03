@@ -99,6 +99,22 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	}
 }
 
+void draw_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, float outline_thickness) {
+	if (unit.destroyed == false) {
+		V2 entity_pos_cs = convert_ws_to_cs(unit.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y });
+		// Center the image on the position of the entity
+		MP_Rect dst = { (int)entity_pos_cs.x - unit.w / 2, (int)entity_pos_cs.y - unit.h / 2, unit.w, unit.h };
+
+		draw_animation_tracker_outlined(&unit.at, dst, 0, outline_color, outline_thickness);
+
+		if (!unit.dead) {
+			V2 health_bar_cs_pos = entity_pos_cs;
+			health_bar_cs_pos.y += unit.health_bar.offset;
+			draw_faction_health_bar(unit.faction, unit.health_bar, health_bar_cs_pos);
+		}
+	}
+}
+
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle) {
 	return get_entity_pointer_from_handle(storage, handle);
 }

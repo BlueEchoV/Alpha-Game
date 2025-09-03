@@ -367,6 +367,24 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	}
 }
 
+void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float angle, Color_Type ct, float outline_thickness) {
+	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
+
+	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
+	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
+
+	Color_RGBA color_rgba = get_color_type(ct);
+	Color_4F color_4f = {(float)color_rgba.r, (float)color_rgba.g, (float)color_rgba.b, (float)color_rgba.a};
+	if (at->flip_horizontally == false) {
+		// mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
+		mp_render_copy_outlined_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE, color_4f, outline_thickness);
+	}
+	else {
+		mp_render_copy_outlined_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL, {255.0f, 0.0f, 0.0f, 255.0f}, outline_thickness);
+	}
+}
+
+
 Type_Descriptor sprite_sheet_type_descriptors[] = {
 	FIELD(Sprite_Sheet_Data, VT_String, root),
 	FIELD(Sprite_Sheet_Data, VT_String, sprite_sheet_name),
