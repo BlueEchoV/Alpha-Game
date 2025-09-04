@@ -74,7 +74,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_night_wave = create_night_wave(F_Enemies, NWT_Not_Specified, SD_North, 2);
+	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 100);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -384,7 +384,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			game_data.current_night_wave.begin_spawning = true;
 		}
 		if (key_pressed(KEY_T)) {
-			game_data.current_night_wave = create_night_wave(F_Enemies, NWT_Not_Specified, SD_West, 2);
+			game_data.current_night_wave = create_night_wave(MD_Normal, SD_East, 2, 1, 100);
 		}
 
 		if (key_pressed(KEY_T)) {
@@ -525,7 +525,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 			}
 
-			spawn_and_update_night_wave("gravebound_peasant", game_data.enemy_unit_handles, game_data.unit_storage, 
+			spawn_and_update_night_wave(game_data.enemy_unit_handles, game_data.unit_storage, 
 				game_data.current_night_wave, game_data.player, game_data.world.map, delta_time);
 		}
 
