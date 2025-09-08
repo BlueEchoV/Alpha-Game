@@ -51,3 +51,4 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 	Night_Wave& night_wave, Player& player, Tile_Map& tile_map, float delta_time);
 
 void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map& tile_map, V2 camera_pos);
+

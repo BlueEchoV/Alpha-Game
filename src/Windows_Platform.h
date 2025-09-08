@@ -70,5 +70,6 @@ bool key_pressed(WPARAM key);
 bool key_pressed_and_held(WPARAM key);
 void reset_is_pressed();
 V2 get_mouse_position(HWND hwnd);
+V2 get_playground_mouse_position(HWND hwnd);
 void get_window_size(HWND window, int& w, int& h);
 LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);

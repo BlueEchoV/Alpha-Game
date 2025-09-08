@@ -1,8 +1,7 @@
 #include "GL_Functions.h"
-#include "Sprite_System.h"
-#include "World.h"
 #include "Audio_xAudio2.h"
 #include "Audio_DirectSound.h"
+#include "UI.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -74,7 +73,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 100);
+	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 5);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -243,7 +242,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				game_data.current_night_wave.spawn_direction = SD_East;
 			}
 
-			V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
+			V2 mouse_cs_pos = get_playground_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
 			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->torso.flip_horizontally, vel_normalized);
@@ -365,7 +364,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (current_debug_spawning_delay <= 0.0f) {
 			current_debug_spawning_delay = debug_spawning_delay;
 			if (key_pressed_and_held(KEY_Q)) {
-				V2 mouse_position = get_mouse_position(Globals::renderer->open_gl.window_handle);
+				V2 mouse_position = get_playground_mouse_position(Globals::renderer->open_gl.window_handle);
 				mouse_position = convert_cs_to_ws(mouse_position, game_data.camera.pos_ws);
 				spawn_unit(
 					F_Enemies,
@@ -560,7 +559,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// draw_entire_map(camera, game_data.map);
 
 		draw_entire_world(camera, game_data.world);
-		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, game_data.world.map, game_data.camera.pos_ws);
+		draw_game_loop_ui(game_data, FT_Basic);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);

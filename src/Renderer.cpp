@@ -426,15 +426,19 @@ void mp_render_set_viewport(const MP_Rect* rect) {
 
 V2 get_viewport_mouse_position(HWND hwnd) {
 	V2 mouse_window_pos = get_mouse_position(hwnd);
+
 	float vp_mouse_x = mouse_window_pos.x - (float)Globals::active_viewport_x;
 	float vp_mouse_y = mouse_window_pos.y - (float)Globals::active_viewport_y;
+
 	if (vp_mouse_x < 0.0f || vp_mouse_x > (float)Globals::active_viewport_w ||
 	vp_mouse_y < 0.0f || vp_mouse_y > (float)Globals::active_viewport_h) {
-	return {-1.0f, -1.0f}; // Indicate invalid position (e.g., in black bars)
+		return {-1.0f, -1.0f}; // Indicate invalid position (e.g., in black bars)
 	}
+
 	// Apply scaling to map to virtual (logical) coordinate space
 	vp_mouse_x /= Globals::active_viewport_scale_x;
 	vp_mouse_y /= Globals::active_viewport_scale_y;
+
 	return {vp_mouse_x, vp_mouse_y};
 }
 

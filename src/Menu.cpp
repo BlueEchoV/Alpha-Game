@@ -138,7 +138,7 @@ int string_size = 2;
 bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, Color_Type text_color, Color_Type background_color, bool center_button) {
 	Font* font = get_font(ft);
 
-	V2 mouse_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+	V2 mouse_pos = get_playground_mouse_position(Globals::renderer->open_gl.window_handle);
 
 	V2 center = {};
 	MP_Rect draw_rect = {};
@@ -191,3 +191,4 @@ bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, C
 
 	return result;
 }
+

@@ -22,7 +22,7 @@ void reset_is_pressed() {
 	}
 }
 
-// In camera space
+// In camera space, NOT PLAYGROUND SPACE
 V2 get_mouse_position(HWND hwnd) {
 	V2 result = {};
 
@@ -44,6 +44,27 @@ V2 get_mouse_position(HWND hwnd) {
 		assert(false);
 	}
 	return result;
+}
+
+// Returns mouse position in playground coordinates (logical game space).
+// Returns a V2 with x/y in [0, playground_area_w] and [0, playground_area_h] if within the viewport;
+// otherwise, returns {-1, -1} to indicate the mouse is outside the active viewport (e.g., in letterbox areas).
+V2 get_playground_mouse_position(HWND hwnd) {
+    V2 window_mouse = get_mouse_position(hwnd);
+    
+    // Check if mouse is within the active viewport bounds.
+    if (window_mouse.x < Globals::active_viewport_x ||
+        window_mouse.x > Globals::active_viewport_x + Globals::active_viewport_w ||
+        window_mouse.y < Globals::active_viewport_y ||
+        window_mouse.y > Globals::active_viewport_y + Globals::active_viewport_h) {
+        return {-1.0f, -1.0f};  // Invalid position (outside viewport).
+    }
+    
+    // Transform to playground space: subtract offset, then scale inversely.
+    float playground_x = (window_mouse.x - Globals::active_viewport_x) / Globals::active_viewport_scale_x;
+    float playground_y = (window_mouse.y - Globals::active_viewport_y) / Globals::active_viewport_scale_y;
+    
+    return {playground_x, playground_y};
 }
 
 void get_window_size(HWND window, int& w, int& h) {

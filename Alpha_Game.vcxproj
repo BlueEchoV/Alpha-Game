@@ -38,6 +38,7 @@
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Rigidbody.cpp" />
     <ClCompile Include="src\Sprite_System.cpp" />
+    <ClCompile Include="src\UI.cpp" />
     <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\Unit.cpp" />
     <ClCompile Include="src\Utility.cpp" />
@@ -64,6 +65,7 @@
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Rigidbody.h" />
     <ClInclude Include="src\Sprite_System.h" />
+    <ClInclude Include="src\UI.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Unit.h" />
     <ClInclude Include="src\Utility.h" />
