@@ -17,12 +17,14 @@ enum Debug_Image {
 	DI_mp_render_copy_alpha,
 	DI_2d_matrix_transformation_rect,
 	DI_copy_ex,
+	DI_button,
     DI_Count
 };
 
 void debug_draw_coor(Game_Data& game_data, V2 coor_to_draw, bool convert_coor_to_draw_to_cs,
 	V2 draw_at, bool convert_draw_at_to_cs, Color_Type c, bool background, std::string_view custom_text);
 void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb);
+void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font, float delta_time);
 void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture, float delta_time);
 void debug_draw_stats(Font& font, MP_Texture* debug_texture);
 void debug_draw_animation_trackers(Font& font, float delta_time);

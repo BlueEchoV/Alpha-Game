@@ -28,68 +28,6 @@ typedef double f64;
 
 Game_Data game_data = {};
 
-// It is used at the start of each button call to determine if the current button was the active one last frame
-std::string frame_hot_name = "";
-std::string next_frame_hot_name = "";
-int string_size = 2;
-// Draws centered by default
-bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, Color_Type text_color, Color_Type background_color, bool center_button) {
-	Font* font = get_font(ft);
-
-	V2 mouse_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
-
-	V2 center = {};
-	MP_Rect draw_rect = {};
-	if (center_button) {
-		center = {(float)button_area.x, (float)button_area.y};
-		draw_rect = button_area;
-		draw_rect.x -= button_area.w / 2;
-		draw_rect.y -= button_area.h / 2;
-	}
-	else {
-		center = {(float)button_area.x + button_area.w / 2, (float)button_area.y + button_area.h / 2};
-		draw_rect = button_area;
-	}
-
-	bool was_hot = frame_hot_name == text;
-
-	mp_set_render_draw_color(background_color);
-	mp_render_fill_rect(&draw_rect);
-
-	bool result = false;
-
-	// 1: Check if mouse is within button range
-	if (mouse_pos.x >= (center.x - (button_area.w / 2)) && 
-		mouse_pos.x <= (center.x + (button_area.w / 2)) && 
-		mouse_pos.y >= (center.y - (button_area.h / 2)) &&
-		mouse_pos.y <= (center.y + (button_area.h / 2))) {
-		mp_set_render_draw_color(CT_Blue);
-
-		// 2: Check if the left mouse button is down
-		if (key_pressed_and_held(VK_LBUTTON)) {
-			next_frame_hot_name = text;
-			mp_set_render_draw_color(CT_Red);
-		}
-
-		if (was_hot && !key_pressed_and_held(VK_LBUTTON)) {
-			mp_set_render_draw_color(CT_Green);
-			result = true;
-		}
-	}
-	else {
-		mp_set_render_draw_color(CT_Green);
-	}
-
-	mp_render_draw_rect(&draw_rect);
-
-	draw_string(*font, text.c_str(), text_color, false, (float)center.x, (float)center.y, string_size, true);
-
-	// std::string temp = std::to_string(center.x) + " " + std::to_string(center.y);
-	// draw_string(*font, temp.c_str(), CT_Dark_Yellow, false, center.x, center.y, string_size, true);
-
-	return result;
-}
-
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
 	REF(lpCmdLine);
@@ -685,11 +623,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);
-
-		MP_Rect button_area = {Globals::playground_area_w / 2, Globals::playground_area_h / 2, 200, 200};;
-		if (button(button_area, "Testing", FT_Basic, CT_Dark_Yellow, CT_Black, true)) {
-			log("Button Pressed");
-		}
 
 		mp_render_present();
 

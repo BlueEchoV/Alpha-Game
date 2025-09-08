@@ -40,6 +40,80 @@ void debug_draw_collider_coodinates(Game_Data& game_data, Rigid_Body& rb) {
 	}
 }
 
+int window_w = 0;
+int window_h = 0;
+void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font, float delta_time) {
+	MP_Renderer* renderer = Globals::renderer;
+	
+	V2 c = {};
+	c.x = center.x;
+	c.y = center.y;
+
+	float w = 100;
+	float h = 100;
+
+	bool recalculate_points = false;
+	if (window_w != renderer->window_width || 
+		window_h != renderer->window_height) {
+		recalculate_points = true;
+	}
+	window_w = renderer->window_width;
+	window_h = renderer->window_height;
+
+	V2 original_top_left = { c.x - (w / 2.0f), (int)c.y + (h / 2) };
+	V2 original_top_right = { c.x + (w / 2.0f), (int)c.y + (h / 2) };
+	V2 original_bottom_right = { c.x + (w / 2.0f), (int)c.y - (h / 2) };
+	V2 original_bottom_left = { c.x - (w / 2.0f), (int)c.y - (h / 2) };
+
+	static V2 new_top_left = original_top_left;
+	static V2 new_top_right = original_top_right;
+	static V2 new_bottom_right = original_bottom_right;
+	static V2 new_bottom_left = original_bottom_left;
+
+	static float angle = 0.0f;
+	static float last_angle = 0.0f;
+	float rotation_speed = 8.0f;
+	angle += delta_time * rotation_speed;
+
+	if (angle != last_angle || recalculate_points) {
+		new_top_left = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_left.x, (float)original_top_left.y);
+		new_top_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_top_right.x, (float)original_top_right.y);
+		new_bottom_right = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_bottom_right.x, (float)original_bottom_right.y);
+		new_bottom_left = rotate_point_based_off_angle(angle, c.x, c.y, (float)original_bottom_left.x, (float)original_bottom_left.y);
+		last_angle = angle;
+	}
+	int string_size = 1;
+	std::string center_string = {};
+	center_string = "(" + std::to_string((int)c.x) + " " + std::to_string((int)c.y) + ")";
+	draw_string(*font, center_string.c_str(), CT_White, true, c.x, c.y, string_size, true);
+
+	std::string angle_string = {};
+	center_string = std::to_string((int)angle);
+	draw_string(*font, center_string.c_str(), CT_White, true, (int)c.x, (int)c.y + (font->char_height * 2) * string_size, string_size, true);
+
+	std::string top_left_string = {};
+	top_left_string = "(" + std::to_string((int)new_top_left.x) + " " + std::to_string((int)new_top_left.y) + ")";
+	draw_string(*font, top_left_string.c_str(), CT_White, true, new_top_left.x, new_top_left.y, string_size, true);
+
+	std::string top_right_string = {};
+	top_right_string = "(" + std::to_string((int)new_top_right.x) + " " + std::to_string((int)new_top_right.y) + ")";
+	draw_string(*font, top_right_string.c_str(), CT_White, true, new_top_right.x, new_top_right.y, string_size, true);
+
+	std::string bottom_right_string = {};
+	bottom_right_string = "(" + std::to_string((int)new_bottom_right.x) + " " + std::to_string((int)new_bottom_right.y) + ")";
+	draw_string(*font, bottom_right_string.c_str(), CT_White, true, new_bottom_right.x, new_bottom_right.y, string_size, true);
+
+	std::string bottom_left_string = {};
+	bottom_left_string = "(" + std::to_string((int)new_bottom_left.x) + " " + std::to_string((int)new_bottom_left.y) + ")";
+	draw_string(*font, bottom_left_string.c_str(), CT_White, true, new_bottom_left.x, new_bottom_left.y, string_size, true);
+
+	mp_set_render_draw_color(CT_Orange);
+	mp_render_draw_line((int)new_top_left.x, (int)new_top_left.y, (int)new_top_right.x, (int)new_top_right.y);
+	mp_render_draw_line((int)new_top_right.x, (int)new_top_right.y, (int)new_bottom_right.x, (int)new_bottom_right.y);
+	mp_render_draw_line((int)new_bottom_right.x, (int)new_bottom_right.y, (int)new_bottom_left.x, (int)new_bottom_left.y);
+	mp_render_draw_line((int)new_bottom_left.x, (int)new_bottom_left.y, (int)new_top_left.x, (int)new_top_left.y);
+}
+
 void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture, float delta_time) {
 	MP_Renderer* renderer = Globals::renderer;
 
@@ -242,6 +316,14 @@ void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture
 			static float rotation_speed = 8.0f;
 			temp_angle += delta_time * rotation_speed;
 			mp_render_copy_ex(images["IT_Sun"].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
+			break;
+		}
+		case DI_button: {
+			draw_string(font, "button", CT_White, true, title_x, title_y, string_size, true);
+			MP_Rect button_area = { x, y, width, height };
+			if (button(button_area, "Click Me", FT_Basic, CT_White, CT_Black, false)) {
+				log("Button Pressed!!!");
+			}
 			break;
 		}
 		default: {

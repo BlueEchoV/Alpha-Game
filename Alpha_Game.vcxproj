@@ -27,6 +27,7 @@
     <ClCompile Include="src\Game_Data.cpp" />
     <ClCompile Include="src\Game_Utility.cpp" />
     <ClCompile Include="src\Globals.cpp" />
+    <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\Night_Wave.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Game_Data.h" />
     <ClInclude Include="src\GL_Functions.h" />
+    <ClInclude Include="src\Menu.h" />
     <ClInclude Include="src\Night_Wave.h" />
     <ClInclude Include="src\Image.h" />
     <ClInclude Include="src\My_Math.h" />

@@ -38,6 +38,9 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{0c5ce9b8-4450-475c-85ba-96b9ce7413d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game\Menu">
+      <UniqueIdentifier>{465330f5-6094-491c-bb30-0eb44c254b98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -109,6 +112,9 @@
     <ClCompile Include="src\Player.cpp">
       <Filter>Source Files\Game\Arsenal</Filter>
     </ClCompile>
+    <ClCompile Include="src\Menu.cpp">
+      <Filter>Source Files\Game\Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Audio_DirectSound.h">
@@ -179,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="src\Player.h">
       <Filter>Source Files\Game\Arsenal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu.h">
+      <Filter>Source Files\Game\Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

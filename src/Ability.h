@@ -2,6 +2,7 @@
 
 #include "Utility.h"
 #include "Player.h"
+#include "Menu.h"
 
 enum Ability_Type {
 	AT_Not_Specified,

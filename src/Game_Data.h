@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "Game_Utility.h"
 #include "Entity_Manager.h"
+#include "Menu.h"
 
 #include "Ability.h"
 #include "Unit.h"
