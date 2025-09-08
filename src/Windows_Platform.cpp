@@ -73,6 +73,14 @@ LRESULT wind_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
 		player_input[wparam].is_held_down = false;
 		break;
 	}
+	case WM_LBUTTONDOWN:
+		player_input[VK_LBUTTON].is_pressed = true;
+		player_input[VK_LBUTTON].is_held_down = true;
+		break;
+
+	case WM_LBUTTONUP:
+		player_input[VK_LBUTTON].is_held_down = false;
+		break;
 	case WM_SIZE: {
 		// SIZE_MINIMIZED is for when the application is minimized 
 		// to the taskbar

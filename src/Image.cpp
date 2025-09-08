@@ -137,6 +137,12 @@ void load_images() {
 
 	images["IT_Rock_32x32"] = load_image("assets\\rock_32x32.png", 0, true);
 	images["IT_Grass_32x32"] = load_image("assets\\grass_32x32.png", 0, true);
+
+	images["IT_Rock_32x32"] = load_image("assets\\rock_32x32.png", 0, true);
+	images["IT_Grass_32x32"] = load_image("assets\\grass_32x32.png", 0, true);
+
+	images["cathedral_tile_one"] = load_image("assets\\cathedral_tile_one.png", 0, true);
+	images["cathedral_tile_two"] = load_image("assets\\cathedral_tile_two.png", 0, true);
 }
 
 Image* get_image(std::string_view image_name) {

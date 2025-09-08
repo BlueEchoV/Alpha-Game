@@ -28,6 +28,68 @@ typedef double f64;
 
 Game_Data game_data = {};
 
+// It is used at the start of each button call to determine if the current button was the active one last frame
+std::string frame_hot_name = "";
+std::string next_frame_hot_name = "";
+int string_size = 2;
+// Draws centered by default
+bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, Color_Type text_color, Color_Type background_color, bool center_button) {
+	Font* font = get_font(ft);
+
+	V2 mouse_pos = get_mouse_position(Globals::renderer->open_gl.window_handle);
+
+	V2 center = {};
+	MP_Rect draw_rect = {};
+	if (center_button) {
+		center = {(float)button_area.x, (float)button_area.y};
+		draw_rect = button_area;
+		draw_rect.x -= button_area.w / 2;
+		draw_rect.y -= button_area.h / 2;
+	}
+	else {
+		center = {(float)button_area.x + button_area.w / 2, (float)button_area.y + button_area.h / 2};
+		draw_rect = button_area;
+	}
+
+	bool was_hot = frame_hot_name == text;
+
+	mp_set_render_draw_color(background_color);
+	mp_render_fill_rect(&draw_rect);
+
+	bool result = false;
+
+	// 1: Check if mouse is within button range
+	if (mouse_pos.x >= (center.x - (button_area.w / 2)) && 
+		mouse_pos.x <= (center.x + (button_area.w / 2)) && 
+		mouse_pos.y >= (center.y - (button_area.h / 2)) &&
+		mouse_pos.y <= (center.y + (button_area.h / 2))) {
+		mp_set_render_draw_color(CT_Blue);
+
+		// 2: Check if the left mouse button is down
+		if (key_pressed_and_held(VK_LBUTTON)) {
+			next_frame_hot_name = text;
+			mp_set_render_draw_color(CT_Red);
+		}
+
+		if (was_hot && !key_pressed_and_held(VK_LBUTTON)) {
+			mp_set_render_draw_color(CT_Green);
+			result = true;
+		}
+	}
+	else {
+		mp_set_render_draw_color(CT_Green);
+	}
+
+	mp_render_draw_rect(&draw_rect);
+
+	draw_string(*font, text.c_str(), text_color, false, (float)center.x, (float)center.y, string_size, true);
+
+	// std::string temp = std::to_string(center.x) + " " + std::to_string(center.y);
+	// draw_string(*font, temp.c_str(), CT_Dark_Yellow, false, center.x, center.y, string_size, true);
+
+	return result;
+}
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 	REF(hPrevInstance);
 	REF(lpCmdLine);
@@ -176,14 +238,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	float debug_spawning_delay = 0.25f;
 	float current_debug_spawning_delay = 0.0f;
 
-	std::string grass_texture_name = "IT_Grass_32x32";
-	std::string rock_texture_name = "IT_Rock_32x32";
+	MP_Texture* texture_one = get_image("cathedral_tile_one")->texture;
+	MP_Texture* texture_two = get_image("cathedral_tile_two")->texture;
 
-	MP_Texture* grass_texture = get_image(grass_texture_name)->texture;
-	MP_Texture* rock_texture = get_image(rock_texture_name)->texture;
+	// MP_Texture* texture_one = get_image(IT_Grass_32x32)->texture;
+	// MP_Texture* texture_two = get_image(IT_Rock_32x32)->texture;
+
 	MP_Texture* noise_texture = create_noise_texture(512);
 
-	game_data.world = create_world(40, 40, grass_texture, rock_texture, noise_texture);
+	game_data.world = create_world(40, 40, texture_one, texture_two, noise_texture);
 
 	MP_Renderer* renderer = Globals::renderer;
 
@@ -210,6 +273,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				Globals::running = false;
 			}
 		}
+
+		frame_hot_name = next_frame_hot_name;
+		next_frame_hot_name = "";
 
 		current_frame_time = mp_get_ticks_64();
 		// Convert to seconds
@@ -581,7 +647,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Unit* enemy_1 = get_entity_pointer_from_handle(game_data.unit_storage, a);
 			Unit* enemy_2 = get_entity_pointer_from_handle(game_data.unit_storage, b);
 
-			if (enemy_1 == nullptr && enemy_2 == nullptr) {
+			if (enemy_1 == nullptr || enemy_2 == nullptr) {
 				return false;
 			}
 			else {
@@ -600,7 +666,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				change_animation_tracker(&u->at, u->at.entity_name, AS_Death, u->at.aps, AM_Animate_Once, u->at.flip_horizontally, std::nullopt);
 			}
 
-			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.75f);
+			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.5f);
+			// draw_unit(*u, game_data.camera.pos_ws);
 
 			if (Globals::debug_show_colliders && u->dead == false) {
 				draw_colliders(&u->rb, game_data.camera.pos_ws);
@@ -618,6 +685,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);
+
+		MP_Rect button_area = {Globals::playground_area_w / 2, Globals::playground_area_h / 2, 200, 200};;
+		if (button(button_area, "Testing", FT_Basic, CT_Dark_Yellow, CT_Black, true)) {
+			log("Button Pressed");
+		}
 
 		mp_render_present();
 

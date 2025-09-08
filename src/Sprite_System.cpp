@@ -374,13 +374,13 @@ void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float a
 	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
 
 	Color_RGBA color_rgba = get_color_type(ct);
-	Color_4F color_4f = {(float)color_rgba.r, (float)color_rgba.g, (float)color_rgba.b, (float)color_rgba.a};
+	Color_4F color_4f_normalized = {(float)color_rgba.r / 255.0f, (float)color_rgba.g / 255.0f, (float)color_rgba.b / 255.0f, (float)color_rgba.a / 255.0f};
 	if (at->flip_horizontally == false) {
 		// mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
-		mp_render_copy_outlined_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE, color_4f, outline_thickness);
+		mp_render_copy_outlined_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE, color_4f_normalized, outline_thickness);
 	}
 	else {
-		mp_render_copy_outlined_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL, {255.0f, 0.0f, 0.0f, 255.0f}, outline_thickness);
+		mp_render_copy_outlined_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL, color_4f_normalized, outline_thickness);
 	}
 }
 
