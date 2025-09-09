@@ -98,9 +98,20 @@ Night_Wave create_night_wave(Map_Difficulty difficulty, Spawn_Direction spawn_di
 	return result;
 }
 
-void reset_and_scale_night_wave(Night_Wave& nw) {
+void reset_and_scale_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, Night_Wave& nw) {
+	// Reset values
 	nw.begin_spawning = false;
 	nw.total_spawned = 0;
+	REF(unit_handles);
+	REF(unit_storage);
+	/*
+	for (Handle& h : unit_handles) {
+		Unit* unit = get_unit_from_handle(unit_storage, h);
+		unit->destroyed = true;
+	}
+	*/
+
+	// Scale Wave
 	if (nw.current_wave < get_max_waves_from_difficulty(nw.difficulty)) {
 		nw.current_wave++;
 		// TODO: Exponential now. Need to change this later.
@@ -117,7 +128,7 @@ void reset_and_scale_night_wave(Night_Wave& nw) {
 
 bool temp = false;
 void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage,
-	Night_Wave& night_wave, Player& player, Tile_Map& tile_map, float delta_time) {
+	Night_Wave& night_wave, int& active_enemy_units, Player& player, Tile_Map& tile_map, float delta_time) {
 	if (night_wave.begin_spawning) {
 		if (night_wave.total_spawned < night_wave.total_to_spawn) {
 			if (check_and_update_cooldown(night_wave.spawning_cd, delta_time)) {
@@ -129,6 +140,7 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 				std::string unit_name = "";
 				if (temp) {
 					unit_name = "ravenous_skulk";
+
 					temp = false;
 				}
 				else {
@@ -148,12 +160,17 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 					random_pos_ws
 				);
 				night_wave.total_spawned++;
+				active_enemy_units++;
 			}
-		} else {
-			reset_and_scale_night_wave(night_wave);
 		}
-	}
+		else {
+			if (active_enemy_units <= 0) {
+				reset_and_scale_night_wave(unit_handles, unit_storage, night_wave);
+			}
+		}
+	} 
 }
+
 
 // NOTE: Draw diagnal lines? Or dotted lines?
 void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map& tile_map, V2 camera_pos) {

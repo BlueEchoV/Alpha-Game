@@ -49,8 +49,8 @@ struct Night_Wave {
 int get_max_waves_from_difficulty(Map_Difficulty md);
 Night_Wave create_night_wave(Map_Difficulty difficulty, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles,
 	int current_wave, int enemies_to_spawn);
-void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, 
-	Night_Wave& night_wave, Player& player, Tile_Map& tile_map, float delta_time);
+void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage,
+	Night_Wave& night_wave, int& active_enemy_units, Player& player, Tile_Map& tile_map, float delta_time);
 
 void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map& tile_map, V2 camera_pos);
 

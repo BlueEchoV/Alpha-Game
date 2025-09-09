@@ -506,6 +506,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 						unit->health_bar.current_hp -= proj->damage;
 						if (unit->health_bar.current_hp <= 0) {
 							unit->dead = true;
+							game_data.active_enemy_units--;
 						}
 					}
 				}
@@ -528,7 +529,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			spawn_and_update_night_wave(game_data.enemy_unit_handles, game_data.unit_storage,
-				game_data.current_night_wave, game_data.player, game_data.world.map, delta_time);
+				game_data.current_night_wave, game_data.active_enemy_units, game_data.player, game_data.world.map, delta_time);
 		}
 
 		// Render

@@ -16,7 +16,7 @@ void delete_destroyed_entities_from_game_data_handles(Game_Data& game_data) {
 		Projectile* proj = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handles);
 		if (proj != NULL) {
 			if (proj->destroyed) {
-				delete_handle(game_data.unit_storage, projectile_handles);
+				delete_handle(game_data.projectile_storage, projectile_handles);
 				*proj = {};
 				return true;
 			}

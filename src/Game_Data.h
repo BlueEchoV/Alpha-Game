@@ -17,6 +17,7 @@ struct Game_Data {
 	Storage<Unit>		unit_storage = { .storage_type = ST_Unit };
 
 	std::vector<Handle> enemy_unit_handles;
+	int active_enemy_units;
 	std::vector<Handle> projectile_handles;
 
 	Night_Wave current_night_wave;
