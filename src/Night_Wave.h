@@ -8,6 +8,7 @@
 #include "Player.h"
 
 enum Map_Difficulty {
+	MD_Not_Specified, 
 	MD_Normal,
 	MD_Hard,
 	MD_Endless
@@ -45,6 +46,7 @@ struct Night_Wave {
 	Cooldown spawning_cd;
 }; 
 
+int get_max_waves_from_difficulty(Map_Difficulty md);
 Night_Wave create_night_wave(Map_Difficulty difficulty, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles,
 	int current_wave, int enemies_to_spawn);
 void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage, 

@@ -17,7 +17,8 @@ enum Debug_Image {
 	DI_mp_render_copy_alpha,
 	DI_2d_matrix_transformation_rect,
 	DI_copy_ex,
-	DI_button,
+	DI_button_text,
+	DI_button_image,
     DI_Count
 };
 

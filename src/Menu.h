@@ -1,6 +1,6 @@
 #pragma once
 #include "Renderer.h"
-#include "Image.h"
+#include "Sprite_System.h"
 
 struct Font {
 	int char_width;
@@ -13,7 +13,8 @@ struct Font {
 };
 
 enum Font_Type {
-	FT_Basic
+	FT_None,
+	FT_Basic 
 };
 
 extern std::unordered_map<Font_Type, Font> fonts;
@@ -28,4 +29,6 @@ void draw_quick_string(Color_Type c, bool background, const char* str, int x, in
 
 extern std::string frame_hot_name;
 extern std::string next_frame_hot_name;
-bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, Color_Type text_color, Color_Type background_color, bool center_button);
+bool button_text(const MP_Rect& button_area, const std::string& text, int text_size, Font_Type ft, Color_Type text_color, bool draw_background,
+	Color_Type background_color, bool center_button);
+bool button_image(const MP_Rect& button_area, const std::string& sprite_sheet_name, MP_Rect* texture_src_rect, bool center_button);

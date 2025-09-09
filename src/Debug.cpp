@@ -318,10 +318,18 @@ void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture
 			mp_render_copy_ex(images["IT_Sun"].texture, NULL, &temp_rect, temp_angle, NULL, SDL_FLIP_NONE);
 			break;
 		}
-		case DI_button: {
+		case DI_button_text: {
 			draw_string(font, "button", CT_White, true, title_x, title_y, string_size, true);
 			MP_Rect button_area = { x, y, width, height };
-			if (button(button_area, "Click Me", FT_Basic, CT_White, CT_Black, false)) {
+			if (button_text(button_area, "Click Me", 2, FT_Basic, CT_White, true, CT_Black, false)) {
+				log("Button Pressed!!!");
+			}
+			break;
+		}
+		case DI_button_image: {
+			draw_string(font, "button", CT_White, true, title_x, title_y, string_size, true);
+			MP_Rect button_area = { x, y, width, height };
+			if (button_image(button_area, "tree", NULL, false)) {
 				log("Button Pressed!!!");
 			}
 			break;

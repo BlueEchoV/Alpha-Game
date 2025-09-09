@@ -282,11 +282,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			// Compute movement direction
-			V2 move_delta = {player_x_delta, player_y_delta};
+			V2 move_delta = { player_x_delta, player_y_delta };
 			// Length of movement
 			float move_magnitude = sqrt(move_delta.x * move_delta.x + move_delta.y * move_delta.y);
 
-			V2 move_dir = {0.0f, 0.0f};
+			V2 move_dir = { 0.0f, 0.0f };
 			// Normalize the movement
 			if (move_magnitude > 0.0f) {
 				move_dir.x = move_delta.x / move_magnitude;
@@ -299,11 +299,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			const float opposition_threshold = 0.0f;
 
 			// Select legs animation state and mode
-			Animation_State legs_state = AS_Walking_Forward; 
+			Animation_State legs_state = AS_Walking_Forward;
 			Animation_Mode legs_mode = AM_Static_First_Frame;
 
 			// NOTE: Just aim legs at the mouse if the player is not moving.
-			V2 legs_facing_dir = vel_normalized; 
+			V2 legs_facing_dir = vel_normalized;
 			if (player_moving) {
 				// NOTE: Compute perpendicular for right (rotate aim 90° clockwise) (new local variable). 
 				//		 X is in the Y place and negated for 90 degrees clockwise. That's the formula.
@@ -318,7 +318,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					reversed = true;
 					// Rotates the movement vector by 180° when you’re moving “behind” your aim.
 					forward_comp = -forward_comp;
-					side_comp = -side_comp; 
+					side_comp = -side_comp;
 				}
 
 				// Reconstruct facing dir 
@@ -333,7 +333,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					legs_facing_dir.y = legs_facing.y / mag;
 				}
 				legs_mode = reversed ? AM_Animate_Looping_Reversed : AM_Animate_Looping;
-			} else {
+			}
+			else {
 				// Idle: static, facing aim 
 				legs_facing_dir = vel_normalized;
 			}
@@ -383,11 +384,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			current_debug_spawning_delay -= delta_time;
 		}
 
-		if (key_pressed(KEY_R)) {
-			game_data.current_night_wave.begin_spawning = true;
-		}
 		if (key_pressed(KEY_T)) {
-			game_data.current_night_wave = create_night_wave(MD_Normal, SD_East, 2, 1, 100);
+			game_data.current_night_wave = create_night_wave(MD_Normal, SD_East, 2, 1, 5);
 		}
 
 		if (key_pressed(KEY_T)) {
@@ -434,7 +432,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		if (key_pressed_and_held(VK_SHIFT)) {
 			game_data.player.rb.current_speed = game_data.player.rb.base_speed * 2;
-		} else {
+		}
+		else {
 			game_data.player.rb.current_speed = game_data.player.rb.base_speed;
 		}
 
@@ -450,7 +449,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		if (key_pressed(VK_F4)) {
 			Globals::debug_show_stats = !Globals::debug_show_stats;
-		} 
+		}
 		if (key_pressed(VK_F5)) {
 			Globals::debug_show_colliders = !Globals::debug_show_colliders;
 		}
@@ -458,7 +457,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 			if (Globals::debug_show_coordinates != Globals::toggle_debug_images) {
 				Globals::debug_show_coordinates = !Globals::debug_show_coordinates;
-			} 
+			}
 			if (Globals::debug_show_stats != Globals::toggle_debug_images) {
 				Globals::debug_show_stats = !Globals::debug_show_stats;
 			}
@@ -483,7 +482,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					update_unit(*unit, delta_time);
 				}
 
-				change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, AM_Animate_Looping,false, unit->rb.vel);
+				change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, AM_Animate_Looping, false, unit->rb.vel);
 				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
@@ -521,14 +520,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
 						log("Player getting hit");
 						player->health_bar.current_hp -= unit->damage;
-					if (player->health_bar.current_hp <= 0) {
+						if (player->health_bar.current_hp <= 0) {
 							player->dead = true;
 						}
 					}
 				}
 			}
 
-			spawn_and_update_night_wave(game_data.enemy_unit_handles, game_data.unit_storage, 
+			spawn_and_update_night_wave(game_data.enemy_unit_handles, game_data.unit_storage,
 				game_data.current_night_wave, game_data.player, game_data.world.map, delta_time);
 		}
 
@@ -548,7 +547,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			// renderer->window_width = Globals::entire_window_width;
 			// renderer->window_height = Globals::entire_window_height;
 
-			viewport = { 0, 0, Globals::client_area_w, Globals::client_area_h};
+			viewport = { 0, 0, Globals::client_area_w, Globals::client_area_h };
 			mp_render_set_viewport(&viewport);
 
 			Globals::viewport_needs_update = false;
@@ -564,7 +563,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 
-		for (Handle projectile: game_data.projectile_handles) {
+		for (Handle projectile : game_data.projectile_handles) {
 			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
 			if (p == NULL) {
 				log("Error: handle returned null");
@@ -572,7 +571,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 			draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
 			if (Globals::debug_show_coordinates) {
-				debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true, 
+				debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true,
 					CT_Green, true, "WS Pos: ");
 			}
 			if (Globals::debug_show_colliders) {
@@ -593,7 +592,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		);
 
-		for (Handle zombie_handle: game_data.enemy_unit_handles) {
+		for (Handle zombie_handle : game_data.enemy_unit_handles) {
 			Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
 			if (u == NULL) {
 				log("Error: handle returned null");
@@ -618,7 +617,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Font* font = get_font(game_data.selected_font);
 		if (game_data.player.dead) {
-			draw_string(*font, "Game Over", CT_Red_Wine, true, Globals::playground_area_w / 2,  Globals::playground_area_h / 2, 5, true);
+			draw_string(*font, "Game Over", CT_Red_Wine, true, Globals::playground_area_w / 2, Globals::playground_area_h / 2, 5, true);
 		}
 
 		debug_draw_all_debug_info(game_data, *font, get_image("dummy_image")->texture, delta_time);

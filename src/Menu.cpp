@@ -133,9 +133,9 @@ void draw_quick_string(Color_Type c, bool background, const char* str, int x, in
 // It is used at the start of each button call to determine if the current button was the active one last frame
 std::string frame_hot_name = "";
 std::string next_frame_hot_name = "";
-int string_size = 2;
 // Draws centered by default
-bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, Color_Type text_color, Color_Type background_color, bool center_button) {
+bool button_text(const MP_Rect& button_area, const std::string& text, int text_size, Font_Type ft, Color_Type text_color, bool draw_background, 
+	Color_Type background_color, bool center_button) {
 	Font* font = get_font(ft);
 
 	V2 mouse_pos = get_playground_mouse_position(Globals::renderer->open_gl.window_handle);
@@ -155,8 +155,10 @@ bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, C
 
 	bool was_hot = frame_hot_name == text;
 
-	mp_set_render_draw_color(background_color);
-	mp_render_fill_rect(&draw_rect);
+	if (draw_background) {
+		mp_set_render_draw_color(background_color);
+		mp_render_fill_rect(&draw_rect);
+	}
 
 	bool result = false;
 
@@ -184,7 +186,7 @@ bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, C
 
 	mp_render_draw_rect(&draw_rect);
 
-	draw_string(*font, text.c_str(), text_color, false, (float)center.x, (float)center.y, string_size, true);
+	draw_string(*font, text.c_str(), text_color, false, (float)center.x, (float)center.y, text_size, true);
 
 	// std::string temp = std::to_string(center.x) + " " + std::to_string(center.y);
 	// draw_string(*font, temp.c_str(), CT_Dark_Yellow, false, center.x, center.y, string_size, true);
@@ -192,3 +194,25 @@ bool button(const MP_Rect& button_area, const std::string& text, Font_Type ft, C
 	return result;
 }
 
+bool button_image(const MP_Rect& button_area, const std::string& sprite_sheet_name, MP_Rect* texture_src_rect, bool center_button) {
+	V2 center = {};
+	MP_Rect draw_rect = {};
+	if (center_button) {
+		center = {(float)button_area.x, (float)button_area.y};
+		draw_rect = button_area;
+		draw_rect.x -= button_area.w / 2;
+		draw_rect.y -= button_area.h / 2;
+	}
+	else {
+		center = {(float)button_area.x + button_area.w / 2, (float)button_area.y + button_area.h / 2};
+		draw_rect = button_area;
+	}
+
+	MP_Point point = { (int)center.x, (int)center.y };
+
+	Sprite_Sheet* ss = get_sprite_sheet(sprite_sheet_name);
+	// TODO: Make this able to play sprite sheets?
+	mp_render_copy_ex(ss->sprites[0].image.texture, texture_src_rect, &draw_rect, 0, &point, SDL_FLIP_NONE);
+
+	return(button_text(draw_rect, "image_name", 0, FT_None, CT_Black, false, CT_Black, center_button));
+}

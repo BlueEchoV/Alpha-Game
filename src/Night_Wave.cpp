@@ -58,6 +58,27 @@ MP_Rect get_spawn_region_in_pixels_ws(Night_Wave& night_wave, Tile_Map& map) {
 	return result;
 }
 
+int normal_max_waves = 20;
+int hard_max_waves = 20;
+int endless_max_waves = INT_MAX;
+int get_max_waves_from_difficulty(Map_Difficulty md) {
+	switch (md) {
+	case MD_Normal: {
+		return normal_max_waves;
+	}
+	case MD_Hard: {
+		return hard_max_waves;
+	}
+	case MD_Endless: {
+		return endless_max_waves;
+	}
+	default: {
+		log("Difficulty not specified");
+		return -1;
+	}
+	}
+}
+
 // Call this at the end of every day?
 Night_Wave create_night_wave(Map_Difficulty difficulty, Spawn_Direction spawn_direction, int spawn_region_size_in_tiles, 
 	int current_wave, int enemies_to_spawn) {
@@ -75,6 +96,23 @@ Night_Wave create_night_wave(Map_Difficulty difficulty, Spawn_Direction spawn_di
 	result.total_spawned = 0;
 
 	return result;
+}
+
+void reset_and_scale_night_wave(Night_Wave& nw) {
+	nw.begin_spawning = false;
+	nw.total_spawned = 0;
+	if (nw.current_wave < get_max_waves_from_difficulty(nw.difficulty)) {
+		nw.current_wave++;
+		// TODO: Exponential now. Need to change this later.
+		nw.total_to_spawn += 2;
+		// Randomize spawn_direction to a different value
+        int current_dir = nw.spawn_direction;
+        int new_dir;
+        do {
+            new_dir = rand() % 4;
+        } while (new_dir == current_dir);
+        nw.spawn_direction = (Spawn_Direction)new_dir;
+	}
 }
 
 bool temp = false;
@@ -109,7 +147,10 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 					&player,
 					random_pos_ws
 				);
+				night_wave.total_spawned++;
 			}
+		} else {
+			reset_and_scale_night_wave(night_wave);
 		}
 	}
 }

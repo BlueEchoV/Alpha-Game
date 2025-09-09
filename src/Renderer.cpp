@@ -424,22 +424,33 @@ void mp_render_set_viewport(const MP_Rect* rect) {
     glViewport(viewport.x, viewport.y, viewport.w, viewport.h);
 };
 
+// Transforms the mouse position from window coordinates to viewport-relative (logical playground) coordinates.
+// This function first gets the raw window mouse position, subtracts viewport offsets, checks if it's within bounds,
+// and then applies inverse scaling to map it to the game's logical space (e.g., [0, playground_area_w] x [0, playground_area_h]).
+// Returns {-1.0f, -1.0f} if the mouse is outside the active viewport (e.g., in letterbox black bars).
 V2 get_viewport_mouse_position(HWND hwnd) {
-	V2 mouse_window_pos = get_mouse_position(hwnd);
-
-	float vp_mouse_x = mouse_window_pos.x - (float)Globals::active_viewport_x;
-	float vp_mouse_y = mouse_window_pos.y - (float)Globals::active_viewport_y;
-
-	if (vp_mouse_x < 0.0f || vp_mouse_x > (float)Globals::active_viewport_w ||
-	vp_mouse_y < 0.0f || vp_mouse_y > (float)Globals::active_viewport_h) {
-		return {-1.0f, -1.0f}; // Indicate invalid position (e.g., in black bars)
-	}
-
-	// Apply scaling to map to virtual (logical) coordinate space
-	vp_mouse_x /= Globals::active_viewport_scale_x;
-	vp_mouse_y /= Globals::active_viewport_scale_y;
-
-	return {vp_mouse_x, vp_mouse_y};
+    // Retrieve the mouse position in window coordinates (bottom-left origin).
+    V2 mouse_window_pos = get_mouse_position(hwnd);
+    
+    // Subtract the viewport's top-left offset to get position relative to the active rendering area.
+    float vp_mouse_x = mouse_window_pos.x - (float)Globals::active_viewport_x;
+    float vp_mouse_y = mouse_window_pos.y - (float)Globals::active_viewport_y;
+    
+    // Check if the offset-adjusted position is within the viewport's dimensions.
+    // If not, the mouse is in inactive areas (e.g., black bars), so return an invalid indicator.
+    if (vp_mouse_x < 0.0f || vp_mouse_x > (float)Globals::active_viewport_w ||
+        vp_mouse_y < 0.0f || vp_mouse_y > (float)Globals::active_viewport_h) {
+        return {-1.0f, -1.0f};  // Indicate invalid position (e.g., in black bars).
+    }
+    
+    // Apply scaling to map to virtual (logical) coordinate space:
+    // Divide by the scale factors to reverse the viewport's stretching/compression.
+	// Derivative of the playround_area
+    vp_mouse_x /= Globals::active_viewport_scale_x;
+    vp_mouse_y /= Globals::active_viewport_scale_y;
+    
+    // Return the transformed position in playground coordinates.
+    return {vp_mouse_x, vp_mouse_y};
 }
 
 Color_RGBA get_color_type(Color_Type c) {
