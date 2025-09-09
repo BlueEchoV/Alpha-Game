@@ -501,6 +501,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 						continue;
 					}
 					if (check_rb_collision(&proj->rb, &unit->rb)) {
+						// TODO: Push back attachable entities here
 						proj->destroyed = true;
 
 						unit->health_bar.current_hp -= proj->damage;
@@ -567,7 +568,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Handle projectile : game_data.projectile_handles) {
 			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
 			if (p == NULL) {
-				log("Error: handle returned null");
 				continue;
 			}
 			draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
@@ -596,7 +596,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Handle zombie_handle : game_data.enemy_unit_handles) {
 			Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
 			if (u == NULL) {
-				log("Error: handle returned null");
 				continue;
 			}
 			if (u->dead) {

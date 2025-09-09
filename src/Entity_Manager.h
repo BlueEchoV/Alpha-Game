@@ -10,7 +10,7 @@ enum Storage_Type : uint8_t {
 	ST_Building
 };
 
-const int MAX_STORAGE_SIZE = 1000;
+const int MAX_STORAGE_SIZE = 100;
 
 // This goes on the entities
 struct Handle {
@@ -60,14 +60,14 @@ Handle create_handle(Storage<T>& storage) {
 
 template <typename T>
 void delete_handle(Storage<T>& storage, Handle handle) {
-	uint32_t index = handle.index;
-	uint32_t generation = handle.generation;
-	if (index < ARRAYSIZE(storage.storage) && 
-		generation == storage.generations[index].current_slot_generation &&
-		storage.storage_type == handle.storage_type){
-		storage.generations->current_slot_generation++;
-		storage.generations->slot_is_taken = false;
-	}
+    uint32_t index = handle.index;
+    uint32_t generation = handle.generation;
+    if (index < ARRAYSIZE(storage.storage) &&
+        generation == storage.generations[index].current_slot_generation &&
+        storage.storage_type == handle.storage_type) {
+        storage.generations[index].current_slot_generation++;
+        storage.generations[index].slot_is_taken = false;
+    }
 }
 
 // NOTE: I need to make sure and check if it returns null. If it does,
@@ -82,7 +82,6 @@ T* get_entity_pointer_from_handle(Storage<T>& storage, Handle handle) {
 		storage.storage_type == handle.storage_type) {
 		return &storage.storage[index];
 	}
-	log("Entity does not exist from handle");
 	// assert(false);
 	return nullptr;
 }
