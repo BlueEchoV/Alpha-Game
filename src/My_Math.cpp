@@ -1,4 +1,4 @@
-#include "My_Math.h"
+﻿#include "My_Math.h"
 
 V2 operator*(const float a, V2 b) {
 	V2 result = {};
@@ -138,18 +138,18 @@ V2 calculate_normalized_origin_to_target_velocity(V2 target, V2 origin) {
 }
 
 float calculate_facing_direction(V2 vec) {
-	float angle = {};
-	// NOTE: atan2 returns a range from -180 to 180
-	angle = (float)atan2((double)vec.x, (double)vec.y);
-	// Range from -180 to 180
-	angle = convert_radians_to_degrees(angle);
-	angle -= 90;
-	// NOTE: Convert from range -180 to 180 to 0 to 360
-	// -result.angle for counter clockwise
-	angle = (float)fmod(-angle + 360.0, 360.0);
-	// Inverted coordinate system
-	// result.angle += 180;
-	return angle;
+    float len = sqrt(vec.x * vec.x + vec.y * vec.y);
+    if (len == 0.0f) return 0.0f;  // Default to north
+
+    // Standard atan2(y, x) for counterclockwise from east (0-360° after normalization)
+    float angle_rad = atan2(vec.y, vec.x);
+    float angle = angle_rad * (180.0f / 3.14159265359f);  // Convert to degrees
+    if (angle < 0.0f) angle += 360.0f;
+
+    // Shift to clockwise from north: 90° - angle (mod 360)
+    angle = fmod(90.0f - angle + 360.0f, 360.0f);
+
+    return angle;
 }
 
 float calculate_distance_between(V2 vec_1, V2 vec_2) {

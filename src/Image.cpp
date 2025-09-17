@@ -1,5 +1,6 @@
 #include "Image.h"
 
+// SEE SPRITE_SYSTEM.CPP FOR NOTES ON THIS
 Image load_image(const char* file_path, int access, bool use_linear_filtering) {
 	Image result = {};
 

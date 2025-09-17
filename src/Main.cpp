@@ -245,7 +245,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 mouse_cs_pos = get_playground_mouse_position(Globals::renderer->open_gl.window_handle);
 			V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
 			V2 vel_normalized = calculate_normalized_origin_to_target_velocity(mouse_ws_pos, game_data.player.rb.pos_ws);
-			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, &player->torso.flip_horizontally, vel_normalized);
+			change_animation_tracker(&player->torso, player->torso.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, 
+				&player->torso.flip_horizontally, vel_normalized);
 
 			bool player_moving = false;
 			if (key_pressed_and_held(KEY_W) && key_pressed_and_held(VK_SHIFT)) {
@@ -299,7 +300,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			const float opposition_threshold = 0.0f;
 
 			// Select legs animation state and mode
-			Animation_State legs_state = AS_Walking_Forward;
+			Animation_State legs_state = AS_Walking;
 			Animation_Mode legs_mode = AM_Static_First_Frame;
 
 			// NOTE: Just aim legs at the mouse if the player is not moving.

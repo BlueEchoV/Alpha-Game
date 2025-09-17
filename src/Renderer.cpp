@@ -205,6 +205,7 @@ int MP_GetRenderDrawColor(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
 	return 0;
 }
 
+// The conversion from the top left being the origin to the bottom right is doin
 V2 mp_pixel_to_uv(int x, int y, int w, int h) {
 	V2 result;
 
@@ -782,6 +783,10 @@ int mp_render_copy_ex(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rec
 	renderer->packets.push_back(result);
 
 	return 0;
+}
+
+void mp_render_copy_atlas() {
+
 }
 
 void mp_render_copy_outlined(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, Color_4F outline_color, float outline_thickness) {

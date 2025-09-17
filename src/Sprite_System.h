@@ -3,6 +3,7 @@
 #include <optional>  // For std::optional<V2>
 
 enum Facing_Direction {
+	FD_NONE, // Optional
 	FD_N,   // 0
 	FD_NNE, // 22.5
 	FD_NE,  // 45
@@ -19,13 +20,11 @@ enum Facing_Direction {
 	FD_WNW, // 292.5
 	FD_NW,  // 315
 	FD_NNW, // 337.5
-	FD_NONE // Optional
 };
 
 enum Animation_State {
 	AS_Idle,
 	AS_Walking,
-	AS_Walking_Forward,
 	AS_Running,
 	AS_Attacking,
 	AS_Death,
@@ -64,6 +63,8 @@ struct Sprite_Sheet_Data {
 
 // Animation Sprite Sheet?
 struct Sprite_Sheet {
+	int columns;
+	int rows;
 	std::vector<Sprite> sprites;
 };
 
@@ -73,7 +74,8 @@ enum Animation_Tracker_Type {
 	ATT_Direction_8_Legs,
 	// For Player
 	ATT_Direction_16,
-	ATT_Direction_16_Torso
+	ATT_Direction_16_Torso,
+	ATT_Direction_8_Atlas
 };
 
 struct Animation_Tracker {
@@ -87,6 +89,7 @@ struct Animation_Tracker {
 	Animation_Play_Speed aps;
 	Facing_Direction fd; 
 	bool flip_horizontally = false;
+	// Total frames is the number of columns
 	int current_frame_index;
 	float current_frame_time;
 	bool loops = true;

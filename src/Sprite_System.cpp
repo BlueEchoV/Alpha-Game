@@ -1,4 +1,49 @@
-#include "Sprite_System.h"
+﻿#include "Sprite_System.h"
+
+
+// REVIEW OF COORDINATE SYSTEMS FOR THIS ANIMATION SYSTEM
+// PNG Default Origin: Images load with top-left (0,0) as origin via STB (y=0 at top, increasing downward)—rendering would 
+// invert vertically without adjustment.
+
+// STB Flip Role: stbi_set_flip_vertically_on_load(true) inverts the buffer during load, swapping rows so buffer y=0 
+// is the original bottom (effective bottom-left origin: y increases upward, restoring upright visuals in OpenGL).
+
+// Loop Traversal: Outer loop (x=0 to rows-1) extracts logical rows top-to-bottom; inner loop (y=0 to columns-1) extracts 
+// columns left-to-right.
+
+// Src_Rect Y-Inversion Formula: src_rect.y = (image.h / rows) * (rows - 1 - x) compensates for the flipped buffer, mapping 
+// x=0 (first row, e.g., North) to the buffer's upper portion (original PNG top), ensuring src_rect points to correct 
+// sub-regions without visual flipping.
+
+// Sprite Vector Order: Resulting sprites vector fills in intuitive top-down order (index 0 = top row/North sprites, index 
+// rows = next row, etc.)—the flip + inversion duo restores logical sequencing, not inverting the vector itself.
+
+// Global Index for Atlas: global_index = row * columns + current_frame_index pulls the right sprite 
+// (e.g., FD_SW row=5 → index 5*columns + frame, corresponding to original SW position).
+
+// Rendering Alignment: With bottom-left NDC/UV, this setup renders upright; if inverted, add y-flip in vertex shader 
+// (f_texture_coordinates.y = 1.0 - v_texture_coordinates.y).
+
+std::unordered_map<std::string, Sprite_Sheet_Data> sprite_sheet_data_map;
+
+/*
+Sprite_Sheet_Data dummy_sprite_sheet_data = {
+	// std::string root; std::string sprite_sheet_name; std::string ext; int rows; int columns;
+	"assets\\", "dummy_image", ".png", 1, 1
+};
+
+Sprite_Sheet_Data* get_sprite_sheet_data(std::string name) {
+	auto it = sprite_sheet_map.find(name);
+
+	if (it != sprite_sheet_map.end()) {
+		return &it->second;
+	}
+	else {
+		// Return bad data
+		return &dummy_sprite_sheet_data;
+	}
+}
+*/
 
 Sprite create_sprite(Image image, MP_Rect src_rect) {
 	Sprite result = {};
@@ -11,7 +56,15 @@ Sprite create_sprite(Image image, MP_Rect src_rect) {
 
 Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows, int columns) {
 	Sprite_Sheet result = {};
+	result.rows = rows;
+	result.columns = columns;
+
 	Image image = load_image(full_file_path.c_str());
+
+	if (full_file_path == "assets\\ravenous_skulk\\walking\\ravenous_skulk_walking_atlas.png") {
+		int i = 0;
+		i++;
+	}
 
 	if (image.texture != NULL) {
 		for (int x = 0; x < rows; x++) {
@@ -19,7 +72,7 @@ Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows,
 				MP_Rect src_rect = {};
 
 				src_rect.x = (y * (image.w / columns));
-				src_rect.y = (x * (image.h / rows));
+				src_rect.y = (image.h / rows) * (rows - 1 - x);
 				src_rect.w = (image.w / columns);
 				src_rect.h = (image.h / rows);
 
@@ -49,17 +102,35 @@ Sprite_Sheet* get_sprite_sheet(std::string name) {
 }
 
 std::string get_sprite_sheet_name(const std::string_view entity_name, Animation_State as) {
+	std::string result = {};
 	switch (as) {
-	case AS_Idle:				return std::string(entity_name) + "_idle";
-	case AS_Walking:			return std::string(entity_name) + "_walking";
-	case AS_Walking_Forward:	return std::string(entity_name) + "_walking_forward";
-	case AS_Running:			return std::string(entity_name) + "_running";
-	case AS_Attacking:			return std::string(entity_name) + "_attacking";
-	case AS_Death:				return std::string(entity_name) + "_death";
-	case AS_No_Animation:		return std::string(entity_name);
+	case AS_Idle:				
+		result = std::string(entity_name) + "_idle";
+		break;
+	case AS_Walking:			
+		result = std::string(entity_name) + "_walking";
+		break;
+	case AS_Running:			
+		result = std::string(entity_name) + "_running";
+		break;
+	case AS_Attacking:			
+		result = std::string(entity_name) + "_attacking";
+		break;
+	case AS_Death:				
+		result = std::string(entity_name) + "_death";
+		break;
+	case AS_No_Animation:		
+		result = std::string(entity_name);
+		break;
 	default: 
 		return "dummy_image";
 	}
+
+	return result;
+}
+
+std::string get_sprite_sheet_atlas_name(const std::string_view entity_name, Animation_State as) {
+	return get_sprite_sheet_name(entity_name, as) + "_atlas";
 }
 
 std::string get_facing_direction_sprite_sheet_name(const std::string& entity_name, Facing_Direction fd, Animation_State as) {
@@ -72,10 +143,6 @@ std::string get_facing_direction_sprite_sheet_name(const std::string& entity_nam
 	}
 	case AS_Walking: {
 		result = entity_name + "_walking";
-		break;
-	}
-	case AS_Walking_Forward: {
-		result = entity_name + "_walking_forward";
 		break;
 	}
 	case AS_Running: {
@@ -166,6 +233,36 @@ Facing_Direction get_facing_direction_8(V2 vec) {
 	return result;
 }
 
+Facing_Direction get_facing_direction_8_atlas(V2 vec) {
+    float angle = calculate_facing_direction(vec);
+    Facing_Direction result = FD_NONE;
+    if (angle >= 337.5f || angle < 22.5f) {
+        result = FD_N;
+    }
+    else if (angle >= 22.5f && angle < 67.5f) {
+        result = FD_NE;
+    }
+    else if (angle >= 67.5f && angle < 112.5f) {
+        result = FD_E;
+    }
+    else if (angle >= 112.5f && angle < 157.5f) {
+        result = FD_SE;
+    }
+    else if (angle >= 157.5f && angle < 202.5f) {
+        result = FD_S;
+    }
+    else if (angle >= 202.5f && angle < 247.5f) {
+        result = FD_SW;
+    }
+    else if (angle >= 247.5f && angle < 292.5f) {
+        result = FD_W;
+    }
+    else if (angle >= 292.5f && angle < 337.5f) {
+        result = FD_NW;
+    }
+    return result;
+}
+
 Facing_Direction get_facing_direction_16(V2 vec) {
 	float angle = calculate_facing_direction(vec);
 	Facing_Direction result = FD_NONE;
@@ -242,22 +339,22 @@ void change_animation_tracker(Animation_Tracker* at, const std::string& entity_n
             at->flip_horizontally = flip_horizontally;
             at->selected_sprite_sheet = get_sprite_sheet_name(entity_name, new_as);
             break;
-
         case ATT_Direction_8:
             new_fd = get_facing_direction_8(velocity);
             at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
             break;
-
         case ATT_Direction_8_Legs:
             new_fd = get_facing_direction_8(velocity);
             at->selected_sprite_sheet = get_legs_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
             break;
-
+		case ATT_Direction_8_Atlas: 
+			new_fd = get_facing_direction_8_atlas(velocity);
+			at->selected_sprite_sheet = get_sprite_sheet_atlas_name(entity_name, new_as);
+			break;
         case ATT_Direction_16:
             new_fd = get_facing_direction_16(velocity);
             at->selected_sprite_sheet = get_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
             break;
-
         case ATT_Direction_16_Torso:
             new_fd = get_facing_direction_16(velocity);
             at->selected_sprite_sheet = get_torso_facing_direction_sprite_sheet_name(entity_name, new_fd, new_as);
@@ -295,7 +392,7 @@ Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::stri
 	result.as = starting_as;
 	result.aps = starting_aps;
 	result.mode = starting_mode;
-	result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
+	result.selected_sprite_sheet = get_sprite_sheet_atlas_name(entity_name, starting_as);
 	result.current_frame_index = 0;
 	result.current_frame_time = 0.0f;
 	result.loops = loops;
@@ -305,7 +402,8 @@ Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::stri
 
 void update_animation_tracker(Animation_Tracker* at, float delta_time, float speed_based) {
     Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
-    size_t frame_count = ss->sprites.size();
+	// The number of frames is the columns
+	size_t frame_count = ss->columns;
 
     // Early exit for no animation or single-frame sheets
     if (at->mode == AM_No_Animation || frame_count <= 1) {
@@ -353,11 +451,41 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
     }
 }
 
+int get_atlas_row_index_from_facing_direction_8(Facing_Direction fd) {
+    switch (fd) {
+        case FD_N:  return 0;
+        case FD_NE: return 1;
+        case FD_E:  return 2;
+        case FD_SE: return 3;
+        case FD_S:  return 4;
+        case FD_SW: return 5;
+        case FD_W:  return 6;
+        case FD_NW: return 7;
+        default:	return 0;
+    }
+}
+
+const int ATLAS_ROWS_8_DIRECTIONS = 8;
+
+// Takes into account texture atlas
+int get_animation_tracker_current_frame_index(Animation_Tracker* at, int ss_rows, int ss_stride) {
+	int result = -1;
+	if (ss_rows == ATLAS_ROWS_8_DIRECTIONS && at->att == ATT_Direction_8_Atlas) {
+		int selected_row = get_atlas_row_index_from_facing_direction_8(at->fd);
+		result = selected_row * ss_stride + at->current_frame_index;
+	}
+	else {
+		result = at->current_frame_index;
+	}
+
+	return result;
+}
+
 void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
-	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
-	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
+	MP_Rect src = ss->sprites[get_animation_tracker_current_frame_index(at, ss->rows, ss->columns)].src_rect;
+	MP_Texture* texture = ss->sprites[get_animation_tracker_current_frame_index(at, ss->rows, ss->columns)].image.texture;
 
 	if (at->flip_horizontally == false) {
 		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
@@ -370,8 +498,9 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float angle, Color_Type ct, float outline_thickness) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
-	MP_Rect src = ss->sprites[at->current_frame_index].src_rect;
-	MP_Texture* texture = ss->sprites[at->current_frame_index].image.texture;
+	int index = get_animation_tracker_current_frame_index(at, ss->rows, ss->columns);
+	MP_Rect src = ss->sprites[index].src_rect;
+	MP_Texture* texture = ss->sprites[index].image.texture;
 
 	Color_RGBA color_rgba = get_color_type(ct);
 	Color_4F color_4f_normalized = {(float)color_rgba.r / 255.0f, (float)color_rgba.g / 255.0f, (float)color_rgba.b / 255.0f, (float)color_rgba.a / 255.0f};
@@ -384,7 +513,6 @@ void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float a
 	}
 }
 
-
 Type_Descriptor sprite_sheet_type_descriptors[] = {
 	FIELD(Sprite_Sheet_Data, VT_String, root),
 	FIELD(Sprite_Sheet_Data, VT_String, sprite_sheet_name),
@@ -392,8 +520,6 @@ Type_Descriptor sprite_sheet_type_descriptors[] = {
 	FIELD(Sprite_Sheet_Data, VT_Int, rows),
 	FIELD(Sprite_Sheet_Data, VT_Int, columns)
 };
-
-std::unordered_map<std::string, Sprite_Sheet_Data> sprite_sheet_data_map;
 
 void load_sprite_sheet_data_csv(CSV_Data* data) {
 	std::vector<Sprite_Sheet_Data> sprite_sheet_data = {};

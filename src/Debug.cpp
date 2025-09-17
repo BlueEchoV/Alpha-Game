@@ -387,7 +387,7 @@ void debug_draw_animation_trackers(Font& font, float delta_time) {
 	static std::vector<Animation_Tracker> trackers = {
 		create_animation_tracker(ATT_Direction_8, "hellhound", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
 		create_animation_tracker(ATT_Direction_8, "gravebound_peasant", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
-		create_animation_tracker(ATT_Direction_8, "ravenous_skulk", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true)
+		create_animation_tracker(ATT_Direction_8_Atlas, "ravenous_skulk", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true)
 	};
 
 	static bool first_pass = true;
