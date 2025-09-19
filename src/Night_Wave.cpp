@@ -137,6 +137,8 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 				random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
 				random_pos_ws.y = (float)((int)spawn_region_ws.y + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.h));
 
+				std::string unit_name = "ravenous_skulk";
+#if 0
 				std::string unit_name = "";
 				if (temp) {
 					unit_name = "ravenous_skulk";
@@ -147,6 +149,7 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 					unit_name = "gravebound_peasant";
 					temp = true;
 				}
+#endif
 
 				spawn_unit(
 					F_Enemies,

@@ -1,6 +1,5 @@
 ﻿#include "Sprite_System.h"
 
-
 // REVIEW OF COORDINATE SYSTEMS FOR THIS ANIMATION SYSTEM
 // PNG Default Origin: Images load with top-left (0,0) as origin via STB (y=0 at top, increasing downward)—rendering would 
 // invert vertically without adjustment.
@@ -201,7 +200,7 @@ std::string get_legs_facing_direction_sprite_sheet_name(const std::string& entit
 }
 
 Facing_Direction get_facing_direction_8(V2 vec) {
-	float angle = calculate_facing_direction(vec);
+	float angle = calculate_facing_direction_north_clockwise(vec);
 
 	Facing_Direction result = FD_NONE;
 
@@ -234,7 +233,7 @@ Facing_Direction get_facing_direction_8(V2 vec) {
 }
 
 Facing_Direction get_facing_direction_8_atlas(V2 vec) {
-    float angle = calculate_facing_direction(vec);
+    float angle = calculate_facing_direction_north_clockwise(vec);
     Facing_Direction result = FD_NONE;
     if (angle >= 337.5f || angle < 22.5f) {
         result = FD_N;
@@ -264,7 +263,7 @@ Facing_Direction get_facing_direction_8_atlas(V2 vec) {
 }
 
 Facing_Direction get_facing_direction_16(V2 vec) {
-	float angle = calculate_facing_direction(vec);
+	float angle = calculate_facing_direction_north_clockwise(vec);
 	Facing_Direction result = FD_NONE;
 	if (angle >= 348.75f || angle < 11.25f) {
 		result = FD_E;
@@ -392,7 +391,13 @@ Animation_Tracker create_animation_tracker(Animation_Tracker_Type att, std::stri
 	result.as = starting_as;
 	result.aps = starting_aps;
 	result.mode = starting_mode;
-	result.selected_sprite_sheet = get_sprite_sheet_atlas_name(entity_name, starting_as);
+	// TODO: Merge this into the actual function to take the att
+	if (result.att == ATT_Direction_8_Atlas) {
+		result.selected_sprite_sheet = get_sprite_sheet_atlas_name(entity_name, starting_as);
+	}
+	else {
+		result.selected_sprite_sheet = get_sprite_sheet_name(entity_name, starting_as);
+	}
 	result.current_frame_index = 0;
 	result.current_frame_time = 0.0f;
 	result.loops = loops;

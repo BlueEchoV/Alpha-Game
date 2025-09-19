@@ -31,7 +31,7 @@ void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectil
 
 	result.w = w;
 	result.h = h;
-	result.rb.angle = calculate_facing_direction(result.rb.vel);
+	result.rb.angle = calculate_facing_direction_east_counterclockwise(result.rb.vel);
 
 	Sprite_Sheet* sprite_sheet = get_sprite_sheet(std::string(projectile_name));
 	float first_sprite_radius = sprite_sheet->sprites[0].image.sprite_radius;

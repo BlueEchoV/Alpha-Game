@@ -27,6 +27,8 @@ assets\gravebound_peasant\walking\,gravebound_peasant_walking_sw,.png,1,20
 assets\gravebound_peasant\walking\,gravebound_peasant_walking_w,.png,1,20
 assets\gravebound_peasant\walking\,gravebound_peasant_walking_nw,.png,1,20
 assets\ravenous_skulk\walking\,ravenous_skulk_walking_atlas,.png,8,14
+assets\ravenous_skulk\dying\,ravenous_skulk_dying_atlas,.png,8,16
+assets\ravenous_skulk\attacking\,ravenous_skulk_attacking_atlas,.png,8,18
 assets\grim_arbelist\walking\torso\,grim_arbelist_walking_e_torso,.png,1,1
 assets\grim_arbelist\walking\torso\,grim_arbelist_walking_ene_torso,.png,1,1
 assets\grim_arbelist\walking\torso\,grim_arbelist_walking_ese_torso,.png,1,1
