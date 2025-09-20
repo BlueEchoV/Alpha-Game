@@ -27,7 +27,7 @@ enum Animation_State {
 	AS_Walking,
 	AS_Running,
 	AS_Attacking,
-	AS_Death,
+	AS_Dying,
 	AS_No_Animation
 };
 
@@ -43,6 +43,7 @@ enum Animation_Mode {
     AM_Animate_Looping_Reversed,
     AM_Animate_Once,
     AM_Static_First_Frame,
+    AM_Static_Last_Frame,
     AM_No_Animation
 };
 
@@ -89,6 +90,7 @@ struct Animation_Tracker {
 	Animation_Play_Speed aps;
 	Facing_Direction fd; 
 	bool flip_horizontally = false;
+	bool force_play_whole_animation = false;
 	// Total frames is the number of columns
 	int current_frame_index;
 	float current_frame_time;

@@ -395,7 +395,12 @@ void debug_draw_animation_trackers(Font& font, float delta_time) {
 		for (Animation_Tracker& at : trackers) {
 				first_pass = false;
 				V2 pointing_south = {0.0f, -1.0f};
-				change_animation_tracker(&at, at.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, pointing_south);
+				if (at.entity_name == "ravenous_skulk") {
+					change_animation_tracker(&at, at.entity_name, AS_Dying, APS_Speed_Based, AM_Animate_Looping, false, pointing_south);
+				}
+				else {
+					change_animation_tracker(&at, at.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, pointing_south);
+				}
 		}
 	}
 

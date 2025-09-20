@@ -73,7 +73,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 5);
+	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 1);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -479,11 +479,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
 			if (unit != NULL) {
-				if (!player->dead) {
+				if (!player->dead && !unit->dead) {
 					update_unit(*unit, delta_time);
+					change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, AM_Animate_Looping, false, unit->rb.vel);
 				}
 
-				change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, AM_Animate_Looping, false, unit->rb.vel);
 				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
@@ -507,6 +507,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 						unit->health_bar.current_hp -= proj->damage;
 						if (unit->health_bar.current_hp <= 0) {
+							change_animation_tracker(&unit->at, unit->at.entity_name, AS_Dying, unit->at.aps, AM_Animate_Once, unit->at.flip_horizontally, unit->rb.vel);
 							unit->dead = true;
 							game_data.active_enemy_units--;
 						}
@@ -561,7 +562,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// draw_entire_map(camera, game_data.map);
 
 		draw_entire_world(camera, game_data.world);
-		draw_game_loop_ui(game_data, FT_Basic);
+
+		// Draw the spawn region?
+		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, game_data.world.map, game_data.camera.pos_ws);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
@@ -599,9 +602,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (u == NULL) {
 				continue;
 			}
-			if (u->dead) {
-				change_animation_tracker(&u->at, u->at.entity_name, AS_Death, u->at.aps, AM_Animate_Once, u->at.flip_horizontally, std::nullopt);
-			}
 
 			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.5f);
 			// draw_unit(*u, game_data.camera.pos_ws);
@@ -611,6 +611,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
+		draw_game_loop_ui(game_data, FT_Basic);
 		draw_player(game_data.player, game_data.camera.pos_ws);
 		player->passive->draw_ui(game_data.camera.pos_ws);
 		player->basic->draw_ui(game_data.camera.pos_ws);

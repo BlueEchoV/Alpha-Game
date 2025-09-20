@@ -115,8 +115,8 @@ std::string get_sprite_sheet_name(const std::string_view entity_name, Animation_
 	case AS_Attacking:			
 		result = std::string(entity_name) + "_attacking";
 		break;
-	case AS_Death:				
-		result = std::string(entity_name) + "_death";
+	case AS_Dying:				
+		result = std::string(entity_name) + "_dying";
 		break;
 	case AS_No_Animation:		
 		result = std::string(entity_name);
@@ -152,8 +152,8 @@ std::string get_facing_direction_sprite_sheet_name(const std::string& entity_nam
 		result = entity_name + "_attacking";
 		break;
 	}
-	case AS_Death: {
-		result = entity_name + "_death";
+	case AS_Dying: {
+		result = entity_name + "_dying";
 		break;
 	}
 	case AS_No_Animation: {
@@ -200,7 +200,7 @@ std::string get_legs_facing_direction_sprite_sheet_name(const std::string& entit
 }
 
 Facing_Direction get_facing_direction_8(V2 vec) {
-	float angle = calculate_facing_direction_north_clockwise(vec);
+	float angle = calculate_facing_direction_east_counterclockwise(vec);
 
 	Facing_Direction result = FD_NONE;
 
@@ -263,7 +263,7 @@ Facing_Direction get_facing_direction_8_atlas(V2 vec) {
 }
 
 Facing_Direction get_facing_direction_16(V2 vec) {
-	float angle = calculate_facing_direction_north_clockwise(vec);
+	float angle = calculate_facing_direction_east_counterclockwise(vec);
 	Facing_Direction result = FD_NONE;
 	if (angle >= 348.75f || angle < 11.25f) {
 		result = FD_E;
@@ -311,12 +311,16 @@ bool has_animation_state_changed(Animation_Tracker* at, const std::string& entit
 }
 
 // Core function; refactored to reduce duplication.
-void change_animation_tracker(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, Animation_Mode mode, 
-	bool flip_horizontally, std::optional<V2> velocity_opt) {
+void change_animation_tracker(Animation_Tracker* at, const std::string& entity_name, Animation_State new_as, Animation_Play_Speed aps, 
+	Animation_Mode mode, bool flip_horizontally, std::optional<V2> velocity_opt) {
+
     if (!at) {
         log("Error: Null Animation_Tracker provided.");
         return;
     }
+	// The bug is that it's setting it to run the frame once, then the frame players, and sets it to static first frame, but detects 
+	// that it's different in the has changed, and resets it to play the loop again. I need a way to track if it's trying to paly once 
+	// nad not change animation state again or something like that.
 
     bool state_changed = has_animation_state_changed(at, entity_name, new_as, mode);
     V2 velocity = velocity_opt.value_or(V2{0.0f, 0.0f}); 
@@ -376,7 +380,7 @@ void change_animation_tracker(Animation_Tracker* at, const std::string& entity_n
 		// TODO: Change this to be apart of the csv file
 		at->aps = aps;
 		at->mode = mode;
-		if (new_as == AS_Death) {
+		if (new_as == AS_Dying) {
 			at->loops = false;
 		}
     }
@@ -421,6 +425,11 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
         return;  // No timer updates needed
     }
 
+    if (at->mode == AM_Static_Last_Frame) {
+        at->current_frame_index = (int)frame_count - 1;
+        return;  // No timer updates needed
+    }
+
     // Handle animating modes
     if (at->current_frame_time <= 0.0f) {
         // Set frame time based on speed
@@ -448,7 +457,7 @@ void update_animation_tracker(Animation_Tracker* at, float delta_time, float spe
                 at->current_frame_index++;
             } else {
                 // Optionally transition to static or another mode
-                at->mode = AM_Static_First_Frame;
+                at->mode = AM_Static_Last_Frame;
             }
         }
     } else {
