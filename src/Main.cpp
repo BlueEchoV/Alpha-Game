@@ -479,12 +479,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
 			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
 			if (unit != NULL) {
-				if (!player->dead && !unit->dead) {
-					update_unit(*unit, delta_time);
-					change_animation_tracker(&unit->at, unit->at.entity_name, AS_Walking, APS_Fast, AM_Animate_Looping, false, unit->rb.vel);
+				if (!player->dead) {
+					update_unit(game_data.player, *unit, delta_time);
 				}
-
-				update_animation_tracker(&unit->at, delta_time, (float)unit->rb.current_speed);
 			}
 		}
 
@@ -507,25 +504,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 						unit->health_bar.current_hp -= proj->damage;
 						if (unit->health_bar.current_hp <= 0) {
-							change_animation_tracker(&unit->at, unit->at.entity_name, AS_Dying, unit->at.aps, AM_Animate_Once, unit->at.flip_horizontally, unit->rb.vel);
-							unit->dead = true;
-							game_data.active_enemy_units--;
-						}
-					}
-				}
-			}
-
-			for (Handle& enemy_handle : game_data.enemy_unit_handles) {
-				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_handle);
-				if (unit == NULL || unit->dead == true) {
-					continue;
-				}
-				if (unit->can_attack) {
-					if (check_rb_collision(&game_data.player.rb, &unit->rb)) {
-						log("Player getting hit");
-						player->health_bar.current_hp -= unit->damage;
-						if (player->health_bar.current_hp <= 0) {
-							player->dead = true;
+							kill_unit(*unit, game_data.active_enemy_units);
 						}
 					}
 				}
