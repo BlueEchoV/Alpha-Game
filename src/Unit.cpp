@@ -97,6 +97,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	case US_Attacking: {
 		// 1: We need to check if we are in the attack frame of the unit and if damage has yet been applied this cycle (multiple frames
 		// per cycle.
+		change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Fast, AM_Animate_Once, false, unit.rb.vel);
 		if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && unit.can_attack) {
 			// 2: Next, we check if we are colliding with the player this frame.
 			if (check_rb_collision(&p.rb, &unit.rb)) {
@@ -124,7 +125,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	}
 	}
 
-	update_animation_tracker(&unit.at, dt, true);
+	update_animation_tracker(&unit.at, dt, (float)unit.rb.base_speed);
 
 	if (unit.destroyed == false) {
 		if (unit.dead == false) {
