@@ -499,6 +499,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 						continue;
 					}
 					if (check_rb_collision(&proj->rb, &unit->rb)) {
+						create_and_add_damage_number(game_data.damage_numbers, proj->rb.pos_ws, { 0.0f, 1.0 }, 50, proj->damage, 3.0f);
+
 						// TODO: Push back attachable entities here
 						proj->destroyed = true;
 
@@ -563,6 +565,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
+		update_damage_numbers(game_data.damage_numbers, delta_time);
+
 		std::sort(game_data.enemy_unit_handles.begin(), game_data.enemy_unit_handles.end(), [&](Handle& a, Handle& b) {
 			Unit* enemy_1 = get_entity_pointer_from_handle(game_data.unit_storage, a);
 			Unit* enemy_2 = get_entity_pointer_from_handle(game_data.unit_storage, b);
@@ -589,6 +593,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				draw_colliders(&u->rb, game_data.camera.pos_ws);
 			}
 		}
+
+		Font* font_basic = get_font(FT_Basic);
+		draw_damage_numbers(*font_basic, game_data.damage_numbers, game_data.camera.pos_ws);
 
 		draw_game_loop_ui(game_data, FT_Basic);
 		draw_player(game_data.player, game_data.camera.pos_ws);

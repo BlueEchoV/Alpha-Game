@@ -19,6 +19,8 @@ struct Game_Data {
 	std::vector<Handle> enemy_unit_handles;
 	int active_enemy_units;
 	std::vector<Handle> projectile_handles;
+	// Emipheral - Handles not needed
+	std::vector<Damage_Number> damage_numbers;
 
 	Night_Wave current_night_wave;
 	World world;

@@ -12,7 +12,9 @@ struct Cooldown {
 	float current;
 };
 Cooldown create_cooldown(float max_cd);
-bool check_and_update_cooldown(Cooldown& cd, float delta_time);
+void update_cooldown(Cooldown& cd, float delta_time);
+bool cooldown_ready(Cooldown& cd);
+bool trigger_cooldown(Cooldown& cd);
 
 struct Health_Bar {
 	int offset;

@@ -1,5 +1,48 @@
 #include "Weapon.h"
 
+void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed, int damage, float life_time) {
+	Damage_Number result = {};
+
+	result.damage = damage;
+	result.life_time = life_time;
+	result.pos_ws = pos_ws;
+	result.velocity = {vel_normalized.x * speed, vel_normalized.y * speed};
+
+	damage_numbers.push_back(result);
+}
+
+void update_damage_numbers(std::vector<Damage_Number>& damage_numbers, const float dt) {
+	for (Damage_Number& number : damage_numbers) {
+		// Update position
+		if (number.life_time > 0.0f) {
+			number.pos_ws.x += number.velocity.x * dt;
+			number.pos_ws.y += number.velocity.y * dt;
+
+			number.life_time -= dt;
+		}
+	}
+}
+
+void draw_damage_numbers(Font& font, std::vector<Damage_Number>& damage_numbers, V2 camera_pos_ws) {
+	for (Damage_Number& number : damage_numbers) {
+		if (number.life_time > 0.0f) {
+			std::string damage = std::to_string(number.damage);
+			V2 damage_text_cs = convert_ws_to_cs(number.pos_ws, camera_pos_ws);
+
+			draw_string(font, damage.c_str(), CT_Red, true, (int)damage_text_cs.x, (int)damage_text_cs.y, 1, true);
+		}
+	}
+}
+
+void delete_expired_damage_numbers(std::vector<Damage_Number>& damage_numbers) {
+	std::erase_if(damage_numbers, [](Damage_Number& number) {
+		if (number.life_time <= 0.0f) {
+				return true;
+		}
+		return false;
+	});
+}
+
 std::unordered_map<std::string, Weapon_Data> weapon_data_map;
 
 Weapon_Data bad_weapon_data = {

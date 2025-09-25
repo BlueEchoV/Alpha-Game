@@ -131,7 +131,7 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 	Night_Wave& night_wave, int& active_enemy_units, Player& player, Tile_Map& tile_map, float delta_time) {
 	if (night_wave.begin_spawning) {
 		if (night_wave.total_spawned < night_wave.total_to_spawn) {
-			if (check_and_update_cooldown(night_wave.spawning_cd, delta_time)) {
+			if (trigger_cooldown(night_wave.spawning_cd)) {
 				V2 random_pos_ws = {};
 				MP_Rect spawn_region_ws = get_spawn_region_in_pixels_ws(night_wave, tile_map);
 				random_pos_ws.x = (float)((int)spawn_region_ws.x + (rand() * (int)(delta_time * 1000.0f) % spawn_region_ws.w));
@@ -172,8 +172,8 @@ void spawn_and_update_night_wave(std::vector<Handle>& unit_handles, Storage<Unit
 			}
 		}
 	} 
+	update_cooldown(night_wave.spawning_cd, delta_time);
 }
-
 
 // NOTE: Draw diagnal lines? Or dotted lines?
 void draw_night_wave_spawn_region(Color_Type c, Night_Wave& night_wave, Tile_Map& tile_map, V2 camera_pos) {

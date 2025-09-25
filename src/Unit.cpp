@@ -65,7 +65,7 @@ void kill_unit(Unit& unit, int& active_enemy_units_counter) {
 V2 update_unit_position(Unit& unit, float dt) {
 	V2 result = {};
 
-	if (unit.dead == false) {
+	if (unit.dead == false && unit.us == US_Moving) {
 		unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
 
 		unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.current_speed) * dt;
@@ -76,6 +76,9 @@ V2 update_unit_position(Unit& unit, float dt) {
 };
 
 void update_unit(Player& p, Unit& unit, float dt) {
+	float speed = (float)unit.rb.base_speed;
+	bool stop_moving = false;
+
 	// Change the animation tracker
 	switch (unit.us) {
 	case US_Idle: {
@@ -84,12 +87,17 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	}
 	case US_Moving: {
 		// change_animation_state to either walking or running
-		if (check_rb_collision(&p.rb, &unit.rb) && unit.attack_cd.current <= 0.0f) {
-			unit.us = US_Attacking;
-			unit.damage_applied = false;
-			change_animation_tracker(&unit.at, unit.unit_name, AS_Attacking, APS_Speed_Based, AM_Animate_Once, false, unit.rb.vel);
-		}
-		else {
+		if (check_rb_collision(&p.rb, &unit.rb)) {
+			if (unit.attack_cd.current <= 0.0f && unit.can_attack) {
+				unit.us = US_Attacking;
+				unit.damage_applied = false;
+				change_animation_tracker(&unit.at, unit.unit_name, AS_Attacking, APS_Fast, AM_Animate_Once, false, unit.rb.vel);
+			}
+			// Don't move if we are in range of target
+			// TODO: Add idle animation here? Or just stand still with static first frame
+			stop_moving = true;
+		} else {
+			stop_moving = false;
 			change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, unit.rb.vel);
 		}
 		break;
@@ -97,8 +105,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	case US_Attacking: {
 		// 1: We need to check if we are in the attack frame of the unit and if damage has yet been applied this cycle (multiple frames
 		// per cycle.
-		change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Fast, AM_Animate_Once, false, unit.rb.vel);
-		if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && unit.can_attack) {
+		if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && cooldown_ready(unit.attack_cd)) {
 			// 2: Next, we check if we are colliding with the player this frame.
 			if (check_rb_collision(&p.rb, &unit.rb)) {
 				// 3: If we are colliding, we apply the damage to the player and check if the player is dead or not
@@ -106,11 +113,11 @@ void update_unit(Player& p, Unit& unit, float dt) {
 				if (p.health_bar.current_hp <= 0) {
 					p.dead = true;
 				}
+				unit.damage_applied = true;
+				trigger_cooldown(unit.attack_cd);
 			}
-			// 4: If there is no collision for this attack cycle, that means we missed, and we reset the damage_applied value
-			unit.damage_applied = false;
 		}
-		// 5: We have hit the end of the frame. Set it back to moving.
+		// 4: We have hit the end of the frame. Set it back to moving.
 		if (unit.at.mode == AM_Static_Last_Frame) {
 			unit.us = US_Moving;
 			unit.damage_applied = false;
@@ -125,19 +132,16 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	}
 	}
 
-	update_animation_tracker(&unit.at, dt, (float)unit.rb.base_speed);
+	update_animation_tracker(&unit.at, dt, speed);
 
 	if (unit.destroyed == false) {
 		if (unit.dead == false) {
-			update_unit_position(unit, dt);
+			if (stop_moving == false) {
+				update_unit_position(unit, dt);
+			}
 
 			// change_animation_direction_8(at, at->entity_name, at->as, unit.rb.vel, APS_Fast);
-			if (check_and_update_cooldown(unit.attack_cd, dt)) {
-				unit.can_attack = true;
-			}
-			else {
-				unit.can_attack = false;
-			}
+			update_cooldown(unit.attack_cd, dt);
 		}
 	}
 }

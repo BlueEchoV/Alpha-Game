@@ -28,19 +28,30 @@ Cooldown create_cooldown(float max_cd) {
 	return result;;
 }
 
+// THINK ABOUT THIS
 // Returns true if the cooldown is down, false elsewise
-bool check_and_update_cooldown(Cooldown& cd, float delta_time) {
-	if (cd.current <= 0.0f) {
-		cd.current = cd.max;
-		return true;
-	}
-	else {
+void update_cooldown(Cooldown& cd, float delta_time) {
+	if (cd.current > 0.0f) {
 		cd.current -= delta_time;
 		if (cd.current < 0.0f) {
 			cd.current = 0.0f;
 		}
-		return false;
 	}
+}
+
+bool cooldown_ready(Cooldown& cd) {
+	if (cd.current <= 0.0f) {
+		return true;
+	}
+	return false;
+}
+
+bool trigger_cooldown(Cooldown& cd) {
+	if (cd.current <= 0.0f) {
+		cd.current = cd.max;
+			return true;
+	}
+	return false;
 }
 
 Health_Bar create_health_bar(int hp, int w, int h, int offset) {
