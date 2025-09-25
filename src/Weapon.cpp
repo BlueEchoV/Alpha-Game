@@ -1,12 +1,14 @@
 #include "Weapon.h"
 
-void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed, int damage, float life_time) {
+void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed, 
+	int damage, float life_time, std::string& background_image_name) {
 	Damage_Number result = {};
 
 	result.damage = damage;
 	result.life_time = life_time;
 	result.pos_ws = pos_ws;
 	result.velocity = {vel_normalized.x * speed, vel_normalized.y * speed};
+	result.background_at = create_animation_tracker(ATT_Direction_2, background_image_name, AS_No_Animation, APS_No_Animation, AM_No_Animation, false);
 
 	damage_numbers.push_back(result);
 }
@@ -19,6 +21,7 @@ void update_damage_numbers(std::vector<Damage_Number>& damage_numbers, const flo
 			number.pos_ws.y += number.velocity.y * dt;
 
 			number.life_time -= dt;
+			update_animation_tracker(&number.background_at, dt, 0);
 		}
 	}
 }
@@ -26,10 +29,22 @@ void update_damage_numbers(std::vector<Damage_Number>& damage_numbers, const flo
 void draw_damage_numbers(Font& font, std::vector<Damage_Number>& damage_numbers, V2 camera_pos_ws) {
 	for (Damage_Number& number : damage_numbers) {
 		if (number.life_time > 0.0f) {
-			std::string damage = std::to_string(number.damage);
+			std::string damage_str = std::to_string(number.damage);
 			V2 damage_text_cs = convert_ws_to_cs(number.pos_ws, camera_pos_ws);
 
-			draw_string(font, damage.c_str(), CT_Red, true, (int)damage_text_cs.x, (int)damage_text_cs.y, 1, true);
+			size_t length = damage_str.length();
+
+			int damage_number_size = 1;
+			int background_padding = 3;
+
+			MP_Rect background_image_dst = {};
+			background_image_dst.w = ((int)length * (font.char_width * damage_number_size)) + (background_padding * 2);
+			background_image_dst.h = background_image_dst.w;
+			background_image_dst.x = (int)damage_text_cs.x - background_image_dst.w / 2;
+			background_image_dst.y = (int)damage_text_cs.y - background_image_dst.w / 2;
+
+			draw_animation_tracker(&number.background_at, background_image_dst, 0.0f);
+			draw_string(font, damage_str.c_str(), CT_Black, false, (int)damage_text_cs.x, (int)damage_text_cs.y, 1, true);
 		}
 	}
 }

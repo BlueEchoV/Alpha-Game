@@ -10,11 +10,13 @@ struct Damage_Number {
 	V2 pos_ws;
 	V2 velocity;
 	float life_time;
+	Animation_Tracker background_at;
 	// Is a crit
 	// Alpha value for fading
 };
 
-void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed, int damage, float life_time);
+void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed,
+	int damage, float life_time, std::string& background_image_name);
 void update_damage_numbers(std::vector<Damage_Number>& damage_numbers, const float dt);
 void draw_damage_numbers(Font& font, std::vector<Damage_Number>& damage_numbers, V2 camera_pos_ws);
 
