@@ -124,6 +124,12 @@ void draw_string(Font& font, const char* str, Color_Type c, bool background, flo
 	draw_string(font, str, c, background, (int)x, (int)y, size, center_x);
 }
 
+void draw_string(Font& font, const char* str, Color_Type c, bool background, int x, int y, int size, bool center_x, uint8_t alpha_mod) {
+	mp_set_texture_alpha_mod(font.image.texture, alpha_mod);
+	draw_string(font, str, c, background, x, y, size, center_x);
+	mp_set_texture_alpha_mod(font.image.texture, 255);
+}
+
 // Draws in camera space 
 void draw_quick_string(Color_Type c, bool background, const char* str, int x, int y) {
 	Font* font = get_font(FT_Basic);

@@ -1,11 +1,12 @@
 #include "Weapon.h"
 
 void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed, 
-	int damage, float life_time, std::string& background_image_name) {
+	int damage, float lifetime, std::string& background_image_name) {
 	Damage_Number result = {};
 
 	result.damage = damage;
-	result.life_time = life_time;
+	result.total_lifetime = lifetime;
+	result.current_lifetime = lifetime;
 	result.pos_ws = pos_ws;
 	result.velocity = {vel_normalized.x * speed, vel_normalized.y * speed};
 	result.background_at = create_animation_tracker(ATT_Direction_2, background_image_name, AS_No_Animation, APS_No_Animation, AM_No_Animation, false);
@@ -16,11 +17,11 @@ void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2
 void update_damage_numbers(std::vector<Damage_Number>& damage_numbers, const float dt) {
 	for (Damage_Number& number : damage_numbers) {
 		// Update position
-		if (number.life_time > 0.0f) {
+		if (number.current_lifetime > 0.0f) {
 			number.pos_ws.x += number.velocity.x * dt;
 			number.pos_ws.y += number.velocity.y * dt;
 
-			number.life_time -= dt;
+			number.current_lifetime -= dt;
 			update_animation_tracker(&number.background_at, dt, 0);
 		}
 	}
@@ -28,7 +29,7 @@ void update_damage_numbers(std::vector<Damage_Number>& damage_numbers, const flo
 
 void draw_damage_numbers(Font& font, std::vector<Damage_Number>& damage_numbers, V2 camera_pos_ws) {
 	for (Damage_Number& number : damage_numbers) {
-		if (number.life_time > 0.0f) {
+		if (number.current_lifetime > 0.0f) {
 			std::string damage_str = std::to_string(number.damage);
 			V2 damage_text_cs = convert_ws_to_cs(number.pos_ws, camera_pos_ws);
 
@@ -43,15 +44,19 @@ void draw_damage_numbers(Font& font, std::vector<Damage_Number>& damage_numbers,
 			background_image_dst.x = (int)damage_text_cs.x - background_image_dst.w / 2;
 			background_image_dst.y = (int)damage_text_cs.y - background_image_dst.w / 2;
 
-			draw_animation_tracker(&number.background_at, background_image_dst, 0.0f);
-			draw_string(font, damage_str.c_str(), CT_Black, false, (int)damage_text_cs.x, (int)damage_text_cs.y, 1, true);
+			uint8_t alpha_mod = 255;
+			if (number.current_lifetime <= number.total_lifetime) {
+				alpha_mod = (uint8_t)((float)alpha_mod * (number.current_lifetime / number.total_lifetime));
+			}
+			draw_animation_tracker(&number.background_at, background_image_dst, 0.0f, alpha_mod);
+			draw_string(font, damage_str.c_str(), CT_Black, false, (int)damage_text_cs.x, (int)damage_text_cs.y, 1, true, alpha_mod);
 		}
 	}
 }
 
 void delete_expired_damage_numbers(std::vector<Damage_Number>& damage_numbers) {
 	std::erase_if(damage_numbers, [](Damage_Number& number) {
-		if (number.life_time <= 0.0f) {
+		if (number.current_lifetime <= 0.0f) {
 				return true;
 		}
 		return false;

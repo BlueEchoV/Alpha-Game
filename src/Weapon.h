@@ -9,7 +9,8 @@ struct Damage_Number {
 	int damage;
 	V2 pos_ws;
 	V2 velocity;
-	float life_time;
+	float current_lifetime;
+	float total_lifetime;
 	Animation_Tracker background_at;
 	// Is a crit
 	// Alpha value for fading

@@ -495,11 +495,13 @@ int get_animation_tracker_current_frame_index(Animation_Tracker* at, int ss_rows
 	return result;
 }
 
-void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
+void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle, uint8_t alpha_mod) {
 	Sprite_Sheet* ss = get_sprite_sheet(at->selected_sprite_sheet);
 
 	MP_Rect src = ss->sprites[get_animation_tracker_current_frame_index(at, ss->rows, ss->columns)].src_rect;
 	MP_Texture* texture = ss->sprites[get_animation_tracker_current_frame_index(at, ss->rows, ss->columns)].image.texture;
+
+	mp_set_texture_alpha_mod(texture, alpha_mod);
 
 	if (at->flip_horizontally == false) {
 		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_NONE);
@@ -507,6 +509,12 @@ void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
 	else {
 		mp_render_copy_ex(texture, &src, &dst, angle, NULL, SDL_FLIP_HORIZONTAL);
 	}
+
+	mp_set_texture_alpha_mod(texture, 255);
+}
+
+void draw_animation_tracker(Animation_Tracker* at, MP_Rect dst, float angle) {
+	draw_animation_tracker(at, dst, angle, 255);
 }
 
 void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float angle, Color_Type ct, float outline_thickness) {

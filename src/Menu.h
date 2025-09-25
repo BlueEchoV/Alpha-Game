@@ -24,6 +24,7 @@ Font load_font(const char* file_path);
 
 void draw_character(Font& font, char character, int x, int y, int size);
 void draw_string(Font& font, const char* str, Color_Type c, bool background, int x, int y, int size, bool center_x);
+void draw_string(Font& font, const char* str, Color_Type c, bool background, int x, int y, int size, bool center_x, uint8_t alpha_mod);
 void draw_string(Font& font, const char* str, Color_Type c, bool background, float x, float y, int size, bool center_x);
 void draw_quick_string(Color_Type c, bool background, const char* str, int x, int y);
 

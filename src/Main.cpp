@@ -500,7 +500,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					}
 					if (check_rb_collision(&proj->rb, &unit->rb)) {
 						std::string damage_number_background_img_name = "damage_number_background";
-						create_and_add_damage_number(game_data.damage_numbers, proj->rb.pos_ws, { 0.0f, 1.0 }, 50, proj->damage, 3.0f, 
+						create_and_add_damage_number(game_data.damage_numbers, proj->rb.pos_ws, { 0.0f, 1.0 }, 50, proj->damage, 2.0f, 
 							damage_number_background_img_name);
 
 						// TODO: Push back attachable entities here
