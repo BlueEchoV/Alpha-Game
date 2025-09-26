@@ -791,6 +791,7 @@ void mp_render_copy_atlas() {
 
 void mp_render_copy_outlined(MP_Texture* texture, const MP_Rect* src_rect, const MP_Rect* dst_rect, Color_4F outline_color, float outline_thickness) {
     MP_Renderer* renderer = Globals::renderer;
+
     Packet result;
     result.type = PT_TEXTURE_OUTLINE;
     result.packet_texture_outline.texture = texture;
@@ -835,6 +836,10 @@ void mp_render_copy_outlined(MP_Texture* texture, const MP_Rect* src_rect, const
     renderer->indices.push_back(vbo_starting_index + 3);
     renderer->indices.push_back(vbo_starting_index + 0);
     result.packet_texture_outline.indices_count = (int)renderer->indices.size() - current_indices;
+
+	// Set UV bounds for shader clamping (added for atlas bleed prevention)
+    result.packet_texture_outline.uv_min = {(float)src.x / (float)texture->w, (float)src.y / (float)texture->h};
+    result.packet_texture_outline.uv_max = {(float)(src.x + src.w) / (float)texture->w, (float)(src.y + src.h) / (float)texture->h};
 
     renderer->packets.push_back(result);
 }
@@ -938,6 +943,10 @@ int mp_render_copy_outlined_ex(MP_Texture* texture, const MP_Rect* src_rect, con
     renderer->indices.push_back(vbo_starting_index + 3);
     renderer->indices.push_back(vbo_starting_index + 0);
     result.packet_texture_outline.indices_count = (int)renderer->indices.size() - current_indices;
+
+	// Set UV bounds for shader clamping (added for atlas bleed prevention)
+    result.packet_texture_outline.uv_min = {(float)src.x / (float)texture->w, (float)src.y / (float)texture->h};
+    result.packet_texture_outline.uv_max = {(float)(src.x + src.w) / (float)texture->w, (float)(src.y + src.h) / (float)texture->h};
 
     renderer->packets.push_back(result);
     return 0;
@@ -1190,18 +1199,18 @@ void mp_render_present() {
 		else if (packet.type == PT_TEXTURE_OUTLINE) {
 			GLuint shader = shader_programs[SP_2D_TEXTURE_OUTLINE];
 			glUseProgram(shader);
-
 			// Bind texture
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, packet.packet_texture_outline.texture->gl_handle);
 			glUniform1i(glGetUniformLocation(shader, "texture_sampler"), 0);
-
-			// Pass uniforms
+			// Pass existing uniforms
 			Color_4F oc = packet.packet_texture_outline.outline_color;
 			glUniform3f(glGetUniformLocation(shader, "outline_color"), oc.r, oc.g, oc.b);
 			glUniform1f(glGetUniformLocation(shader, "outline_thickness"), packet.packet_texture_outline.outline_thickness);
 			glUniform2f(glGetUniformLocation(shader, "tex_size"), (float)packet.packet_texture_outline.texture->w, (float)packet.packet_texture_outline.texture->h);
-
+			// Pass new UV bounds (assume stored in packet or calculated here)
+			glUniform2f(glGetUniformLocation(shader, "uv_min"), packet.packet_texture_outline.uv_min.x, packet.packet_texture_outline.uv_min.y);
+			glUniform2f(glGetUniformLocation(shader, "uv_max"), packet.packet_texture_outline.uv_max.x, packet.packet_texture_outline.uv_max.y);
 			int index = packet.packet_texture_outline.indices_array_index;
 			int count = packet.packet_texture_outline.indices_count;
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(index * sizeof(unsigned int)));
@@ -1319,8 +1328,11 @@ MP_Texture* mp_create_texture(uint32_t format, int access, int w, int h, bool us
 	glBindTexture(GL_TEXTURE_2D, result->gl_handle);
 
 	// Default wrapping
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Filtering
 	GLint filter = use_linear_filtering ? GL_LINEAR : GL_NEAREST;

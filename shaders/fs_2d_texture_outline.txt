@@ -1,19 +1,17 @@
 #version 330 core
 in vec4 f_color;
 in vec2 f_texture_coordinates;
-
 out vec4 f_final_color;
-
 uniform sampler2D texture_sampler;
-uniform vec3 outline_color;         // RGB outline color (passed as uniform)
-uniform float outline_thickness;    // Normalized thickness (e.g., 0.005 for thin outline)
-uniform vec2 tex_size;              // Texture dimensions (for offset calculation)
-
+uniform vec3 outline_color; // RGB outline color (passed as uniform)
+uniform float outline_thickness; // Normalized thickness (e.g., 0.005 for thin outline)
+uniform vec2 tex_size; // Texture dimensions (for offset calculation)
+uniform vec2 uv_min;   // Minimum UV bounds for the current sprite (new)
+uniform vec2 uv_max;   // Maximum UV bounds for the current sprite (new)
 void main() {
-    vec4 tex_color = texture(texture_sampler, f_texture_coordinates) * f_color;  // Apply texture and modulation
-
-    if (tex_color.a > 0.01) {  // Threshold to avoid faint artifacts
-        f_final_color = tex_color;  // Interior pixel
+    vec4 tex_color = texture(texture_sampler, f_texture_coordinates) * f_color; // Apply texture and modulation
+    if (tex_color.a > 0.01) { // Threshold to avoid faint artifacts
+        f_final_color = tex_color; // Interior pixel
     } else {
         // Sample neighbors to detect edge
         float max_alpha = 0.0;
@@ -28,14 +26,15 @@ void main() {
                     continue;
                 }
                 vec2 sample_coord = f_texture_coordinates + vec2(x * offset.x, y * offset.y);
+                sample_coord = clamp(sample_coord, uv_min, uv_max); // Clamp to sprite bounds (new)
                 float sample_alpha = texture(texture_sampler, sample_coord).a;
                 max_alpha = max(max_alpha, sample_alpha);
             }
         }
         if (max_alpha > 0.01) {
-            f_final_color = vec4(outline_color, 1.0);  // Outline pixel
+            f_final_color = vec4(outline_color, 1.0); // Outline pixel
         } else {
-            discard;  // Fully transparent
+            discard; // Fully transparent
         }
     }
 }

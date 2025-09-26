@@ -60,11 +60,6 @@ Sprite_Sheet create_animation_sprite_sheet(std::string full_file_path, int rows,
 
 	Image image = load_image(full_file_path.c_str());
 
-	if (full_file_path == "assets\\ravenous_skulk\\walking\\ravenous_skulk_walking_atlas.png") {
-		int i = 0;
-		i++;
-	}
-
 	if (image.texture != NULL) {
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < columns; y++) {
@@ -523,6 +518,11 @@ void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float a
 	int index = get_animation_tracker_current_frame_index(at, ss->rows, ss->columns);
 	MP_Rect src = ss->sprites[index].src_rect;
 	MP_Texture* texture = ss->sprites[index].image.texture;
+	
+	if (at->att == ATT_Direction_8_Atlas && at->as == AS_Attacking && at->fd == FD_E) {
+		int temp = 0;
+		temp++;
+	}
 
 	Color_RGBA color_rgba = get_color_type(ct);
 	Color_4F color_4f_normalized = {(float)color_rgba.r / 255.0f, (float)color_rgba.g / 255.0f, (float)color_rgba.b / 255.0f, (float)color_rgba.a / 255.0f};

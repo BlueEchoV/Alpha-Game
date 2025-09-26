@@ -34,6 +34,8 @@
 
 #define GL_FUNC_ADD                       0x8006
 
+#define GL_CLAMP_TO_EDGE				  0x812F
+
 typedef int64_t GLsizeiptr;
 
 typedef GLuint(*glCreateShaderFunc)(GLenum shaderType);

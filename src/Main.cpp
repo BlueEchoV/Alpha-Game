@@ -193,6 +193,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	renderer->window_width= Globals::playground_area_w;
 	renderer->window_height = Globals::playground_area_h;
 
+	float dt_modifier = 1.0f;
+	float dt_increment = 0.20f;
+
 	while (Globals::running) {
 		reset_is_pressed();
 
@@ -217,6 +220,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		current_frame_time = mp_get_ticks_64();
 		// Convert to seconds
 		delta_time = (float)(current_frame_time - last_frame_time) / 1000;
+		if (key_pressed(VK_UP)) {
+			dt_modifier += dt_increment;
+		}
+		else if (key_pressed(VK_DOWN)) {
+			if (dt_modifier >= dt_increment) {
+				dt_modifier -= dt_increment;
+			}
+		}
+		delta_time *= dt_modifier;
 		last_frame_time = current_frame_time;
 		// log("Current Time %i", current_frame_time);
 		// uint64_t temp = uint64_t(delta_time * 1000.0f);
@@ -582,13 +594,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		);
 
-		for (Handle zombie_handle : game_data.enemy_unit_handles) {
-			Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, zombie_handle);
+		for (Handle unit : game_data.enemy_unit_handles) {
+			Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, unit);
 			if (u == NULL) {
 				continue;
 			}
 
-			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.5f);
+			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Dark_Yellow, 0.5f);
 			// draw_unit(*u, game_data.camera.pos_ws);
 
 			if (Globals::debug_show_colliders && u->dead == false) {

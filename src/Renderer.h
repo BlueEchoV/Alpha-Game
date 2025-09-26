@@ -123,6 +123,8 @@ struct Packet_Texture_Outline {
     int indices_count;
     Color_4F outline_color;  // RGBA for outline (alpha for opacity if needed)
     float outline_thickness;  // e.g., 1.0 to 5.0 pixels, normalized later
+	V2 uv_min;
+	V2 uv_max;
 };
 
 struct Packet {
