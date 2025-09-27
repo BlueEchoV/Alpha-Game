@@ -387,7 +387,8 @@ void debug_draw_animation_trackers(Font& font, float delta_time) {
 	static std::vector<Animation_Tracker> trackers = {
 		create_animation_tracker(ATT_Direction_8, "hellhound", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
 		create_animation_tracker(ATT_Direction_8, "gravebound_peasant", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
-		create_animation_tracker(ATT_Direction_8_Atlas, "ravenous_skulk", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true)
+		create_animation_tracker(ATT_Direction_8_Atlas, "ravenous_skulk", AS_Walking, APS_Speed_Based, AM_Animate_Looping, true),
+		create_animation_tracker(ATT_Direction_2, "bone_turret_s", AS_No_Animation, APS_No_Animation, AM_No_Animation, false)
 	};
 
 	static bool first_pass = true;
@@ -397,6 +398,9 @@ void debug_draw_animation_trackers(Font& font, float delta_time) {
 				V2 pointing_south = {0.0f, -1.0f};
 				if (at.entity_name == "ravenous_skulk") {
 					change_animation_tracker(&at, at.entity_name, AS_Dying, APS_Speed_Based, AM_Animate_Looping, false, pointing_south);
+				}
+				else if (at.entity_name == "bone_turret_s") {
+					change_animation_tracker(&at, at.entity_name, AS_No_Animation, APS_No_Animation, AM_No_Animation, false, pointing_south);
 				}
 				else {
 					change_animation_tracker(&at, at.entity_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, pointing_south);
