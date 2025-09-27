@@ -600,7 +600,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				continue;
 			}
 
-			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Dark_Yellow, 0.5f);
+			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.5f);
 			// draw_unit(*u, game_data.camera.pos_ws);
 
 			if (Globals::debug_show_colliders && u->dead == false) {

@@ -102,14 +102,10 @@ void reset_and_scale_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>
 	// Reset values
 	nw.begin_spawning = false;
 	nw.total_spawned = 0;
-	REF(unit_handles);
-	REF(unit_storage);
-	/*
 	for (Handle& h : unit_handles) {
 		Unit* unit = get_unit_from_handle(unit_storage, h);
 		unit->destroyed = true;
 	}
-	*/
 
 	// Scale Wave
 	if (nw.current_wave < get_max_waves_from_difficulty(nw.difficulty)) {
