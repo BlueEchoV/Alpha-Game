@@ -360,8 +360,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 
 			if (key_pressed_and_held(VK_SPACE)) {
+				V2 proj_spawn_pos = game_data.player.rb.pos_ws;
+				proj_spawn_pos.y += game_data.player.h / 6;
 				player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage,
-					game_data.camera, game_data.player.rb.pos_ws, F_Player);
+					game_data.camera, proj_spawn_pos, F_Player);
 			}
 
 			player->weapon->update_weapon(delta_time);
