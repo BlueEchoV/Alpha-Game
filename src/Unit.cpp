@@ -105,7 +105,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	case US_Attacking: {
 		// 1: We need to check if we are in the attack frame of the unit and if damage has yet been applied this cycle (multiple frames
 		// per cycle.
-		if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && cooldown_ready(unit.attack_cd)) {
+	if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && cooldown_ready(unit.attack_cd)) {
 			// 2: Next, we check if we are colliding with the player this frame.
 			if (check_rb_collision(&p.rb, &unit.rb)) {
 				// 3: If we are colliding, we apply the damage to the player and check if the player is dead or not

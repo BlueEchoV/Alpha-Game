@@ -73,7 +73,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 1);
+	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 10);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -394,8 +394,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					mouse_position
 				);
 			}
-		}
-		else {
+		} else {
 			current_debug_spawning_delay -= delta_time;
 		}
 
