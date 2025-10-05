@@ -36,6 +36,7 @@ namespace Globals {
 	extern bool debug_show_coordinates;
 	extern bool debug_show_stats;
 	extern bool debug_show_colliders;
+	extern bool debug_show_wireframes;
 
 	extern float noise_frequency;
 

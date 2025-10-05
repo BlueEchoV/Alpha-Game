@@ -460,6 +460,28 @@ void debug_draw_animation_trackers(Font& font, float delta_time) {
 	}
 }
 
+void debug_draw_wireframes(Camera& camera) {
+	int starting_tile_x = ((int)camera.pos_ws.x / Globals::tile_w) - 1;
+	int starting_tile_y = ((int)camera.pos_ws.y / Globals::tile_h) - 1;
+
+	int ending_tile_x = ((int)camera.pos_ws.x + camera.w) / Globals::tile_w;
+	int ending_tile_y = ((int)camera.pos_ws.y + camera.h) / Globals::tile_h;
+
+	for (int tile_x = starting_tile_x - 1; tile_x < ending_tile_x + 2; tile_x++) {
+		for (int tile_y = starting_tile_y - 1; tile_y < ending_tile_y + 2; tile_y++) {
+			V2 tile_ws_pos = { (float)(tile_x * Globals::tile_w), (float)(tile_y * Globals::tile_h) };
+			V2 tile_cs_pos = convert_ws_to_cs(tile_ws_pos, camera.pos_ws);
+
+			MP_Rect current_tile = { (int)tile_cs_pos.x, (int)tile_cs_pos.y, Globals::tile_w, Globals::tile_h };
+			std::string tile = std::to_string(tile_x) + "," + std::to_string(tile_y);
+			// draw_string(*font_basic, tile.c_str(), CT_Red, false, (int)tile_cs_pos.x, (int)tile_cs_pos.y, 1, false);
+
+			mp_set_render_draw_color(CT_Green);
+			mp_render_draw_rect(&current_tile);
+		}
+	}
+}
+
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
 	if (Globals::toggle_debug_images) {
 		debug_draw_mp_renderer_visualizations(font, debug_texture, delta_time);

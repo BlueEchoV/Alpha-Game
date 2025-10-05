@@ -24,11 +24,13 @@ namespace Globals {
 	extern float active_viewport_scale_x = 0;
 	extern float active_viewport_scale_y = 0;
 
+	// NOTE: WILL BE REPLACED WITH A CONSOLE
 	bool toggle_debug_images = false;
 	bool toggle_debug_unit_images = false;
 	bool debug_show_coordinates = false;
 	bool debug_show_stats = false;
 	bool debug_show_colliders = false;
+	bool debug_show_wireframes = false;
 
 	float noise_frequency = 0.05f;
 	// Pixels

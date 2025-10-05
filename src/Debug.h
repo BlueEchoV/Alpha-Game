@@ -29,4 +29,5 @@ void draw_debug_2d_rotation_matrix_rect(V2 center, Font* font, float delta_time)
 void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture, float delta_time);
 void debug_draw_stats(Font& font, MP_Texture* debug_texture);
 void debug_draw_animation_trackers(Font& font, float delta_time);
+void debug_draw_wireframes(Camera& camera);
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);
