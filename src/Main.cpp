@@ -562,6 +562,33 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// Draw the spawn region?
 		draw_night_wave_spawn_region(CT_Red, game_data.current_night_wave, game_data.world.map, game_data.camera.pos_ws);
 
+		Font* font_basic = get_font(FT_Basic);
+
+		//V2 mouse_cs_pos = get_mouse_position(renderer->open_gl.window_handle);
+		//V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
+		//std::string temp_debug_mouse = "Mouse WS pos: " + std::to_string((int)mouse_ws_pos.x) + ", " + std::to_string((int)mouse_ws_pos.y);
+		//log(temp_debug_mouse.c_str());
+
+		//V2 tile_supposed_to_be_hovering = { mouse_ws_pos.x / Globals::tile_w, mouse_ws_pos.y / Globals::tile_h};
+		//std::string temp_debug_mouse_2 = "Mouse Tile Hovering: " + std::to_string((int)tile_supposed_to_be_hovering.x) 
+		//	+ ", " + std::to_string((int)tile_supposed_to_be_hovering.y);
+		//log(temp_debug_mouse_2.c_str());
+
+		// int tile_x = ((int)mouse_ws_pos.x / Globals::tile_w) - (int)mouse_ws_pos.x % Globals::tile_w;
+		// int tile_y = ((int)mouse_ws_pos.y / Globals::tile_h) - (int)mouse_ws_pos.y & Globals::tile_h;
+		int tile_x = 0;
+		int tile_y = 0;
+
+		V2 tile_ws_pos = {(float)(tile_x * Globals::tile_w), (float)(tile_y * Globals::tile_h)};
+		V2 tile_cs_pos = convert_ws_to_cs(tile_ws_pos, game_data.camera.pos_ws);
+
+		MP_Rect currently_hovered_tile_outline_rect = {(int)tile_cs_pos.x, (int)tile_cs_pos.y, Globals::tile_w, Globals::tile_h};
+		std::string tile = "" + std::to_string(tile_x) + "," + std::to_string(tile_y) + "";
+		draw_string(*font_basic, tile.c_str(), CT_Red, false, (int)tile_cs_pos.x + Globals::tile_w / 2, (int)tile_cs_pos.y + Globals::tile_h / 2, 
+			1, true);
+
+		mp_set_render_draw_color(CT_Green);
+		mp_render_draw_rect(&currently_hovered_tile_outline_rect);
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 
@@ -609,7 +636,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		Font* font_basic = get_font(FT_Basic);
 		draw_damage_numbers(*font_basic, game_data.damage_numbers, game_data.camera.pos_ws);
 
 		draw_game_loop_ui(game_data, FT_Basic);

@@ -113,3 +113,4 @@ void draw_animation_tracker_outlined(Animation_Tracker* at, MP_Rect dst, float a
 
 void load_sprite_sheets();
 void load_sprite_sheet_data_csv(CSV_Data* data); 
+
