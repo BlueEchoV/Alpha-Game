@@ -476,7 +476,7 @@ void debug_draw_wireframes(Camera& camera) {
 			std::string tile = std::to_string(tile_x) + "," + std::to_string(tile_y);
 			// draw_string(*font_basic, tile.c_str(), CT_Red, false, (int)tile_cs_pos.x, (int)tile_cs_pos.y, 1, false);
 
-			mp_set_render_draw_color(CT_Green);
+			mp_set_render_draw_color(CT_Dark_Yellow);
 			mp_render_draw_rect(&current_tile);
 		}
 	}

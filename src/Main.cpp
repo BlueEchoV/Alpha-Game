@@ -73,7 +73,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
-	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 10);
+	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 1);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -567,25 +567,32 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		Font* font_basic = get_font(FT_Basic);
 
-		//V2 mouse_cs_pos = get_mouse_position(renderer->open_gl.window_handle);
-		//V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-		//std::string temp_debug_mouse = "Mouse WS pos: " + std::to_string((int)mouse_ws_pos.x) + ", " + std::to_string((int)mouse_ws_pos.y);
-		//log(temp_debug_mouse.c_str());
-
-		//V2 tile_supposed_to_be_hovering = { mouse_ws_pos.x / Globals::tile_w, mouse_ws_pos.y / Globals::tile_h};
-		//std::string temp_debug_mouse_2 = "Mouse Tile Hovering: " + std::to_string((int)tile_supposed_to_be_hovering.x) 
-		//	+ ", " + std::to_string((int)tile_supposed_to_be_hovering.y);
-		//log(temp_debug_mouse_2.c_str());
-
-		// int tile_x = ((int)mouse_ws_pos.x / Globals::tile_w) - (int)mouse_ws_pos.x % Globals::tile_w;
-		// int tile_y = ((int)mouse_ws_pos.y / Globals::tile_h) - (int)mouse_ws_pos.y & Globals::tile_h;
-
-		// Only render tiles in the view of the player
-		// Currently in world space
-		// Draw the tiles around the player
 		if (Globals::debug_show_wireframes) {
 			debug_draw_wireframes(game_data.camera);
 		}
+
+		V2 mouse_cs_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
+		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
+		std::string temp_debug_mouse = "Mouse WS pos: " + std::to_string((int)mouse_ws_pos.x) + ", " + std::to_string((int)mouse_ws_pos.y);
+		log(temp_debug_mouse.c_str());
+
+		// Numerical example: For mouse_ws_pos.x = -15.0 and tile_w = 32,
+		// -15.0 / 32.0 = -0.46875, std::floor(-0.46875) = -1.0, resulting in tile_x = -1.
+		int tile_x = static_cast<int>(std::floor(mouse_ws_pos.x / static_cast<float>(Globals::tile_w)));
+		int tile_y = static_cast<int>(std::floor(mouse_ws_pos.y / static_cast<float>(Globals::tile_h)));
+
+		std::string temp_tile_str = std::to_string(tile_x) + "," + std::to_string(tile_y);
+		draw_string(*font_basic, temp_tile_str.c_str(), CT_Red, false, mouse_cs_pos.x, mouse_cs_pos.y, 1, true);
+
+		V2 tile_ws_pos = { (float)(tile_x * Globals::tile_w), (float)(tile_y * Globals::tile_h) };
+		V2 tile_cs_pos = convert_ws_to_cs(tile_ws_pos, camera.pos_ws);
+
+		MP_Rect current_tile = { (int)tile_cs_pos.x, (int)tile_cs_pos.y, Globals::tile_w, Globals::tile_h };
+		std::string temp_tile_pos = std::to_string(tile_ws_pos.x) + "," + std::to_string(tile_ws_pos.y);
+		log(temp_tile_pos.c_str());
+
+		mp_set_render_draw_color(CT_Green);
+		mp_render_draw_rect(&current_tile);
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);

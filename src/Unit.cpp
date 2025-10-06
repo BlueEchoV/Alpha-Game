@@ -98,7 +98,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 			stop_moving = true;
 		} else {
 			stop_moving = false;
-			change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, unit.rb.vel);
+			change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Fast, AM_Animate_Looping, false, unit.rb.vel);
 		}
 		break;
 	}
@@ -122,7 +122,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 			unit.us = US_Moving;
 			unit.damage_applied = false;
 			unit.attack_cd.current = unit.attack_cd.max;
-			change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Speed_Based, AM_Animate_Looping, false, unit.rb.vel);
+			change_animation_tracker(&unit.at, unit.unit_name, AS_Walking, APS_Fast, AM_Animate_Looping, false, unit.rb.vel);
 		}
 		break;
 	}

@@ -22,6 +22,7 @@ void reset_is_pressed() {
 	}
 }
 
+// IMPORTANT: THIS FUNCTION ISN'T IDEAL BECAUSE IT DOESN'T TAKE INTO ACCOUNT THE VIEWPORT. USE WITH CAUTION.
 // Retrieves the current mouse position in window coordinates, adjusted to a bottom-left origin.
 // This function uses Windows API calls to get the cursor position relative to the client area of the window.
 // Note: The result is in pixel units relative to the window's client area, with y increasing upwards from the bottom.
