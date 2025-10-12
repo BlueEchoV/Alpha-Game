@@ -54,7 +54,6 @@ struct Unit {
     bool damage_applied = false; // To guarrantee multiple attacks don't hit in the same cycle
     int attack_hit_frame = 8;  // Per-unit or load from data
 
-
 	Handle handle;
 };
 
@@ -64,7 +63,6 @@ void kill_unit(Unit& unit, int& active_enemy_units_counter);
 void update_unit(Player& p, Unit& unit, float dt);
 void draw_unit(Unit& unit, V2 camera_pos);
 void draw_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, float outline_thickness);
-
 
 Unit* get_unit_from_handle(Storage<Unit>& storage, Handle handle);
 

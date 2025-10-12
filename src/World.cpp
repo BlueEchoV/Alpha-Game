@@ -2,12 +2,23 @@
 
 #include <perlin.h>
 
-V2 get_tile_pos_ws(int tile_index_x, int tile_index_y) {
-	return {(float)Globals::tile_w * (float)tile_index_x, (float)Globals::tile_h * (float)tile_index_y};
+void get_tile_pos_index_from_pos_ws(V2 pos_ws, int& tile_grid_index_x, int& tile_grid_index_y) {
+	tile_grid_index_x = (int)pos_ws.x / Globals::tile_w; 
+	tile_grid_index_y = (int)pos_ws.y / Globals::tile_h;
 }
 
-V2 get_tile_pos_index(V2 pos_ws) {
-	return { pos_ws.x / Globals::tile_w, pos_ws.y / Globals::tile_h };
+V2 get_tile_pos_ws_from_grid_index(int tile_grid_index_x, int tile_grid_index_y) {
+	return {(float)Globals::tile_w * (float)tile_grid_index_x, (float)Globals::tile_h * (float)tile_grid_index_y};
+}
+
+V2 get_tile_pos_ws_from_pos_ws(V2 pos_ws) {
+	int tile_grid_index_x = 0;
+	int tile_grid_index_y = 0;
+	get_tile_pos_index_from_pos_ws(pos_ws, tile_grid_index_x, tile_grid_index_y);
+
+	V2 tile_pos_ws = get_tile_pos_ws_from_grid_index(tile_grid_index_x, tile_grid_index_y);
+
+	return tile_pos_ws;
 }
 
 // All tilemaps are centered around 0, 0 ws position
@@ -153,7 +164,7 @@ void draw_environment_entity(Camera camera, int tile_index_x, int tile_index_y, 
 
 	// Only draw if we pull an image to draw
 	if (image_name != "") {
-		V2 tile_pos_ws = get_tile_pos_ws(tile_index_x, tile_index_y);
+		V2 tile_pos_ws = get_tile_pos_ws_from_grid_index(tile_index_x, tile_index_y);
 
 		// Move everything around the camera
 		int tile_cs_x = (int)tile_pos_ws.x - (int)camera.pos_ws.x;

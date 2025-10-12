@@ -22,6 +22,7 @@
     <ClCompile Include="src\Ability.cpp" />
     <ClCompile Include="src\Audio_DirectSound.cpp" />
     <ClCompile Include="src\Audio_xAudio2.cpp" />
+    <ClCompile Include="src\Building.cpp" />
     <ClCompile Include="src\Debug.cpp" />
     <ClCompile Include="src\Entity_Manager.cpp" />
     <ClCompile Include="src\Game_Data.cpp" />
@@ -49,6 +50,7 @@
     <ClInclude Include="src\Ability.h" />
     <ClInclude Include="src\Audio_DirectSound.h" />
     <ClInclude Include="src\Audio_xAudio2.h" />
+    <ClInclude Include="src\Building.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\Entity_Manager.h" />
     <ClInclude Include="src\Game_Utility.h" />

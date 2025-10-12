@@ -118,6 +118,9 @@
     <ClCompile Include="src\UI.cpp">
       <Filter>Source Files\Game\Menu / UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Building.cpp">
+      <Filter>Source Files\Game\Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Audio_DirectSound.h">
@@ -194,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="src\UI.h">
       <Filter>Source Files\Game\Menu / UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Building.h">
+      <Filter>Source Files\Game\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

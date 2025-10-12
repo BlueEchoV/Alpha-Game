@@ -2,6 +2,7 @@
 #include "Audio_xAudio2.h"
 #include "Audio_DirectSound.h"
 #include "UI.h"
+#include "Building.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -74,6 +75,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
 	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 1);
+
+	spawn_building("null", NULL, { 100, 100 }, game_data.building_storage, game_data.building_handles);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -484,7 +487,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		// Update
-		for (Handle& projectile_handle : game_data.projectile_handles) {
+		for (Handle projectile_handle : game_data.projectile_handles) {
 			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
 			if (p != NULL) {
 				if (!player->dead) {
@@ -497,6 +500,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (unit != NULL) {
 				if (!player->dead) {
 					update_unit(game_data.player, *unit, delta_time);
+				}
+			}
+		}
+		for (Handle building_handle : game_data.building_handles) {
+			Building* b = get_entity_pointer_from_handle(game_data.building_storage, building_handle);
+			if (b != NULL) {
+				if (!player->dead) {
+					update_building(*b, delta_time);
 				}
 			}
 		}
@@ -533,6 +544,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			spawn_and_update_night_wave(game_data.enemy_unit_handles, game_data.unit_storage,
 				game_data.current_night_wave, game_data.active_enemy_units, game_data.player, game_data.world.map, delta_time);
 		}
+
+
 
 		// Render
 
@@ -614,6 +627,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		update_damage_numbers(game_data.damage_numbers, delta_time);
 
+		// TODO: HAVE THIS ALSO INCLUDE BUILDINGS AND THE PALYER AND PROJECTILES
 		std::sort(game_data.enemy_unit_handles.begin(), game_data.enemy_unit_handles.end(), [&](Handle& a, Handle& b) {
 			Unit* enemy_1 = get_entity_pointer_from_handle(game_data.unit_storage, a);
 			Unit* enemy_2 = get_entity_pointer_from_handle(game_data.unit_storage, b);
@@ -639,6 +653,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (Globals::debug_show_colliders && u->dead == false) {
 				draw_colliders(&u->rb, game_data.camera.pos_ws);
 			}
+		}
+
+		for (Handle building : game_data.building_handles) {
+			Building* b = get_entity_pointer_from_handle(game_data.building_storage, building);
+			if (b == NULL) {
+				continue;
+			}
+
+			draw_building_outlined(*b, game_data.camera.pos_ws);
 		}
 
 		draw_damage_numbers(*font_basic, game_data.damage_numbers, game_data.camera.pos_ws);

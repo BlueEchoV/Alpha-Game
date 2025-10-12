@@ -7,6 +7,7 @@
 #include "Ability.h"
 #include "Unit.h"
 #include "Night_Wave.h"
+#include "Building.h"
 
 struct Game_Data {
 	Camera camera;
@@ -15,10 +16,13 @@ struct Game_Data {
 
 	Storage<Projectile> projectile_storage = { .storage_type = ST_Projectile };
 	Storage<Unit>		unit_storage = { .storage_type = ST_Unit };
+	Storage<Building>   building_storage = { .storage_type = ST_Building };
 
 	std::vector<Handle> enemy_unit_handles;
 	int active_enemy_units;
 	std::vector<Handle> projectile_handles;
+	std::vector<Handle> building_handles;
+
 	// Emipheral - Handles not needed
 	std::vector<Damage_Number> damage_numbers;
 
