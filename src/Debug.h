@@ -30,4 +30,5 @@ void debug_draw_mp_renderer_visualizations(Font& font, MP_Texture* debug_texture
 void debug_draw_stats(Font& font, MP_Texture* debug_texture);
 void debug_draw_animation_trackers(Font& font, float delta_time);
 void debug_draw_wireframes(Camera& camera);
+void debug_show_hovered_tile(HWND window, V2 camera_pos_ws);
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time);

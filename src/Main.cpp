@@ -3,6 +3,7 @@
 #include "Audio_DirectSound.h"
 #include "UI.h"
 #include "Building.h"
+#include "Unit.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -45,6 +46,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	load_unit_data_csv(&unit_data_csv);
 	close_csv_data_file(&unit_data_csv);
 
+	CSV_Data building_data_csv = create_open_csv_data("data\\building_data.csv");
+	open_csv_data_file(&building_data_csv);
+	load_building_data_csv(&building_data_csv);
+	close_csv_data_file(&building_data_csv);
+
 	CSV_Data sprite_sheet_data_csv = create_open_csv_data("data\\sprite_sheet_data.csv");
 	open_csv_data_file(&sprite_sheet_data_csv);
 	load_sprite_sheet_data_csv(&sprite_sheet_data_csv);
@@ -76,7 +82,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 1);
 
-	spawn_building("null", NULL, { 100, 100 }, game_data.building_storage, game_data.building_handles);
+	spawn_building("bone_turret", NULL, { 100, 100 }, game_data.building_storage, game_data.building_handles);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -296,6 +302,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				player_moving = true;
 				player_x_delta = 1.0f;
 			}
+			if (key_pressed(VK_LBUTTON)) {
+				V2 mouse_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
+				V2 mouse_pos_ws = convert_cs_to_ws(mouse_pos, game_data.camera.pos_ws);
+				spawn_building("bone_turret", false, mouse_pos_ws, game_data.building_storage, game_data.building_handles);
+			}
 
 			// Compute movement direction
 			V2 move_delta = { player_x_delta, player_y_delta };
@@ -365,8 +376,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (key_pressed_and_held(VK_SPACE)) {
 				V2 proj_spawn_pos = game_data.player.rb.pos_ws;
 				proj_spawn_pos.y += game_data.player.h / 6;
+
+				V2 mouse_cs_pos_target = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
+				V2 mouse_ws_pos_target = convert_cs_to_ws(mouse_cs_pos_target, game_data.camera.pos_ws);
+
 				player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage,
-					game_data.camera, proj_spawn_pos, F_Player);
+					game_data.camera, proj_spawn_pos, mouse_ws_pos_target, F_Player);
 			}
 
 			player->weapon->update_weapon(delta_time);
@@ -473,6 +488,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed(VK_F6)) {
 			Globals::debug_show_wireframes = !Globals::debug_show_wireframes;
 		}
+		if (key_pressed(VK_F7)) {
+			Globals::debug_show_hovered_tile = !Globals::debug_show_hovered_tile;
+		}
 		if (key_pressed(VK_F9)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 			if (Globals::debug_show_coordinates != Globals::toggle_debug_images) {
@@ -486,33 +504,29 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		// Update
-		for (Handle projectile_handle : game_data.projectile_handles) {
-			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
-			if (p != NULL) {
-				if (!player->dead) {
+		if (!game_data.player.dead) {
+			// Update
+			for (Handle projectile_handle : game_data.projectile_handles) {
+				Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile_handle);
+				if (p != NULL) {
 					update_projectile(*p, delta_time);
 				}
 			}
-		}
-		for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
-			Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-			if (unit != NULL) {
-				if (!player->dead) {
+			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
+				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+				if (unit != NULL) {
 					update_unit(game_data.player, *unit, delta_time);
 				}
 			}
-		}
-		for (Handle building_handle : game_data.building_handles) {
-			Building* b = get_entity_pointer_from_handle(game_data.building_storage, building_handle);
-			if (b != NULL) {
-				if (!player->dead) {
-					update_building(*b, delta_time);
+			for (Handle building_handle : game_data.building_handles) {
+				Building* b = get_entity_pointer_from_handle(game_data.building_storage, building_handle);
+				if (b != NULL) {
+					// Assuming you have a vector<Unit*> active_enemies populated from game_data.active_enemy_units
+					update_building(*b, delta_time, game_data.enemy_unit_handles, game_data.unit_storage,
+						game_data.projectile_handles, game_data.projectile_storage, game_data.camera);
 				}
 			}
-		}
 
-		if (!game_data.player.dead) {
 			// Collision
 			// TODO: Add the destroyed checks into a function for consistency
 			for (Handle& projectile_handle : game_data.projectile_handles) {
@@ -584,28 +598,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			debug_draw_wireframes(game_data.camera);
 		}
 
-		V2 mouse_cs_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
-		V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, game_data.camera.pos_ws);
-		std::string temp_debug_mouse = "Mouse WS pos: " + std::to_string((int)mouse_ws_pos.x) + ", " + std::to_string((int)mouse_ws_pos.y);
-		log(temp_debug_mouse.c_str());
-
-		// Numerical example: For mouse_ws_pos.x = -15.0 and tile_w = 32,
-		// -15.0 / 32.0 = -0.46875, std::floor(-0.46875) = -1.0, resulting in tile_x = -1.
-		int tile_x = static_cast<int>(std::floor(mouse_ws_pos.x / static_cast<float>(Globals::tile_w)));
-		int tile_y = static_cast<int>(std::floor(mouse_ws_pos.y / static_cast<float>(Globals::tile_h)));
-
-		std::string temp_tile_str = std::to_string(tile_x) + "," + std::to_string(tile_y);
-		draw_string(*font_basic, temp_tile_str.c_str(), CT_Red, false, mouse_cs_pos.x, mouse_cs_pos.y, 1, true);
-
-		V2 tile_ws_pos = { (float)(tile_x * Globals::tile_w), (float)(tile_y * Globals::tile_h) };
-		V2 tile_cs_pos = convert_ws_to_cs(tile_ws_pos, camera.pos_ws);
-
-		MP_Rect current_tile = { (int)tile_cs_pos.x, (int)tile_cs_pos.y, Globals::tile_w, Globals::tile_h };
-		std::string temp_tile_pos = std::to_string(tile_ws_pos.x) + "," + std::to_string(tile_ws_pos.y);
-		log(temp_tile_pos.c_str());
-
-		mp_set_render_draw_color(CT_Green);
-		mp_render_draw_rect(&current_tile);
+		if (Globals::debug_show_hovered_tile) {
+			debug_show_hovered_tile(renderer->open_gl.window_handle, game_data.camera.pos_ws);
+		}
 
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);

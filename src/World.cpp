@@ -3,8 +3,10 @@
 #include <perlin.h>
 
 void get_tile_pos_index_from_pos_ws(V2 pos_ws, int& tile_grid_index_x, int& tile_grid_index_y) {
-	tile_grid_index_x = (int)pos_ws.x / Globals::tile_w; 
-	tile_grid_index_y = (int)pos_ws.y / Globals::tile_h;
+	// Numerical example: For mouse_ws_pos.x = -15.0 and tile_w = 32,
+	// -15.0 / 32.0 = -0.46875, std::floor(-0.46875) = -1.0, resulting in tile_x = -1.
+	tile_grid_index_x = static_cast<int>(std::floor(pos_ws.x / static_cast<float>(Globals::tile_w)));
+	tile_grid_index_y = static_cast<int>(std::floor(pos_ws.y / static_cast<float>(Globals::tile_h)));
 }
 
 V2 get_tile_pos_ws_from_grid_index(int tile_grid_index_x, int tile_grid_index_y) {

@@ -31,6 +31,7 @@ namespace Globals {
 	bool debug_show_stats = false;
 	bool debug_show_colliders = false;
 	bool debug_show_wireframes = false;
+	bool debug_show_hovered_tile = false;
 
 	float noise_frequency = 0.05f;
 	// Pixels

@@ -48,8 +48,8 @@ bool cooldown_ready(Cooldown& cd) {
 
 bool trigger_cooldown(Cooldown& cd) {
 	if (cd.current <= 0.0f) {
-		cd.current = cd.max;
-			return true;
+		cd.current = cd.max; 
+		return true;
 	}
 	return false;
 }

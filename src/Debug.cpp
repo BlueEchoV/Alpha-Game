@@ -483,6 +483,17 @@ void debug_draw_wireframes(Camera& camera) {
 	}
 }
 
+
+void debug_show_hovered_tile(HWND window, V2 camera_pos_ws) {
+	V2 mouse_cs_pos = get_viewport_mouse_position(window);
+	V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, camera_pos_ws);
+	V2 tile_ws_pos = get_tile_pos_ws_from_pos_ws(mouse_ws_pos);
+	V2 tile_cs_pos = convert_ws_to_cs(tile_ws_pos, camera_pos_ws);
+	MP_Rect current_tile = { (int)tile_cs_pos.x, (int)tile_cs_pos.y, Globals::tile_w, Globals::tile_h };
+	mp_set_render_draw_color(CT_Green);
+	mp_render_draw_rect(&current_tile);
+}
+
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
 	if (Globals::toggle_debug_images) {
 		debug_draw_mp_renderer_visualizations(font, debug_texture, delta_time);

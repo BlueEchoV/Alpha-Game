@@ -1,1 +1,2 @@
-
+building_name,sprite_sheet_name,w,h,hp,weapon_name,attack_range
+bone_turret,bone_turret_s,32,64,100,bone_launcher,300
