@@ -2,7 +2,7 @@
 #include "Entity_Manager.h"
 
 Building_Data bad_building_data = {
-	"bone_turret", "bone_turret_s", Globals::tile_w, Globals::tile_h * 2, 100, "bone_launcher", 50
+	"bone_turret", "bone_turret_s", Globals::tile_w, Globals::tile_h * 2, 1, 1, 100, "bone_launcher", 50
 };
 
 std::unordered_map<std::string, Building_Data> building_data_map;
@@ -22,19 +22,47 @@ void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Sto
 	int tile_taken_y = 0;
 	get_tile_pos_index_from_pos_ws(pos_ws, tile_taken_x, tile_taken_y);
 
-	for (Handle handle : handles) {
-		Building* b = get_entity_pointer_from_handle(storage, handle);
-		if (b == NULL) {
-			return;
-		}
-		if (b->tile_x == tile_taken_x && b->tile_y == tile_taken_y) {
-			return;
-		}
-	}
-	result.tile_x = tile_taken_x;
-	result.tile_y = tile_taken_y;
-
 	Building_Data* data = get_building_data(std::string(building_name));
+
+    // Collision footprint: tile counts from bottom-left, as specified
+    int collision_tile_offset_x = data->collision_tile_offset_x;
+    int collision_tile_offset_y = data->collision_tile_offset_y;
+
+    // Validate that the proposed collision footprint does not overlap with any existing building's collision footprint
+    int new_coll_start_x = tile_taken_x;
+    int new_coll_start_y = tile_taken_y;
+    for (int dx = 1; dx <= collision_tile_offset_x; dx++) {
+        for (int dy = 1; dy <= collision_tile_offset_y; dy++) {
+            int check_x = new_coll_start_x + dx;
+            int check_y = new_coll_start_y + dy;
+
+            for (Handle handle : handles) {
+                Building* b = get_entity_pointer_from_handle(storage, handle);
+                if (b == nullptr) {
+                    continue;
+                }
+
+                int b_coll_start_x = b->tile_x;
+                int b_coll_start_y = b->tile_y;
+                int b_coll_end_x = b_coll_start_x + b->collision_tile_offset_x;
+                int b_coll_end_y = b_coll_start_y + b->collision_tile_offset_y;
+
+                // Check if the candidate collision tile falls within the existing building's collision rectangular footprint
+                if (check_x >= b_coll_start_x && check_x < b_coll_end_x &&
+                    check_y >= b_coll_start_y && check_y < b_coll_end_y) {
+                    return; // Overlap detected; abort spawning
+                }
+            }
+        }
+    }
+
+    // No overlaps; proceed with spawning
+    result.tile_x = tile_taken_x;
+    result.tile_y = tile_taken_y;
+
+	// Set collision footprint
+    result.collision_tile_offset_x = collision_tile_offset_x;
+    result.collision_tile_offset_y = collision_tile_offset_y;
 
 	result.building_name = building_name;
 	result.destroyed = false;
@@ -112,7 +140,7 @@ void draw_building_outlined(Building& building, V2 camera_pos) {
 	draw_animation_tracker_outlined(&building.at, dst_rect, 0, CT_Black, 1);
 }
 
-void destroy_building(Building& building);  
+// void destroy_building(Building& building);  
 
 void upgrade_building(Building& building) {
 	REF(building);
@@ -123,6 +151,8 @@ Type_Descriptor building_data_type_descriptors[] = {
 	FIELD(Building_Data, VT_String, sprite_sheet_name),
 	FIELD(Building_Data, VT_Int, w),
 	FIELD(Building_Data, VT_Int, h),
+	FIELD(Building_Data, VT_Int, collision_tile_offset_x),
+	FIELD(Building_Data, VT_Int, collision_tile_offset_y),
 	FIELD(Building_Data, VT_Int, hp),
 	FIELD(Building_Data, VT_String, weapon_name),
 	FIELD(Building_Data, VT_Int, attack_range)

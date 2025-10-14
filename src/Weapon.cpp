@@ -94,6 +94,12 @@ void Weapon::update_max_ammo_size(int new_size) {
 
 // Pass the pointer as a reference so we can modify the actual address it pointing at
 void equip_weapon(Weapon*& weapon, std::string weapon_name) {
+	if (weapon_name.empty()) {
+		if (weapon != NULL) {
+			delete_weapon(weapon);
+		}
+		return;
+	}
 	if (weapon == NULL) {
 		// New re-assigns the pointer to point to a new location in memory
 		weapon = new Weapon();

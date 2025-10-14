@@ -13,6 +13,7 @@ struct Building_Data {
     std::string building_name;
     std::string sprite_sheet_name;
     int w, h;
+    int collision_tile_offset_x, collision_tile_offset_y;
     int hp;
     std::string weapon_name;
     int attack_range;
@@ -23,6 +24,8 @@ struct Building {
     Rigid_Body rb;  
     // The tile the building is on
     int tile_x, tile_y;
+    // Which tiles are the collision for the building
+    int collision_tile_offset_x, collision_tile_offset_y;
     Animation_Tracker at;
     Health_Bar health_bar;
     int w, h;
@@ -43,7 +46,7 @@ void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Sto
 void update_building(Building& building, float dt, std::vector<Handle>& enemy_handles, Storage<Unit>& unit_storage,
     std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage, Camera camera);
 void draw_building_outlined(Building& building, V2 camera_pos);
-void destroy_building(Building& building);  
+// void destroy_building(Building& building);  
 void upgrade_building(Building& building);  
 
 void load_building_data_csv(CSV_Data* data);
