@@ -21,6 +21,8 @@ struct Building_Data {
 struct Building {
     std::string building_name;
     Rigid_Body rb;  
+    // The tile the building is on
+    int tile_x, tile_y;
     Animation_Tracker at;
     Health_Bar health_bar;
     int w, h;

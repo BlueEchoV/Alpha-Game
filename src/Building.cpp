@@ -1,4 +1,5 @@
-# include "Building.h"
+#include "Building.h"
+#include "Entity_Manager.h"
 
 Building_Data bad_building_data = {
 	"bone_turret", "bone_turret_s", Globals::tile_w, Globals::tile_h * 2, 100, "bone_launcher", 50
@@ -17,12 +18,28 @@ Building_Data* get_building_data(std::string building_type) {
 void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Storage<Building>& storage, std::vector<Handle>& handles) {
 	Building result = {};
 
+	int tile_taken_x = 0;
+	int tile_taken_y = 0;
+	get_tile_pos_index_from_pos_ws(pos_ws, tile_taken_x, tile_taken_y);
+
+	for (Handle handle : handles) {
+		Building* b = get_entity_pointer_from_handle(storage, handle);
+		if (b == NULL) {
+			return;
+		}
+		if (b->tile_x == tile_taken_x && b->tile_y == tile_taken_y) {
+			return;
+		}
+	}
+	result.tile_x = tile_taken_x;
+	result.tile_y = tile_taken_y;
+
 	Building_Data* data = get_building_data(std::string(building_name));
 
 	result.building_name = building_name;
 	result.destroyed = false;
 
-	V2 tile_grid_pos_ws = get_tile_pos_ws_from_pos_ws(pos_ws);
+	V2 tile_grid_pos_ws = get_tile_pos_ws_from_grid_index(result.tile_x, result.tile_y);
 
 	result.rb = create_rigid_body(tile_grid_pos_ws, 0);
 

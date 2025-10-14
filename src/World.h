@@ -23,7 +23,7 @@ struct World {
 	MP_Texture* noise_tex;
 };
 
-void get_tile_grid_index_from_pos_ws(V2 pos_ws, int& tile_grid_index_x, int& tile_grid_index_y);
+void get_tile_pos_index_from_pos_ws(V2 pos_ws, int& tile_grid_index_x, int& tile_grid_index_y);
 V2 get_tile_pos_ws_from_grid_index(int tile_grid_index_x, int tile_grid_index_y);
 V2 get_tile_pos_ws_from_pos_ws(V2 pos_ws);
 
