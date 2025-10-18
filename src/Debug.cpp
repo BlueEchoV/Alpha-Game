@@ -494,7 +494,9 @@ void debug_show_hovered_tile(HWND window, V2 camera_pos_ws) {
 }
 
 void debug_draw_buildings_attack_range(Color_Type c, V2 pos_ws, V2 camera_pos, int radius) {
-	draw_circle_cs(c, pos_ws, camera_pos, radius, 24);
+	if (radius > 0) {
+		draw_circle_cs(c, pos_ws, camera_pos, radius, 24);
+	}
 }
 
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
@@ -510,7 +512,11 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 	if (Globals::debug_show_attack_range) {
 		for (Handle h : game_data.building_handles) {
 			Building* b = get_entity_pointer_from_handle(game_data.building_storage, h);
-			debug_draw_buildings_attack_range(CT_Red, b->rb.pos_ws, game_data.camera.pos_ws, b->attack_range);
+			if (b != nullptr) {
+				if (!b->is_wall) {
+					debug_draw_buildings_attack_range(CT_Red, b->rb.pos_ws, game_data.camera.pos_ws, b->attack_range);
+				}
+			}
 		}
 	}
 	if (Globals::debug_show_stats) {
