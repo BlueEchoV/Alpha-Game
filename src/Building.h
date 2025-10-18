@@ -10,13 +10,13 @@
 #include <vector>
 
 struct Building_Data {
-    std::string building_name;
-    std::string sprite_sheet_name;
-    int w, h;
-    int collision_tile_offset_x, collision_tile_offset_y;
-    int hp;
-    std::string weapon_name;
-    int attack_range;
+    std::string building_name = "";
+    std::string sprite_sheet_name = "";
+    int w, h = 0;
+    int collision_tile_offset_x, collision_tile_offset_y = 0;
+    int hp = 0;
+    std::string weapon_name = "";
+    int attack_range = 0;
 };
 
 struct Building {

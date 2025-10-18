@@ -6,7 +6,7 @@ void draw_game_loop_ui(Game_Data& game_data, Font_Type ft) {
 	MP_Rect ready_button_area = { (int)((float)Globals::playground_area_w * 0.5f), (int)((float)Globals::playground_area_h * 0.90f), 160, 40};
 	Night_Wave* nw = &game_data.current_night_wave;
 	if (nw->begin_spawning == false && nw->current_wave < get_max_waves_from_difficulty(nw->difficulty) && game_data.active_enemy_units <= 0) {
-		if (button_text(ready_button_area, "Ready", 3, FT_Basic, CT_Dark_Yellow, true, CT_Black, true)) {
+		if (button_text(ready_button_area, "Ready", 3, FT_Basic, CT_Dark_Yellow, true, CT_Black, true) || key_pressed(KEY_R)) {
 			game_data.current_night_wave.begin_spawning = true;
 		}
 	}

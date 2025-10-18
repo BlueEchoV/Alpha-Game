@@ -125,6 +125,9 @@ void update_building(Building& building, float dt, std::vector<Handle>& enemy_ha
 		}
 
 		if (target != nullptr) {
+			V2 fire_pos_ws = {};
+			fire_pos_ws.x = building.rb.pos_ws.x + building.w / 2;
+			fire_pos_ws.y = building.rb.pos_ws.y + building.h / 2;
 			building.weapon->fire_weapon(projectile_handles, projectile_storage, camera, building.rb.pos_ws,target->rb.pos_ws, F_Player);
 		}
 	}

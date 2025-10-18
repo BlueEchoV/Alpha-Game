@@ -1,2 +1,2 @@
 building_name,sprite_sheet_name,w,h,collision_tile_offset_x,collision_tile_offset_y,hp,weapon_name,attack_range
-bone_turret,bone_turret_s,32,64,1,1,100,bone_launcher,300
+bone_turret,bone_turret_s,32,64,1,1,100,bone_launcher,1000
