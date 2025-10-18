@@ -34,6 +34,7 @@ namespace Globals {
 	extern bool toggle_debug_images;
 	extern bool toggle_debug_unit_images;
 	extern bool debug_show_coordinates;
+	extern bool debug_show_attack_range;
 	extern bool debug_show_stats;
 	extern bool debug_show_colliders;
 	extern bool debug_show_wireframes;

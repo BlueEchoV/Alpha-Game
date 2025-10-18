@@ -491,6 +491,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		if (key_pressed(VK_F7)) {
 			Globals::debug_show_hovered_tile = !Globals::debug_show_hovered_tile;
 		}
+		if (key_pressed(VK_F8)) {
+			Globals::debug_show_attack_range = !Globals::debug_show_attack_range;
+		}
 		if (key_pressed(VK_F9)) {
 			Globals::toggle_debug_images = !Globals::toggle_debug_images;
 			if (Globals::debug_show_coordinates != Globals::toggle_debug_images) {

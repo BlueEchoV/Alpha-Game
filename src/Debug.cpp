@@ -483,7 +483,6 @@ void debug_draw_wireframes(Camera& camera) {
 	}
 }
 
-
 void debug_show_hovered_tile(HWND window, V2 camera_pos_ws) {
 	V2 mouse_cs_pos = get_viewport_mouse_position(window);
 	V2 mouse_ws_pos = convert_cs_to_ws(mouse_cs_pos, camera_pos_ws);
@@ -492,6 +491,10 @@ void debug_show_hovered_tile(HWND window, V2 camera_pos_ws) {
 	MP_Rect current_tile = { (int)tile_cs_pos.x, (int)tile_cs_pos.y, Globals::tile_w, Globals::tile_h };
 	mp_set_render_draw_color(CT_Green);
 	mp_render_draw_rect(&current_tile);
+}
+
+void debug_draw_buildings_attack_range(Color_Type c, V2 pos_ws, V2 camera_pos, int radius) {
+	draw_circle_cs(c, pos_ws, camera_pos, radius, 24);
 }
 
 void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* debug_texture, float delta_time) {
@@ -503,6 +506,12 @@ void debug_draw_all_debug_info(Game_Data& game_data, Font& font, MP_Texture* deb
 		V2 mouse_cs_pos = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 		V2 player_cs_pos = convert_ws_to_cs(game_data.player.rb.pos_ws, game_data.camera.pos_ws);
 		mp_render_draw_line(player_cs_pos.x, player_cs_pos.y, mouse_cs_pos.x, mouse_cs_pos.y);
+	}
+	if (Globals::debug_show_attack_range) {
+		for (Handle h : game_data.building_handles) {
+			Building* b = get_entity_pointer_from_handle(game_data.building_storage, h);
+			debug_draw_buildings_attack_range(CT_Red, b->rb.pos_ws, game_data.camera.pos_ws, b->attack_range);
+		}
 	}
 	if (Globals::debug_show_stats) {
 		debug_draw_stats(font, debug_texture);

@@ -28,6 +28,7 @@ namespace Globals {
 	bool toggle_debug_images = false;
 	bool toggle_debug_unit_images = false;
 	bool debug_show_coordinates = false;
+	bool debug_show_attack_range = false;
 	bool debug_show_stats = false;
 	bool debug_show_colliders = false;
 	bool debug_show_wireframes = false;
