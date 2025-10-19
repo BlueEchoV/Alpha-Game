@@ -15,8 +15,11 @@ Building_Data* get_building_data(std::string building_type) {
 	return &bad_building_data;
 }
 
-void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Storage<Building>& storage, std::vector<Handle>& handles) {
+void spawn_building(std::string_view building_name, Color_Type outline_color, bool is_wall, V2 pos_ws, 
+	Storage<Building>& storage, std::vector<Handle>& handles, 
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 	Building result = {};
+	result.outline_color = outline_color;
 
 	int tile_taken_x = 0;
 	int tile_taken_y = 0;
@@ -31,8 +34,8 @@ void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Sto
     // Validate that the proposed collision footprint does not overlap with any existing building's collision footprint
     int new_coll_start_x = tile_taken_x;
     int new_coll_start_y = tile_taken_y;
-    for (int dx = 1; dx <= collision_tile_offset_x; dx++) {
-        for (int dy = 1; dy <= collision_tile_offset_y; dy++) {
+    for (int dx = 0; dx < collision_tile_offset_x; dx++) {
+        for (int dy = 0; dy < collision_tile_offset_y; dy++) {
             int check_x = new_coll_start_x + dx;
             int check_y = new_coll_start_y + dy;
 
@@ -94,13 +97,26 @@ void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Sto
 	result.destroyed = false;
 
 	result.handle = create_handle(storage);
-	handles.push_back(result.handle);
 
+	// Create corresponding Draw_Order
+    Handle draw_order_handle = create_handle(draw_order_storage);
+    Draw_Order draw_order = {};
+    draw_order.h = result.handle; // Store original handle
+	draw_order.entity_handle = result.handle;
+    draw_order.y = result.rb.pos_ws.y;
+    draw_order.et = ET_Building;
+    result.draw_order_handle = draw_order_handle; // Store in Building
+
+    draw_order_storage.storage[draw_order_handle.index] = draw_order;
+    draw_order_handles.push_back(draw_order_handle);
+
+	handles.push_back(result.handle);
 	storage.storage[result.handle.index] = result;
 }
 
-void update_building(Building& building, float dt, std::vector<Handle>& enemy_handles, Storage<Unit>& unit_storage,
-	std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage, Camera camera) {
+void update_building(Building& building, float dt, std::vector<Handle>& enemy_handles, Storage<Unit>& unit_storage, Camera camera,
+	std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) { 
 	// Attack Speed, Damage, Attack Range
 
 	if (building.weapon->can_fire) {
@@ -128,19 +144,21 @@ void update_building(Building& building, float dt, std::vector<Handle>& enemy_ha
 			V2 fire_pos_ws = {};
 			fire_pos_ws.x = building.rb.pos_ws.x + building.w / 2;
 			fire_pos_ws.y = building.rb.pos_ws.y + building.h / 2;
-			building.weapon->fire_weapon(projectile_handles, projectile_storage, camera, building.rb.pos_ws,target->rb.pos_ws, F_Player);
+			building.weapon->fire_weapon(camera, building.rb.pos_ws,target->rb.pos_ws, F_Player,
+				projectile_storage, projectile_handles,				
+				draw_order_storage, draw_order_handles);
 		}
 	}
 
 	building.weapon->update_weapon(dt);
 }
 
-void draw_building_outlined(Building& building, V2 camera_pos) {
+void render_building_outlined(Building& building, V2 camera_pos) {
 	V2 cs_pos = convert_ws_to_cs(building.rb.pos_ws, camera_pos);
 
 	MP_Rect dst_rect = {(int)cs_pos.x, (int)cs_pos.y, building.w, building.h};
 
-	draw_animation_tracker_outlined(&building.at, dst_rect, 0, CT_Black, 1);
+	draw_animation_tracker_outlined(&building.at, dst_rect, 0, building.outline_color, 2);
 }
 
 // void destroy_building(Building& building);  

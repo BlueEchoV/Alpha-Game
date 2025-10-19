@@ -69,8 +69,9 @@ struct Weapon {
 	int projectile_speed;
 	std::string projectile_name;
 
-	void fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
-		Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Faction faction);
+	void fire_weapon(Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Faction faction,
+		Storage<Projectile>& projectile_storage, std::vector<Handle>& projectile_handles,
+		Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
 	void update_weapon(float delta_time);
 	void update_max_ammo_size(int new_size);
 	void update_reload_interval(int new_reload_per_sec);

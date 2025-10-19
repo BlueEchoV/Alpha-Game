@@ -15,6 +15,7 @@ struct Player_Data {
 };
 
 struct Player {
+	Handle draw_order_handle;
 	bool dead;
 
 	Faction faction = F_Player;
@@ -38,8 +39,10 @@ struct Player {
 	int damage;
 };
 
-Player create_player(std::string_view character_name, V2 spawn_pos_ws);
-void draw_player(Player& p, V2 camera_ws_pos);
+Player create_player(std::string_view character_name, V2 spawn_pos_ws,
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
+void delete_player(Player* player, Storage<Draw_Order>& draw_order_storage);
+void render_player(Player& p, V2 camera_ws_pos);
 
 // Torso - All 16 degrees
 // Legs - NW N NE  

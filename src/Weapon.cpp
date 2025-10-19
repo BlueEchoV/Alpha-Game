@@ -131,8 +131,9 @@ void delete_weapon(Weapon*& weapon) {
 }
 
 // Fires at the mouse
-void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage, 
-	Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Faction faction) {
+void Weapon::fire_weapon(Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Faction faction,
+	Storage<Projectile>& projectile_storage, std::vector<Handle>& projectile_handles, 
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 	REF(camera);
 	// TODO: This currently is obsolete. I might add it back later. 
 	switch (faction) {
@@ -154,8 +155,8 @@ void Weapon::fire_weapon(std::vector<Handle>& projectile_handles, Storage<Projec
 	// UES PROGRESS TIME INSTEAD
 	if (this->can_fire && this->ammo > 0 && this->ammo <= this->max_ammo && this->reload_progress >= (1.0f / (float)this->reload_per_sec)) { 
 		// Change this to fire weapon
-		spawn_projectile(projectile_handles, projectile_storage, this->projectile_name, this->damage, 
-			this->projectile_speed, this->projectile_w, this->projectile_h, spawn_pos_ws, target_pos_ws);
+		spawn_projectile(this->projectile_name, this->damage, this->projectile_speed, this->projectile_w, this->projectile_h, 
+			spawn_pos_ws, target_pos_ws, projectile_handles, projectile_storage, draw_order_storage, draw_order_handles);
 		Globals::debug_total_arrows++;
 		this->can_fire = false;
 		this->fire_cooldown = 1.0f / this->attacks_per_sec;

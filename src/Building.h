@@ -37,15 +37,21 @@ struct Building {
 
     int upgrade_level = 0;
     bool is_wall = false; 
+	Handle draw_order_handle;
     bool destroyed = false;
     Handle handle;
     // Add any building-specific fields, e.g., passive_damage for spiked walls
+
+    Color_Type outline_color;
 };
 
-void spawn_building(std::string_view building_name, bool is_wall, V2 pos_ws, Storage<Building>& storage, std::vector<Handle>& handles);
-void update_building(Building& building, float dt, std::vector<Handle>& enemy_handles, Storage<Unit>& unit_storage,
-    std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage, Camera camera);
-void draw_building_outlined(Building& building, V2 camera_pos);
+void spawn_building(std::string_view building_name, Color_Type outline_color, bool is_wall, V2 pos_ws,
+    Storage<Building>& storage, std::vector<Handle>& handles,
+    Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
+void update_building(Building& building, float dt, std::vector<Handle>& enemy_handles, Storage<Unit>& unit_storage, Camera camera,
+    std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
+    Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
+void render_building_outlined(Building& building, V2 camera_pos);
 // void destroy_building(Building& building);  
 void upgrade_building(Building& building);  
 

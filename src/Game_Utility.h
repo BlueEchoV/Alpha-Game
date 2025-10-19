@@ -2,9 +2,9 @@
 #include "Renderer.h"
 
 enum Faction {
-	F_Player,
 	F_Allies,
-	F_Enemies
+	F_Enemies,
+	F_Player
 };
 
 struct Cooldown {

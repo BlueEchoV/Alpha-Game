@@ -15,8 +15,10 @@ Unit_Data* get_unit_data(std::string unit_type) {
 	return &bad_unit_data;
 }
 
-void spawn_unit(Faction faction, std::string_view unit_name, Animation_State starting_as, Animation_Play_Speed starting_aps, Animation_Mode starting_am, 
-	Storage<Unit>& storage, std::vector<Handle>& handles, Player* target, V2 spawn_pos) {
+void spawn_unit(Faction faction, std::string_view unit_name, Animation_State starting_as, 
+	Animation_Play_Speed starting_aps, Animation_Mode starting_am, Player* target, V2 spawn_pos, 
+	Storage<Unit>& storage, std::vector<Handle>& handles, 
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 	Unit result = {};
 
 	result.faction = faction;
@@ -47,7 +49,25 @@ void spawn_unit(Faction faction, std::string_view unit_name, Animation_State sta
 	result.attack_cd.max = (1.0f / data->attacks_per_sec);
 	result.attack_cd.current = result.attack_cd.max;
 	result.target = target;
+
 	result.handle = create_handle(storage);
+
+	// Create corresponding Draw_Order
+    Handle draw_order_handle = create_handle(draw_order_storage);
+    Draw_Order draw_order = {};
+    draw_order.h = result.handle; // Store original handle
+	draw_order.entity_handle = result.handle;
+    draw_order.y = result.rb.pos_ws.y;
+	if (faction == F_Enemies) {
+		draw_order.et = ET_Enemy_Unit;
+	}
+	else if (faction == F_Allies) {
+		draw_order.et = ET_Allied_Unit;
+	}
+    result.draw_order_handle = draw_order_handle; 
+
+    draw_order_storage.storage[draw_order_handle.index] = draw_order;
+    draw_order_handles.push_back(draw_order_handle);
 	
 	handles.push_back(result.handle);
 	storage.storage[result.handle.index] = result;
@@ -146,7 +166,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	}
 }
 
-void draw_unit(Unit& unit, V2 camera_pos) {
+void render_unit(Unit& unit, V2 camera_pos) {
 	if (unit.destroyed == false) {
 		V2 entity_pos_cs = convert_ws_to_cs(unit.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y });
 		// Center the image on the position of the entity
@@ -162,7 +182,7 @@ void draw_unit(Unit& unit, V2 camera_pos) {
 	}
 }
 
-void draw_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, float outline_thickness) {
+void render_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, float outline_thickness) {
 	if (unit.destroyed == false) {
 		V2 entity_pos_cs = convert_ws_to_cs(unit.rb.pos_ws, { (float)camera_pos.x, (float)camera_pos.y });
 		// Center the image on the position of the entity

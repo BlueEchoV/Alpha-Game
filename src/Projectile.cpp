@@ -17,8 +17,9 @@ Projectile_Data get_projectile_data(std::string_view projectile_name) {
 }
 #endif
 
-void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
-	std::string_view projectile_name, int damage, int speed, int w, int h, V2 origin_ws, V2 target_ws) {
+void spawn_projectile(std::string_view projectile_name, int damage, int speed, int w, int h, V2 origin_ws, V2 target_ws, 
+	std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 
 	Projectile result = {};
 	result.damage = damage;
@@ -40,6 +41,18 @@ void spawn_projectile(std::vector<Handle>& projectile_handles, Storage<Projectil
 	add_collider(&result.rb, pos_ls, first_sprite_radius / 4);
 
 	result.handle = create_handle(projectile_storage);
+	// Create corresponding Draw_Order
+    Handle draw_order_handle = create_handle(draw_order_storage);
+    Draw_Order draw_order = {};
+    draw_order.h = result.handle; 
+	draw_order.entity_handle = result.handle;
+    draw_order.y = result.rb.pos_ws.y;
+    draw_order.et = ET_Projectile;
+    result.draw_order_handle = draw_order_handle;
+
+    draw_order_storage.storage[draw_order_handle.index] = draw_order;
+    draw_order_handles.push_back(draw_order_handle);
+
 	projectile_handles.push_back(result.handle);
 	projectile_storage.storage[result.handle.index] = result;
 }
@@ -49,10 +62,9 @@ void update_projectile(Projectile& projectile, float delta_time) {
 	projectile.rb.pos_ws.y += projectile.rb.current_speed * (projectile.rb.vel.y * delta_time);
 }
 
-void draw_projectile(int camera_pos_x, int camera_pos_y, Projectile& projectile) {
+void render_projectile(Projectile& projectile, V2 camera_pos_ws) {
 	// Draw everything around the camera (converting to camera space)
-	V2 entity_pos_cs = convert_ws_to_cs(projectile.rb.pos_ws, { (float)camera_pos_x, 
-		(float)camera_pos_y });
+	V2 entity_pos_cs = convert_ws_to_cs(projectile.rb.pos_ws, camera_pos_ws);
 	// Center the image on the position of the entity
 	MP_Rect dst = { (int)entity_pos_cs.x - projectile.w / 2, 
 		(int)entity_pos_cs.y - projectile.h / 2, projectile.w, projectile.h };

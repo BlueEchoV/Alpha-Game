@@ -10,6 +10,9 @@ void draw_game_loop_ui(Game_Data& game_data, Font_Type ft) {
 			game_data.current_night_wave.begin_spawning = true;
 		}
 	}
+	if (key_pressed(KEY_R)) {
+		game_data.current_night_wave.begin_spawning = true;
+	}
 	std::string current_wave_string = "Current Wave = " + std::to_string(nw->current_wave);
 	draw_string(*font, current_wave_string.c_str(), CT_Red_Wine, true, 
 		(int)((float)Globals::playground_area_w * 0.5f), (int)((float)Globals::playground_area_h * 0.95f), 3, true);

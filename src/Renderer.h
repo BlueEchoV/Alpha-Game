@@ -1,9 +1,26 @@
 #pragma once
 #include "Windows_Platform.h"
 #include "Utility.h"
+#include "Entity_Manager.h"
 
 #include <unordered_map>
 #include <stdint.h>
+
+enum Entity_Type {
+	ET_Player,
+	ET_Enemy_Unit, 
+	ET_Allied_Unit, 
+	ET_Building,
+	ET_Projectile
+};
+
+struct Draw_Order {
+	Handle h;
+	Handle entity_handle;
+	float y;
+	Entity_Type et;
+	bool destroyed = false;
+};
 
 struct Camera {
 	V2 pos_ws;

@@ -77,12 +77,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	game_data.selected_font = FT_Basic;
 
-	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f });
+	game_data.player = create_player("grim_arbelist", { 0.0f, 0.0f }, game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 	game_data.camera = create_camera(game_data.player.rb.pos_ws);
 
 	game_data.current_night_wave = create_night_wave(MD_Normal, SD_North, 2, 1, 1);
-
-	spawn_building("bone_turret", NULL, { 100, 100 }, game_data.building_storage, game_data.building_handles);
 
 	// This is like the "frames per second" in a video or the "resolution" of your sound timeline. 
 	//		It�s how many "pixels" (samples) you capture per second to draw the sound.
@@ -305,7 +303,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			if (key_pressed(VK_LBUTTON)) {
 				V2 mouse_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
 				V2 mouse_pos_ws = convert_cs_to_ws(mouse_pos, game_data.camera.pos_ws);
-				spawn_building("bone_turret", false, mouse_pos_ws, game_data.building_storage, game_data.building_handles);
+				spawn_building("bone_turret", CT_Black, false, mouse_pos_ws, 
+					game_data.building_storage, game_data.building_handles, 
+					game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 			}
 
 			// Compute movement direction
@@ -380,8 +380,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				V2 mouse_cs_pos_target = get_viewport_mouse_position(Globals::renderer->open_gl.window_handle);
 				V2 mouse_ws_pos_target = convert_cs_to_ws(mouse_cs_pos_target, game_data.camera.pos_ws);
 
-				player->weapon->fire_weapon(game_data.projectile_handles, game_data.projectile_storage,
-					game_data.camera, proj_spawn_pos, mouse_ws_pos_target, F_Player);
+				player->weapon->fire_weapon(game_data.camera, proj_spawn_pos, mouse_ws_pos_target, F_Player,
+					game_data.projectile_storage, game_data.projectile_handles, 
+					game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 			}
 
 			player->weapon->update_weapon(delta_time);
@@ -406,10 +407,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					AS_Walking,
 					APS_Speed_Based,
 					AM_Animate_Looping,
+					&game_data.player,
+					mouse_position,
 					game_data.unit_storage,
 					game_data.enemy_unit_handles,
-					&game_data.player,
-					mouse_position
+					game_data.entities_draw_order_storage,
+					game_data.entities_draw_order_handles
 				);
 			}
 		} else {
@@ -525,8 +528,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				Building* b = get_entity_pointer_from_handle(game_data.building_storage, building_handle);
 				if (b != NULL) {
 					// Assuming you have a vector<Unit*> active_enemies populated from game_data.active_enemy_units
-					update_building(*b, delta_time, game_data.enemy_unit_handles, game_data.unit_storage,
-						game_data.projectile_handles, game_data.projectile_storage, game_data.camera);
+					update_building(*b, delta_time, game_data.enemy_unit_handles, game_data.unit_storage, game_data.camera,
+						game_data.projectile_handles, game_data.projectile_storage, 
+						game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 				}
 			}
 
@@ -558,8 +562,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 			}
 
-			spawn_and_update_night_wave(game_data.enemy_unit_handles, game_data.unit_storage,
-				game_data.current_night_wave, game_data.active_enemy_units, game_data.player, game_data.world.map, delta_time);
+			spawn_and_update_night_wave(game_data.current_night_wave, game_data.active_enemy_units, game_data.player, game_data.world.map, delta_time,
+			game_data.enemy_unit_handles, game_data.unit_storage, 
+			game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
+
 		}
 
 
@@ -608,64 +614,43 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		// draw_player(game_data.player, game_data.camera.pos_ws);
 		// draw_colliders(&game_data.player.rb, game_data.camera.pos_ws);
 
-		for (Handle projectile : game_data.projectile_handles) {
-			Projectile* p = get_entity_pointer_from_handle(game_data.projectile_storage, projectile);
-			if (p == NULL) {
-				continue;
-			}
-			draw_projectile((int)game_data.camera.pos_ws.x, (int)game_data.camera.pos_ws.y, *p);
-			if (Globals::debug_show_coordinates) {
-				debug_draw_coor(game_data, p->rb.pos_ws, false, p->rb.pos_ws, true,
-					CT_Green, true, "WS Pos: ");
-			}
-			if (Globals::debug_show_colliders) {
-				draw_colliders(&p->rb, game_data.camera.pos_ws);
-			}
-		}
-
 		update_damage_numbers(game_data.damage_numbers, delta_time);
 
-		// TODO: HAVE THIS ALSO INCLUDE BUILDINGS AND THE PALYER AND PROJECTILES
-		std::sort(game_data.enemy_unit_handles.begin(), game_data.enemy_unit_handles.end(), [&](Handle& a, Handle& b) {
-			Unit* enemy_1 = get_entity_pointer_from_handle(game_data.unit_storage, a);
-			Unit* enemy_2 = get_entity_pointer_from_handle(game_data.unit_storage, b);
-
-			if (enemy_1 == nullptr || enemy_2 == nullptr) {
-				return false;
-			}
-			else {
-				return enemy_1->rb.pos_ws.y > enemy_2->rb.pos_ws.y;
-			}
-			}
-		);
-
-		for (Handle unit : game_data.enemy_unit_handles) {
-			Unit* u = get_entity_pointer_from_handle(game_data.unit_storage, unit);
-			if (u == NULL) {
-				continue;
-			}
-
-			draw_unit_outlined(*u, game_data.camera.pos_ws, CT_Black, 0.5f);
-			// draw_unit(*u, game_data.camera.pos_ws);
-
-			if (Globals::debug_show_colliders && u->dead == false) {
-				draw_colliders(&u->rb, game_data.camera.pos_ws);
-			}
-		}
-
-		for (Handle building : game_data.building_handles) {
-			Building* b = get_entity_pointer_from_handle(game_data.building_storage, building);
-			if (b == NULL) {
-				continue;
-			}
-
-			draw_building_outlined(*b, game_data.camera.pos_ws);
-		}
+		render_game(game_data);
 
 		draw_damage_numbers(*font_basic, game_data.damage_numbers, game_data.camera.pos_ws);
 
+		V2 mouse_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
+		V2 mouse_pos_ws = convert_cs_to_ws(mouse_pos, game_data.camera.pos_ws);
+		for (Handle h : game_data.building_handles) {
+			Building* b = get_entity_pointer_from_handle(game_data.building_storage, h);
+			if (b != NULL) {
+				V2 building_pos_ws = b->rb.pos_ws;
+				int offset_tile_x = b->collision_tile_offset_x;
+				int offset_tile_y = b->collision_tile_offset_y;
+				if (mouse_pos_ws.x >= building_pos_ws.x && 
+					mouse_pos_ws.x <= building_pos_ws.x + Globals::tile_w * offset_tile_x && 
+					mouse_pos_ws.y >= building_pos_ws.y && 
+					mouse_pos_ws.y <= building_pos_ws.y + Globals::tile_h * offset_tile_y) {
+					b->outline_color = CT_Orange;
+
+					V2 b_pos_cs = convert_ws_to_cs(building_pos_ws, game_data.camera.pos_ws);
+					MP_Rect dst = {};
+					dst.x = (int)b_pos_cs.x;
+					dst.y = (int)b_pos_cs.y;
+					dst.w = Globals::tile_w * offset_tile_x;
+					dst.h = Globals::tile_h * offset_tile_y;
+
+					// mp_set_render_draw_color(CT_Dark_Yellow);
+					// mp_render_draw_rect(&dst);
+				}
+				else {
+					b->outline_color = CT_Black;
+				}
+			}
+		}
+
 		draw_game_loop_ui(game_data, FT_Basic);
-		draw_player(game_data.player, game_data.camera.pos_ws);
 		player->passive->draw_ui(game_data.camera.pos_ws);
 		player->basic->draw_ui(game_data.camera.pos_ws);
 		player->ultimate->draw_ui(game_data.camera.pos_ws);

@@ -16,8 +16,17 @@ Player_Data get_player_data(std::string_view character_name) {
 	return bad_player_data;
 };
 
-Player create_player(std::string_view character_name, V2 spawn_pos_ws) {
+Player create_player(std::string_view character_name, V2 spawn_pos_ws, 
+	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 	Player result = {};
+
+	result.draw_order_handle = create_handle(draw_order_storage);
+
+    Draw_Order player_draw_order = {};
+    player_draw_order.y = result.rb.pos_ws.y;
+    player_draw_order.et = ET_Player;
+    draw_order_storage.storage[result.draw_order_handle.index] = player_draw_order;
+    draw_order_handles.push_back(result.draw_order_handle);
 
 	result.dead = false;
 	result.faction = F_Player;
@@ -52,7 +61,7 @@ Player create_player(std::string_view character_name, V2 spawn_pos_ws) {
 	return result;
 }
 
-void draw_player(Player& p, V2 camera_ws_pos) {
+void render_player(Player& p, V2 camera_ws_pos) {
 	// WE ARE DRAWING THE PLAYER RELATIVE TO THE CAMERA.
 	MP_Rect p_draw_rect = {
 		(int)p.rb.pos_ws.x - p.w / 2,
@@ -75,8 +84,8 @@ void draw_player(Player& p, V2 camera_ws_pos) {
 	}
 }
 
-void delete_player(Player* player) {
+void delete_player(Player* player, Storage<Draw_Order>& draw_order_storage) {
 	delete_weapon(player->weapon);
+	delete_handle(draw_order_storage, player->draw_order_handle);
 	*player = {};
 }
-
