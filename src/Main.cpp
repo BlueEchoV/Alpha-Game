@@ -300,12 +300,27 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				player_moving = true;
 				player_x_delta = 1.0f;
 			}
-			if (key_pressed(VK_LBUTTON)) {
-				V2 mouse_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
-				V2 mouse_pos_ws = convert_cs_to_ws(mouse_pos, game_data.camera.pos_ws);
-				spawn_building("bone_turret", CT_Black, false, mouse_pos_ws, 
-					game_data.building_storage, game_data.building_handles, 
-					game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
+			V2 mouse_pos = get_viewport_mouse_position(renderer->open_gl.window_handle);
+			V2 mouse_pos_ws = convert_cs_to_ws(mouse_pos, game_data.camera.pos_ws);
+			if (!is_point_in_rect(&ready_button_area, mouse_pos, true)) {
+				if (key_pressed(VK_LBUTTON)) {
+					spawn_building("bone_turret", CT_Black, false, mouse_pos_ws,
+						game_data.building_storage, game_data.building_handles,
+						game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
+				}
+				if (key_pressed(VK_RBUTTON)) {
+					for (Handle h : game_data.building_handles) {
+						Building* b = get_entity_pointer_from_handle(game_data.building_storage, h);
+						if (b != NULL) {
+							int tile_hovered_x = 0;
+							int tile_hovered_y = 0;
+							get_tile_pos_index_from_pos_ws(mouse_pos_ws, tile_hovered_x, tile_hovered_y);
+							if (b->tile_x == tile_hovered_x && b->tile_y == tile_hovered_y) {
+								b->destroyed = true;
+							}
+						}
+					}
+				}
 			}
 
 			// Compute movement direction

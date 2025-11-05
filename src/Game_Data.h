@@ -46,6 +46,3 @@ void render_game(Game_Data& game_data);
 // void render(Game_Data& game_data, float delta_time);
 
 void destroy_game_data(Game_Data& game_data);
-
-// 1: I need to load the CSV file
-// 2: I need to 
