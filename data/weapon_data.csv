@@ -1,5 +1,5 @@
-weapon_name,damage,attacks_per_sec,max_ammo,reload_per_sec,projectile_name,projectile_w,projectile_h,projectile_speed
-sword,300,1,1,0,slash,100,100,100
-crossbow,25,10,12,3,bolt,25,25,500
-pistol,50,2,1,0,bullet,25,25,700
-bone_launcher,10,4,1,1,bolt,25,25,500
+weapon_name,damage,attacks_per_sec,max_ammo,reload_per_sec,projectile_name,projectile_w,projectile_h,projectile_speed,projectile_lifespan
+sword,300,1,1,0,slash,100,100,100,1
+crossbow,25,10,12,3,bolt,25,25,500,1
+pistol,50,2,1,0,bullet,25,25,700,1
+bone_launcher,10,4,1,1,bolt,25,25,500,1

@@ -17,7 +17,7 @@ Projectile_Data get_projectile_data(std::string_view projectile_name) {
 }
 #endif
 
-void spawn_projectile(std::string_view projectile_name, int damage, int speed, int w, int h, V2 origin_ws, V2 target_ws, 
+void spawn_projectile(std::string_view projectile_name, int damage, int speed, int w, int h, float projectile_lifespan, V2 origin_ws, V2 target_ws, 
 	std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 
@@ -33,6 +33,8 @@ void spawn_projectile(std::string_view projectile_name, int damage, int speed, i
 	result.w = w;
 	result.h = h;
 	result.rb.angle = calculate_facing_direction_east_counterclockwise(result.rb.vel);
+
+	result.lifespan = projectile_lifespan;
 
 	Sprite_Sheet* sprite_sheet = get_sprite_sheet(std::string(projectile_name));
 	float first_sprite_radius = sprite_sheet->sprites[0].image.sprite_radius;
@@ -58,8 +60,17 @@ void spawn_projectile(std::string_view projectile_name, int damage, int speed, i
 }
 
 void update_projectile(Projectile& projectile, float delta_time) {
-	projectile.rb.pos_ws.x += projectile.rb.current_speed * (projectile.rb.vel.x * delta_time);
-	projectile.rb.pos_ws.y += projectile.rb.current_speed * (projectile.rb.vel.y * delta_time);
+	if (projectile.lifespan > 0.0f) {
+		projectile.lifespan -= delta_time;
+		if (projectile.lifespan < 0.0f) {
+			projectile.lifespan = 0.0f;
+			projectile.destroyed = true;
+		}
+		else {
+			projectile.rb.pos_ws.x += projectile.rb.current_speed * (projectile.rb.vel.x * delta_time);
+			projectile.rb.pos_ws.y += projectile.rb.current_speed * (projectile.rb.vel.y * delta_time);
+		}
+	}
 }
 
 void render_projectile(Projectile& projectile, V2 camera_pos_ws) {

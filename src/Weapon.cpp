@@ -122,6 +122,7 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->projectile_w = current_weapon_data.projectile_w;
 	weapon->projectile_h = current_weapon_data.projectile_h;
 	weapon->projectile_speed = current_weapon_data.projectile_speed;
+	weapon->projectile_lifespan = current_weapon_data.projectile_lifespan;
 }
 
 void delete_weapon(Weapon*& weapon) {
@@ -155,7 +156,7 @@ void Weapon::fire_weapon(Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Facti
 	// UES PROGRESS TIME INSTEAD
 	if (this->can_fire && this->ammo > 0 && this->ammo <= this->max_ammo && this->reload_progress >= (1.0f / (float)this->reload_per_sec)) { 
 		// Change this to fire weapon
-		spawn_projectile(this->projectile_name, this->damage, this->projectile_speed, this->projectile_w, this->projectile_h, 
+		spawn_projectile(this->projectile_name, this->damage, this->projectile_speed, this->projectile_w, this->projectile_h, this->projectile_lifespan,
 			spawn_pos_ws, target_pos_ws, projectile_handles, projectile_storage, draw_order_storage, draw_order_handles);
 		Globals::debug_total_arrows++;
 		this->can_fire = false;
@@ -261,7 +262,8 @@ Type_Descriptor weapon_data_type_descriptors[] = {
 	FIELD(Weapon_Data, VT_String, projectile_name),
 	FIELD(Weapon_Data, VT_Int, projectile_w),
 	FIELD(Weapon_Data, VT_Int, projectile_h),
-	FIELD(Weapon_Data, VT_Int, projectile_speed)
+	FIELD(Weapon_Data, VT_Int, projectile_speed),
+	FIELD(Weapon_Data, VT_Float, projectile_lifespan)
 };
 
 void load_weapon_data_csv(CSV_Data* data) {

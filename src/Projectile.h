@@ -26,11 +26,13 @@ struct Projectile {
 	bool destroyed = false;
 	int damage;
 
+	float lifespan;
+
 	Handle handle;
 };
 
 // Damage based off weapon
-void spawn_projectile(std::string_view projectile_name, int damage, int speed, int w, int h, V2 origin_ws, V2 target_ws,
+void spawn_projectile(std::string_view projectile_name, int damage, int speed, int w, int h, float projectile_lifespan, V2 origin_ws, V2 target_ws, 
 	std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
 void update_projectile(Projectile& projectile, float delta_time);

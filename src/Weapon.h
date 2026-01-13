@@ -34,6 +34,7 @@ struct Weapon_Data {
 	int projectile_speed;
 	int projectile_w;
 	int projectile_h;
+	float projectile_lifespan;
 };
 
 enum Weapon_Type {
@@ -68,6 +69,7 @@ struct Weapon {
 	int projectile_h;
 	int projectile_speed;
 	std::string projectile_name;
+	float projectile_lifespan;
 
 	void fire_weapon(Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Faction faction,
 		Storage<Projectile>& projectile_storage, std::vector<Handle>& projectile_handles,
