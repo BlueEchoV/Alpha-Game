@@ -422,7 +422,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					AS_Walking,
 					APS_Speed_Based,
 					AM_Animate_Looping,
-					&game_data.player,
 					mouse_position,
 					game_data.unit_storage,
 					game_data.enemy_unit_handles,
@@ -533,19 +532,23 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					update_projectile(*p, delta_time);
 				}
 			}
-			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
-				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
-				if (unit != NULL) {
-					update_unit(game_data.player, *unit, delta_time);
-				}
-			}
+			// For the units to track
+			std::vector<Rigid_Body> building_rbs;
+			building_rbs.clear();
 			for (Handle building_handle : game_data.building_handles) {
 				Building* b = get_entity_pointer_from_handle(game_data.building_storage, building_handle);
 				if (b != NULL) {
+					building_rbs.push_back(b->rb);
 					// Assuming you have a vector<Unit*> active_enemies populated from game_data.active_enemy_units
 					update_building(*b, delta_time, game_data.enemy_unit_handles, game_data.unit_storage, game_data.camera,
 						game_data.projectile_handles, game_data.projectile_storage, 
 						game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
+				}
+			}
+			for (Handle enemy_unit_handle : game_data.enemy_unit_handles) {
+				Unit* unit = get_entity_pointer_from_handle(game_data.unit_storage, enemy_unit_handle);
+				if (unit != NULL) {
+					update_unit(game_data.player, building_rbs, *unit, delta_time);
 				}
 			}
 
@@ -577,7 +580,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				}
 			}
 
-			spawn_and_update_night_wave(game_data.current_night_wave, game_data.active_enemy_units, game_data.player, game_data.world.map, delta_time,
+			spawn_and_update_night_wave(game_data.current_night_wave, game_data.active_enemy_units, game_data.world.map, delta_time,
 			game_data.enemy_unit_handles, game_data.unit_storage, 
 			game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 

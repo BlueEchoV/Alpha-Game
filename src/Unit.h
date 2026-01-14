@@ -42,7 +42,7 @@ struct Unit {
 	Rigid_Body rb;
 	int w, h;
 
-	Player* target;
+	Rigid_Body target_rb;
 
 	int damage;
 
@@ -59,11 +59,11 @@ struct Unit {
 };
 
 void spawn_unit(Faction faction, std::string_view unit_name, Animation_State starting_as,
-	Animation_Play_Speed starting_aps, Animation_Mode starting_am, Player* target, V2 spawn_pos,
+	Animation_Play_Speed starting_aps, Animation_Mode starting_am, V2 spawn_pos,
 	Storage<Unit>& storage, std::vector<Handle>& handles,
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
 void kill_unit(Unit& unit, int& active_enemy_units_counter);
-void update_unit(Player& p, Unit& unit, float dt);
+void update_unit(Player& p, std::vector<Rigid_Body> building_rbs, Unit& unit, float dt);
 void render_unit(Unit& unit, V2 camera_pos);
 void render_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, float outline_thickness);
 

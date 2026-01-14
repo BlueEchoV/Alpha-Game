@@ -123,7 +123,7 @@ void reset_and_scale_night_wave(std::vector<Handle>& unit_handles, Storage<Unit>
 }
 
 bool temp = false;
-void spawn_and_update_night_wave(Night_Wave& night_wave, int& active_enemy_units, Player& player, Tile_Map& tile_map, float delta_time,
+void spawn_and_update_night_wave(Night_Wave& night_wave, int& active_enemy_units, Tile_Map& tile_map, float delta_time,
 	std::vector<Handle>& unit_handles, Storage<Unit>& unit_storage,
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 
@@ -155,7 +155,6 @@ void spawn_and_update_night_wave(Night_Wave& night_wave, int& active_enemy_units
 					AS_Walking,
 					APS_Fast,
 					AM_Animate_Looping,
-					&player,
 					random_pos_ws,
 					unit_storage,
 					unit_handles,

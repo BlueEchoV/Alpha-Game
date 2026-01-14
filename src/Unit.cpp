@@ -16,7 +16,7 @@ Unit_Data* get_unit_data(std::string unit_type) {
 }
 
 void spawn_unit(Faction faction, std::string_view unit_name, Animation_State starting_as, 
-	Animation_Play_Speed starting_aps, Animation_Mode starting_am, Player* target, V2 spawn_pos, 
+	Animation_Play_Speed starting_aps, Animation_Mode starting_am, V2 spawn_pos, 
 	Storage<Unit>& storage, std::vector<Handle>& handles, 
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 	Unit result = {};
@@ -48,7 +48,8 @@ void spawn_unit(Faction faction, std::string_view unit_name, Animation_State sta
 	result.damage = data->damage;
 	result.attack_cd.max = (1.0f / data->attacks_per_sec);
 	result.attack_cd.current = result.attack_cd.max;
-	result.target = target;
+	// Currently no target
+	result.target_rb = {};
 
 	result.handle = create_handle(storage);
 
@@ -86,7 +87,7 @@ V2 update_unit_position(Unit& unit, float dt) {
 	V2 result = {};
 
 	if (unit.dead == false && unit.us == US_Moving) {
-		unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target->rb.pos_ws, unit.rb.pos_ws);
+		unit.rb.vel = calculate_normalized_origin_to_target_velocity(unit.target_rb.pos_ws, unit.rb.pos_ws);
 
 		unit.rb.pos_ws.x += (unit.rb.vel.x * unit.rb.current_speed) * dt;
 		unit.rb.pos_ws.y += (unit.rb.vel.y * unit.rb.current_speed) * dt;
@@ -95,7 +96,7 @@ V2 update_unit_position(Unit& unit, float dt) {
 	return result;
 };
 
-void update_unit(Player& p, Unit& unit, float dt) {
+void update_unit(Player& p, std::vector<Rigid_Body> building_rbs, Unit& unit, float dt) {
 	float speed = (float)unit.rb.base_speed;
 	bool stop_moving = false;
 
@@ -125,7 +126,7 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	case US_Attacking: {
 		// 1: We need to check if we are in the attack frame of the unit and if damage has yet been applied this cycle (multiple frames
 		// per cycle.
-	if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && cooldown_ready(unit.attack_cd)) {
+		if (unit.at.current_frame_index == unit.attack_hit_frame && !unit.damage_applied && cooldown_ready(unit.attack_cd)) {
 			// 2: Next, we check if we are colliding with the player this frame.
 			if (check_rb_collision(&p.rb, &unit.rb)) {
 				// 3: If we are colliding, we apply the damage to the player and check if the player is dead or not
@@ -153,6 +154,18 @@ void update_unit(Player& p, Unit& unit, float dt) {
 	}
 
 	update_animation_tracker(&unit.at, dt, speed);
+
+	// Update the target
+
+	// Default init to player pos
+	unit.target_rb = p.rb;
+	for (Rigid_Body& rb : building_rbs) {
+		float current_target_distance = calculate_distance_sq(unit.rb.pos_ws, unit.target_rb.pos_ws);
+		float new_target_distance = calculate_distance_sq(unit.rb.pos_ws, rb.pos_ws);
+		if (new_target_distance < current_target_distance) {
+			unit.target_rb = rb;
+		}
+	}
 
 	if (unit.destroyed == false) {
 		if (unit.dead == false) {

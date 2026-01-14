@@ -69,6 +69,7 @@ V2 rotate_point_based_off_angle(float angle_in_degrees, float center_x, float ce
 
 float hypotenuse(float a, float b) {
 	float result = {};
+	/*
 	// 1-2 cpu cycles
 	int x = 4;
 	int y = 2;
@@ -79,6 +80,7 @@ float hypotenuse(float a, float b) {
 	// sqrt requires 20-50 more cycles or more
 	double z = sqrt(y);
 	z++;
+	*/
 
 	result = (float)sqrt(fabs((a * a) + (b * b)));
 
@@ -176,6 +178,7 @@ float calculate_facing_direction_east_counterclockwise(V2 vec) {
     return angle_deg;
 }
 
+// NOTE: About 20-30+ cycles
 float calculate_distance_between(V2 vec_1, V2 vec_2) {
 	float result = {};
 
@@ -183,6 +186,13 @@ float calculate_distance_between(V2 vec_1, V2 vec_2) {
 	result = hypotenuse(direction_vector.x, direction_vector.y);
 
 	return result;
+}
+
+// NOTE: 3-5 times cheaper than calculate_distance_between because it avoids sqrt (20-30 cpu cycles)
+// NOTE: This function is about 3-5 cycles
+float calculate_distance_sq(V2 a, V2 b) {
+    V2 d = a - b;
+    return d.x*d.x + d.y*d.y;
 }
 
 float lerp(float a_starting_val, float b_ending_val, float t_where) {

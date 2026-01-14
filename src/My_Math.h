@@ -38,5 +38,6 @@ float calculate_facing_direction_north_clockwise(V2 vec);
 float calculate_facing_direction_east_counterclockwise(V2 vec);
 
 float calculate_distance_between(V2 vec_1, V2 vec_2);
+float calculate_distance_sq(V2 a, V2 b);
 
 float lerp(float a_starting_val, float b_ending_val, float t_where);
