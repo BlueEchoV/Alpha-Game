@@ -28,9 +28,10 @@ void spawn_unit(Faction faction, std::string_view unit_name, Animation_State sta
 	Unit_Data* data = get_unit_data(std::string(unit_name));
 	result.health_bar = create_health_bar(
 		data->health, 
-		Globals::DEFAULT_HEALTH_BAR_WIDTH, 
-		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
-		data->h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
+		Globals::DEFAULT_PLAYER_HEALTH_BAR_WIDTH, 
+		Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT, 
+		result.w, result.h,
+		data->h / 2 + Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT
 	);
 
 	result.at = create_animation_tracker(ATT_Direction_8_Atlas, unit_name, starting_as, starting_aps, starting_am, true);
@@ -189,8 +190,7 @@ void render_unit(Unit& unit, V2 camera_pos) {
 
 		if (!unit.dead) {
 			V2 health_bar_cs_pos = entity_pos_cs;
-			health_bar_cs_pos.y += unit.health_bar.offset;
-			draw_faction_health_bar(unit.faction, unit.health_bar, health_bar_cs_pos);
+			draw_faction_health_bar(unit.faction, unit.health_bar, health_bar_cs_pos, true);
 		}
 	}
 }
@@ -205,8 +205,7 @@ void render_unit_outlined(Unit& unit, V2 camera_pos, Color_Type outline_color, f
 
 		if (!unit.dead) {
 			V2 health_bar_cs_pos = entity_pos_cs;
-			health_bar_cs_pos.y += unit.health_bar.offset;
-			draw_faction_health_bar(unit.faction, unit.health_bar, health_bar_cs_pos);
+			draw_faction_health_bar(unit.faction, unit.health_bar, health_bar_cs_pos, true);
 		}
 	}
 }

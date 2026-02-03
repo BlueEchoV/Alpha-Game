@@ -48,9 +48,10 @@ Player create_player(std::string_view character_name, V2 spawn_pos_ws,
 
 	result.health_bar = create_health_bar(
 		data.hp, 
-		Globals::DEFAULT_HEALTH_BAR_WIDTH, 
-		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
-		data.h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
+		Globals::DEFAULT_PLAYER_HEALTH_BAR_WIDTH, 
+		Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT, 
+		result.w, result.h,
+		data.h / 2 + Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT
 	);
 
 	float collider_radius = (float)result.h / 6.0f;
@@ -74,9 +75,8 @@ void render_player(Player& p, V2 camera_ws_pos) {
 	draw_animation_tracker(&p.torso, p_draw_rect, 0);
 
 	V2 health_bar_cs_pos = p.rb.pos_ws;
-	health_bar_cs_pos.y += p.health_bar.offset;
 	health_bar_cs_pos = convert_ws_to_cs(health_bar_cs_pos, camera_ws_pos);
-	draw_faction_health_bar(p.faction, p.health_bar, health_bar_cs_pos);
+	draw_faction_health_bar(p.faction, p.health_bar, health_bar_cs_pos, true);
 	p.weapon->draw_ui(health_bar_cs_pos);
 
 	if (Globals::debug_show_colliders) {

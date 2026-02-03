@@ -209,9 +209,9 @@ void Weapon::draw_ui(V2 hb_pos_cs) {
 
 	// Draw the ammo bar
 	if (this->max_ammo > 0) {
-		int inner_health_bar_w = Globals::DEFAULT_HEALTH_BAR_WIDTH;
+		int inner_health_bar_w = Globals::DEFAULT_PLAYER_HEALTH_BAR_WIDTH;
 		// This includes the outline around the health bar
-		int total_health_bar_h = Globals::DEFAULT_HEALTH_BAR_HEIGHT + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
+		int total_health_bar_h = Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT + Globals::DEFAULT_RESOURCE_BAR_OUTLINE * 2;
 
 		int ammo_rect_h = Globals::DEFAULT_RESOURCE_BAR_H;
 		int ammo_rect_w = inner_health_bar_w / this->max_ammo;

@@ -91,7 +91,7 @@ void Portable_Ballista::draw_ui(V2 camera_pos) {
 		Font* font = get_font(FT_Basic);
 
 		V2 pos_cs = convert_ws_to_cs(player->rb.pos_ws, camera_pos);
-		draw_string(*font, "+15% damage", CT_Dark_Yellow, true, pos_cs.x, pos_cs.y + player->h / 2 + player->health_bar.h * 3, 1, true);
+		draw_string(*font, "+15% damage", CT_Dark_Yellow, true, pos_cs.x, pos_cs.y + player->h / 2 + player->health_bar.health_bar_h * 3, 1, true);
 	}
 	draw_ability_icon(AT_Passive, this->name);
 }

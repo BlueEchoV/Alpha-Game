@@ -22,6 +22,9 @@ struct Building_Data {
 
 struct Building {
     std::string building_name;
+
+    Faction faction;
+
     Rigid_Body rb;  
     // The tile the building is on
     int tile_x, tile_y;
@@ -30,8 +33,6 @@ struct Building {
     Animation_Tracker at;
     Health_Bar health_bar;
     int w, h;
-
-    int hp;
 
     Weapon* weapon;
     int attack_range;
@@ -46,7 +47,7 @@ struct Building {
     Color_Type outline_color;
 };
 
-void spawn_building(std::string_view building_name, Color_Type outline_color, bool is_wall, V2 pos_ws,
+void spawn_building(Faction faction, std::string_view building_name, Color_Type outline_color, bool is_wall, V2 pos_ws,
     Storage<Building>& storage, std::vector<Handle>& handles,
     Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
 void update_building(Building& building, float dt, std::vector<Handle>& enemy_handles, Storage<Unit>& unit_storage, Camera camera,

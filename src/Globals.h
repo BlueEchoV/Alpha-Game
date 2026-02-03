@@ -52,8 +52,10 @@ namespace Globals {
 	extern float travel_speed_based_frames_per_second;
 
 	const int MAX_COLLIDERS = 100;
-	const int DEFAULT_HEALTH_BAR_WIDTH = 60;
-	const int DEFAULT_HEALTH_BAR_HEIGHT = 8;
+	const int DEFAULT_PLAYER_HEALTH_BAR_WIDTH = 60;
+	const int DEFAULT_PLAYER_HEALTH_BAR_HEIGHT = 8;
+	const int DEFAULT_BUILDING_HEALTH_BAR_WIDTH = 45;
+	const int DEFAULT_BUILDING_HEALTH_BAR_HEIGHT = 6;
 	const int DEFAULT_RESOURCE_BAR_OUTLINE = 1;
 	const int DEFAULT_RESOURCE_BAR_H = 4;
 

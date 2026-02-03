@@ -15,10 +15,13 @@ Building_Data* get_building_data(std::string building_type) {
 	return &bad_building_data;
 }
 
-void spawn_building(std::string_view building_name, Color_Type outline_color, bool is_wall, V2 pos_ws, 
+void spawn_building(Faction faction, std::string_view building_name, Color_Type outline_color, bool is_wall, V2 pos_ws, 
 	Storage<Building>& storage, std::vector<Handle>& handles, 
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 	Building result = {};
+
+	result.faction = faction;
+
 	result.outline_color = outline_color;
 
 	int tile_taken_x = 0;
@@ -79,7 +82,13 @@ void spawn_building(std::string_view building_name, Color_Type outline_color, bo
 	result.w = data->w;
 	result.h = data->h;
 
-    result.hp = data->hp;
+	result.health_bar = create_health_bar(
+		data->hp, 
+		Globals::DEFAULT_PLAYER_HEALTH_BAR_WIDTH, 
+		Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT, 
+		result.w, result.h,
+		data->h / 2 + Globals::DEFAULT_PLAYER_HEALTH_BAR_HEIGHT
+	);
 
 	equip_weapon(result.weapon, data->weapon_name);
 
@@ -87,9 +96,10 @@ void spawn_building(std::string_view building_name, Color_Type outline_color, bo
 
 	result.health_bar = create_health_bar(
 		data->hp, 
-		Globals::DEFAULT_HEALTH_BAR_WIDTH, 
-		Globals::DEFAULT_HEALTH_BAR_HEIGHT, 
-		data->h / 2 + Globals::DEFAULT_HEALTH_BAR_HEIGHT
+		Globals::DEFAULT_BUILDING_HEALTH_BAR_WIDTH, 
+		Globals::DEFAULT_BUILDING_HEALTH_BAR_HEIGHT, 
+		result.w, result.h,
+		data->h / 2 + Globals::DEFAULT_BUILDING_HEALTH_BAR_HEIGHT
 	);
 
 	result.upgrade_level = 0;
@@ -159,6 +169,8 @@ void render_building_outlined(Building& building, V2 camera_pos) {
 	MP_Rect dst_rect = {(int)cs_pos.x, (int)cs_pos.y, building.w, building.h};
 
 	draw_animation_tracker_outlined(&building.at, dst_rect, 0, building.outline_color, 2);
+
+	draw_faction_health_bar(building.faction, building.health_bar, cs_pos, false);
 }
 
 // void destroy_building(Building& building);  

@@ -20,11 +20,12 @@ struct Health_Bar {
 	int offset;
 	int max_hp;
 	int current_hp;
-	int w, h;
+	int health_bar_w, health_bar_h;
+	int attached_entity_w, attached_entity_h;
 };
 
-Health_Bar create_health_bar(int hp, int w, int h, int offset);
+Health_Bar create_health_bar(int hp, int hb_w, int hb_h, int attached_entity_w, int attached_entity_h, int offset);
 void draw_outline_box(Color_Type c, MP_Rect* rect, int outline_thickness, bool exclude_outline_from_w_and_h, bool center);
-void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos);
-void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos);
+void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos_cs, bool is_pos_cs_centered);
+void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos_cs, bool is_pos_cs_centered);
 

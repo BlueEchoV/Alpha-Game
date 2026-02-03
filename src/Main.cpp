@@ -304,7 +304,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			V2 mouse_pos_ws = convert_cs_to_ws(mouse_pos, game_data.camera.pos_ws);
 			if (!is_point_in_rect(&ready_button_area, mouse_pos, true)) {
 				if (key_pressed(VK_LBUTTON)) {
-					spawn_building("bone_turret", CT_Black, false, mouse_pos_ws,
+					spawn_building(F_Allies, "bone_turret", CT_Black, false, mouse_pos_ws,
 						game_data.building_storage, game_data.building_handles,
 						game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 				}

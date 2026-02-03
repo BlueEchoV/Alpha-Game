@@ -54,14 +54,16 @@ bool trigger_cooldown(Cooldown& cd) {
 	return false;
 }
 
-Health_Bar create_health_bar(int hp, int w, int h, int offset) {
+Health_Bar create_health_bar(int hp, int hb_w, int hb_h, int attached_entity_w, int attached_entity_h, int offset) {
 	Health_Bar result = {};
 
 	result.offset = offset;
 	result.max_hp = hp;
 	result.current_hp = result.max_hp;
-	result.w = w;
-	result.h = h;
+	result.health_bar_w = hb_w;
+	result.health_bar_h = hb_h;
+	result.attached_entity_w = attached_entity_w;
+	result.attached_entity_h = attached_entity_h;
 
 	return result;
 }
@@ -123,39 +125,45 @@ void draw_outline_box(Color_Type c, MP_Rect* rect, int outline_thickness, bool e
 	mp_render_fill_rect(&e);
 }
 
-void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos) {
+void draw_health_bar(Color_Type c, Health_Bar& health_bar, V2 pos_cs, bool is_pos_cs_centered) {
+	V2 updated_pos = pos_cs;
+	updated_pos.y += health_bar.offset;
+	if (!is_pos_cs_centered) {
+		updated_pos = { updated_pos.x + (float)(health_bar.attached_entity_w / 2), updated_pos.y + (float)(health_bar.attached_entity_h / 2) };
+	}
+
 	// EXAMPLE: Hp = 500 / 1000
 	float hp_percent = (float)health_bar.current_hp / (float)health_bar.max_hp;
 	clamp(hp_percent, 0.0f, 1.0f);
 
 	// Green section
 	MP_Rect green_rect = {};
-	green_rect.x = (int)pos.x - health_bar.w / 2;
-	green_rect.y = (int)pos.y - health_bar.h / 2;
-	green_rect.w = (int)((float)health_bar.w * hp_percent);
-	green_rect.w = (int)lerp(0.0f, (float)health_bar.w, hp_percent);
-	green_rect.h = health_bar.h;
+	green_rect.x = (int)updated_pos.x - health_bar.health_bar_w / 2;
+	green_rect.y = (int)updated_pos.y - health_bar.health_bar_h / 2;
+	green_rect.w = (int)((float)health_bar.health_bar_w * hp_percent);
+	green_rect.w = (int)lerp(0.0f, (float)health_bar.health_bar_w, hp_percent);
+	green_rect.h = health_bar.health_bar_h;
 	mp_set_render_draw_color(c);
 	mp_render_fill_rect(&green_rect);
 
 	// Red section
 	MP_Rect red_rect = {};
 	red_rect.x = green_rect.x + green_rect.w;
-	red_rect.y = (int)pos.y - health_bar.h / 2;
-	red_rect.w = health_bar.w - green_rect.w;
-	red_rect.h = health_bar.h;
+	red_rect.y = (int)updated_pos.y - health_bar.health_bar_h / 2;
+	red_rect.w = health_bar.health_bar_w - green_rect.w;
+	red_rect.h = health_bar.health_bar_h;
 	mp_set_render_draw_color(CT_Dark_Grey);
 	mp_render_fill_rect(&red_rect);
 
 	MP_Rect final_outline_rect = {};
-	final_outline_rect.x = (int)pos.x;
-	final_outline_rect.y = (int)pos.y;
-	final_outline_rect.w = health_bar.w;
-	final_outline_rect.h = health_bar.h;
+	final_outline_rect.x = (int)updated_pos.x;
+	final_outline_rect.y = (int)updated_pos.y;
+	final_outline_rect.w = health_bar.health_bar_w;
+	final_outline_rect.h = health_bar.health_bar_h;
 	draw_outline_box(CT_Black, &final_outline_rect, 1, true , true);
 }
 
-void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {
+void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos_cs, bool is_pos_cs_centered) {
 	Color_Type c;
 
 	switch (faction) {
@@ -164,7 +172,7 @@ void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {
 		break;
 	}
 	case F_Allies: {
-		c = CT_Dark_Blue;
+		c = CT_Orange;
 		break;
 	}
 	case F_Enemies: {
@@ -177,7 +185,7 @@ void draw_faction_health_bar(Faction faction, Health_Bar& health_bar, V2 pos) {
 	}
 	}
 
-	draw_health_bar(c, health_bar, pos);
+	draw_health_bar(c, health_bar, pos_cs, is_pos_cs_centered);
 }
 
 
