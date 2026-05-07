@@ -36,6 +36,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	Globals::renderer = mp_create_renderer(hInstance);
 
+	AudioEngine audio_engine = {};
+	audio_engine.init();
+	// TODO: Don't forget to call de-init
+
 	// Just raw images
 	load_images();
 
@@ -62,6 +66,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	open_csv_data_file(&weapon_data_csv);
 	load_weapon_data_csv(&weapon_data_csv);
 	close_csv_data_file(&weapon_data_csv);
+
+	// Loads sounds referenced by weapon_data_map; must run after the weapon CSV is loaded.
+	load_sounds();
 
 #if 0
 	CSV_Data projectile_data_csv = create_open_csv_data("data\\projectile_data.csv");
@@ -396,7 +403,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 				V2 mouse_ws_pos_target = convert_cs_to_ws(mouse_cs_pos_target, game_data.camera.pos_ws);
 
 				player->weapon->fire_weapon(game_data.camera, proj_spawn_pos, mouse_ws_pos_target, F_Player,
-					game_data.projectile_storage, game_data.projectile_handles, 
+					game_data.projectile_storage, game_data.projectile_handles,
 					game_data.entities_draw_order_storage, game_data.entities_draw_order_handles);
 			}
 
@@ -566,11 +573,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 					}
 					if (check_rb_collision(&proj->rb, &unit->rb)) {
 						std::string damage_number_background_img_name = "damage_number_background";
-						create_and_add_damage_number(game_data.damage_numbers, proj->rb.pos_ws, { 0.0f, 1.0 }, 50, proj->damage, 2.0f, 
+						create_and_add_damage_number(game_data.damage_numbers, proj->rb.pos_ws, { 0.0f, 1.0 }, 50, proj->damage, 2.0f,
 							damage_number_background_img_name);
 
 						// TODO: Push back attachable entities here
 						proj->destroyed = true;
+						play_sound(proj->impact_sound_name);
 
 						unit->health_bar.current_hp -= proj->damage;
 						if (unit->health_bar.current_hp <= 0) {

@@ -35,6 +35,9 @@ struct Weapon_Data {
 	int projectile_w;
 	int projectile_h;
 	float projectile_lifespan;
+
+	std::string fire_sound_name;
+	std::string impact_sound_name;
 };
 
 enum Weapon_Type {
@@ -71,6 +74,9 @@ struct Weapon {
 	std::string projectile_name;
 	float projectile_lifespan;
 
+	std::string fire_sound_name;
+	std::string impact_sound_name;
+
 	void fire_weapon(Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Faction faction,
 		Storage<Projectile>& projectile_storage, std::vector<Handle>& projectile_handles,
 		Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles);
@@ -95,4 +101,6 @@ void delete_weapon(Weapon*& weapon);
 // Draw weapon UI (Ammo and whatnot)
 
 void load_weapon_data_csv(CSV_Data* data);
+
+extern std::unordered_map<std::string, Weapon_Data> weapon_data_map;
 

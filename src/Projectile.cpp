@@ -17,12 +17,13 @@ Projectile_Data get_projectile_data(std::string_view projectile_name) {
 }
 #endif
 
-void spawn_projectile(std::string_view projectile_name, int damage, int speed, int w, int h, float projectile_lifespan, V2 origin_ws, V2 target_ws, 
+void spawn_projectile(std::string_view projectile_name, std::string_view impact_sound_name, int damage, int speed, int w, int h, float projectile_lifespan, V2 origin_ws, V2 target_ws,
 	std::vector<Handle>& projectile_handles, Storage<Projectile>& projectile_storage,
 	Storage<Draw_Order>& draw_order_storage, std::vector<Handle>& draw_order_handles) {
 
 	Projectile result = {};
 	result.damage = damage;
+	result.impact_sound_name = std::string(impact_sound_name);
 
 	result.rb = create_rigid_body(origin_ws, speed);
 	V2 vel_normalized = calculate_normalized_origin_to_target_velocity(target_ws, origin_ws);

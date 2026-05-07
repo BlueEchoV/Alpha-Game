@@ -1,4 +1,5 @@
 #include "Weapon.h"
+#include "Audio_xAudio2.h"
 
 void create_and_add_damage_number(std::vector<Damage_Number>& damage_numbers, V2 pos_ws, V2 vel_normalized, float speed, 
 	int damage, float lifetime, std::string& background_image_name) {
@@ -123,6 +124,9 @@ void equip_weapon(Weapon*& weapon, std::string weapon_name) {
 	weapon->projectile_h = current_weapon_data.projectile_h;
 	weapon->projectile_speed = current_weapon_data.projectile_speed;
 	weapon->projectile_lifespan = current_weapon_data.projectile_lifespan;
+
+	weapon->fire_sound_name = current_weapon_data.fire_sound_name;
+	weapon->impact_sound_name = current_weapon_data.impact_sound_name;
 }
 
 void delete_weapon(Weapon*& weapon) {
@@ -154,10 +158,11 @@ void Weapon::fire_weapon(Camera camera, V2 spawn_pos_ws, V2 target_pos_ws, Facti
 	}
 
 	// UES PROGRESS TIME INSTEAD
-	if (this->can_fire && this->ammo > 0 && this->ammo <= this->max_ammo && this->reload_progress >= (1.0f / (float)this->reload_per_sec)) { 
+	if (this->can_fire && this->ammo > 0 && this->ammo <= this->max_ammo && this->reload_progress >= (1.0f / (float)this->reload_per_sec)) {
 		// Change this to fire weapon
-		spawn_projectile(this->projectile_name, this->damage, this->projectile_speed, this->projectile_w, this->projectile_h, this->projectile_lifespan,
+		spawn_projectile(this->projectile_name, this->impact_sound_name, this->damage, this->projectile_speed, this->projectile_w, this->projectile_h, this->projectile_lifespan,
 			spawn_pos_ws, target_pos_ws, projectile_handles, projectile_storage, draw_order_storage, draw_order_handles);
+		play_sound(this->fire_sound_name);
 		Globals::debug_total_arrows++;
 		this->can_fire = false;
 		this->fire_cooldown = 1.0f / this->attacks_per_sec;
@@ -263,7 +268,9 @@ Type_Descriptor weapon_data_type_descriptors[] = {
 	FIELD(Weapon_Data, VT_Int, projectile_w),
 	FIELD(Weapon_Data, VT_Int, projectile_h),
 	FIELD(Weapon_Data, VT_Int, projectile_speed),
-	FIELD(Weapon_Data, VT_Float, projectile_lifespan)
+	FIELD(Weapon_Data, VT_Float, projectile_lifespan),
+	FIELD(Weapon_Data, VT_String, fire_sound_name),
+	FIELD(Weapon_Data, VT_String, impact_sound_name)
 };
 
 void load_weapon_data_csv(CSV_Data* data) {
